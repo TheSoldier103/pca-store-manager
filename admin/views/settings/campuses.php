@@ -49,7 +49,7 @@
     </thead>
     <tbody>
         <?php
-        $campuses_table = $wpdb->prefix . 'pca_campuses';
+        $campuses_table = $wpdb->prefix . 'pca_store_campuses';
         $rows = $wpdb->get_results("
             SELECT c.*, s.name AS school_name
             FROM $campuses_table c

@@ -23,7 +23,7 @@
     <tbody>
         <?php
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_schools';
+        $table = $wpdb->prefix . 'pca_store_schools';
         $rows = $wpdb->get_results("SELECT * FROM $table ORDER BY name ASC");
 
         if ($rows) {
