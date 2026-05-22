@@ -29,7 +29,7 @@ class PCA_Store_Settings_Controller {
 
     public static function save_school() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_schools';
+        $table = $wpdb->prefix . 'pca_store_schools';
 
         $id   = intval($_POST['id'] ?? 0);
         $name = sanitize_text_field($_POST['name']);
@@ -50,7 +50,7 @@ class PCA_Store_Settings_Controller {
 
     public static function delete_school() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_schools';
+        $table = $wpdb->prefix . 'pca_store_schools';
         $id    = intval($_POST['id']);
 
         $wpdb->delete($table, ['id' => $id]);
@@ -62,7 +62,7 @@ class PCA_Store_Settings_Controller {
 
     public static function save_campus() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_campuses';
+        $table = $wpdb->prefix . 'pca_store_campuses';
 
         $id        = intval($_POST['id'] ?? 0);
         $name      = sanitize_text_field($_POST['name']);
@@ -91,7 +91,7 @@ class PCA_Store_Settings_Controller {
 
     public static function delete_campus() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_campuses';
+        $table = $wpdb->prefix . 'pca_store_campuses';
         $id    = intval($_POST['id']);
 
         $wpdb->delete($table, ['id' => $id]);
