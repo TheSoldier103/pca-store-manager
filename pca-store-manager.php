@@ -35,11 +35,15 @@ register_activation_hook( __FILE__, [ 'PCA_Store_Activator', 'activate' ] );
 add_action( 'plugins_loaded', function() {
     PCA_Store_Permissions::init();
     PCA_Store_Admin_Menu::init();
+});
+
+add_action('init', function() {
     PCA_Store_Settings_Controller::init();
     PCA_Store_Items_Controller::init();
     PCA_Store_Stock_Controller::init();
     PCA_Store_Reports_Controller::init();
 });
+
 
 function pca_store_manager_upgrade_check() {
     $current = get_option('pca_store_db_version');
