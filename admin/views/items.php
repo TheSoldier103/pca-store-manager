@@ -2,27 +2,29 @@
 $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'books';
 
 $tabs = [
-    'books'    => 'Books',
-    'uniforms' => 'Uniforms',
-    'lowstock' => 'Low Stock',
+    'books'      => 'Books',
+    'packs'      => 'Book Packs',
+    'stationery' => 'Stationery',
+    'lowstock'   => 'Low Stock'
 ];
 
-PCA_Store_Admin_Tabs::render_tabs( $tabs, $active_tab );
+PCA_Store_Admin_Tabs::render_tabs($tabs, $active_tab);
 
 switch ($active_tab) {
 
     case 'books':
-        echo '<h2>Books Inventory</h2>';
-        echo '<p>Books table will go here.</p>';
+        include __DIR__ . '/items/books-list.php';
         break;
 
-    case 'uniforms':
-        echo '<h2>Uniforms Inventory</h2>';
-        echo '<p>Uniforms table will go here.</p>';
+    case 'packs':
+        include __DIR__ . '/items/packs-list.php';
+        break;
+
+    case 'stationery':
+        include __DIR__ . '/items/stationery-list.php';
         break;
 
     case 'lowstock':
-        echo '<h2>Low Stock Items</h2>';
-        echo '<p>Low stock list will go here.</p>';
+        include __DIR__ . '/items/lowstock-list.php';
         break;
 }

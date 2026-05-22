@@ -87,6 +87,22 @@ class PCA_Store_Activator {
             KEY name (name)
         ) $charset;";
 
+
+        // ---------------------------------------------------------
+        // Pack Items
+        // ---------------------------------------------------------
+        $tables[] = "CREATE TABLE {$prefix}item_packs (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            pack_id BIGINT UNSIGNED NOT NULL,
+            child_item_id BIGINT UNSIGNED NOT NULL,
+            quantity INT NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY pack_id (pack_id),
+            KEY child_item_id (child_item_id)
+        ) $charset;";
+
+
         // ---------------------------------------------------------
         // Suppliers
         // ---------------------------------------------------------
