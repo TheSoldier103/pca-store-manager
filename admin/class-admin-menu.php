@@ -91,17 +91,17 @@ class PCA_Store_Admin_Menu {
             [__CLASS__, 'render_audit_log']
         );
 
-        // Settings
-        if (get_option('pca_roles_can_manage_settings')) {
-            add_submenu_page(
-                'pca-store',
-                'Settings',
-                'Settings',
-                'manage_options',
-                'pca-store-settings',
-                [$this, 'render_settings_page']
-            );
-        }
+        // // Settings
+        // if (get_option('pca_roles_can_manage_settings')) {
+        //     add_submenu_page(
+        //         'pca-store',
+        //         'Settings',
+        //         'Settings',
+        //         'manage_options',
+        //         'pca-store-settings',
+        //         [$this, 'render_settings_page']
+        //     );
+        // }
 
         add_submenu_page(
             'pca-store-dashboard',
