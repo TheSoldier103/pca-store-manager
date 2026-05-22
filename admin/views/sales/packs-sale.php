@@ -1,83 +1,73 @@
-<h2 class="title">Book Packs Sale</h2>
+<h2 class="title">Record Book Sale</h2>
 
-<div class="pca-sale-form">
+<table class="form-table">
 
-    <table class="form-table">
+    <tr>
+        <th><label>Select Book</label></th>
+        <td>
+            <select id="pca-sale-item" class="regular-text">
+                <option value="">Select Book</option>
+                <?php
+                global $wpdb;
+                $items = $wpdb->prefix . 'pca_store_items';
 
-        <tr>
-            <th><label>Select Pack</label></th>
-            <td>
-                <select id="pca-sale-pack">
-                    <option value="">Select Pack</option>
-                    <?php
-                    global $wpdb;
-                    $items = $wpdb->prefix . 'pca_store_items';
+                $books = $wpdb->get_results("
+                    SELECT id, name, selling_price, current_stock
+                    FROM $items
+                    WHERE department='books' AND item_type='single' AND status='active'
+                    ORDER BY name ASC
+                ");
 
-                    $packs = $wpdb->get_results("
-                        SELECT id, name, selling_price
-                        FROM $items
-                        WHERE department='books' AND item_type='pack'
-                        ORDER BY name ASC
-                    ");
+                foreach ($books as $b) {
+                    echo "<option value='{$b->id}' data-price='{$b->selling_price}' data-stock='{$b->current_stock}'>
+                            {$b->name} (Stock: {$b->current_stock})
+                          </option>";
+                }
+                ?>
+            </select>
+        </td>
+    </tr>
 
-                    foreach ($packs as $p) {
-                        echo "<option value='{$p->id}' data-price='{$p->selling_price}'>
-                                {$p->name}
-                              </option>";
-                    }
-                    ?>
-                </select>
-            </td>
-        </tr>
+    <tr>
+        <th><label>Quantity</label></th>
+        <td><input type="number" id="pca-sale-qty" value="1"></td>
+    </tr>
 
-        <tr>
-            <th><label>Quantity</label></th>
-            <td><input type="number" id="pca-sale-pack-qty" value="1"></td>
-        </tr>
+    <tr>
+        <th><label>Price</label></th>
+        <td><input type="number" id="pca-sale-price" readonly></td>
+    </tr>
 
-    </table>
+    <tr>
+        <th><label>Discount (optional)</label></th>
+        <td><input type="number" id="pca-sale-discount" value="0"></td>
+    </tr>
 
-    <div id="pca-pack-contents" style="display:none;">
-        <h3>Pack Contents</h3>
-        <p>You may remove items (e.g., if a sibling already has the book).</p>
+    <tr>
+        <th><label>Receipt Number</label></th>
+        <td><input type="text" id="pca-sale-receipt" class="regular-text"></td>
+    </tr>
 
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th>Book</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody id="pca-pack-items"></tbody>
-        </table>
-    </div>
+    <tr>
+        <th><label>Payment Method</label></th>
+        <td>
+            <select id="pca-sale-method">
+                <option value="cash">Cash</option>
+                <option value="transfer">Transfer</option>
+                <option value="pos">POS</option>
+            </select>
+        </td>
+    </tr>
 
-    <p>
-        <button class="button button-primary" id="pca-add-pack-to-cart">Add Pack to Cart</button>
-    </p>
+    <tr>
+        <th><label>Notes</label></th>
+        <td><textarea id="pca-sale-notes" class="large-text"></textarea></td>
+    </tr>
 
-</div>
-
-<hr>
-
-<h3>Cart</h3>
-
-<table class="wp-list-table widefat fixed striped" id="pca-sale-cart">
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Discount</th>
-            <th>Total</th>
-            <th width="80">Remove</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
 </table>
 
+<input type="hidden" id="pca-sale-department" value="books">
+
 <p>
-    <button class="button button-primary" id="pca-complete-sale">Complete Sale</button>
+    <button class="button button-primary" id="pca-record-sale-btn">Record Sale</button>
 </p>

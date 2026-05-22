@@ -20,6 +20,8 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controller.php';
 PCA_Store_Items_Controller::init();
 
+require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
+PCA_Store_Stock_Controller::init();
 
 
 register_activation_hook( __FILE__, [ 'PCA_Store_Activator', 'activate' ] );

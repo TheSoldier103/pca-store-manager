@@ -1,71 +1,68 @@
-<h2 class="title">Stationery Sale</h2>
+<h2 class="title">Record Stationery Sale</h2>
 
-<div class="pca-sale-form">
+<table class="form-table">
 
-    <table class="form-table">
+    <tr>
+        <th><label>Select Item</label></th>
+        <td>
+            <select id="pca-sale-item">
+                <option value="">Select Item</option>
+                <?php
+                global $wpdb;
+                $items = $wpdb->prefix . 'pca_store_items';
 
-        <tr>
-            <th><label>Select Item</label></th>
-            <td>
-                <select id="pca-sale-stationery">
-                    <option value="">Select Item</option>
-                    <?php
-                    global $wpdb;
-                    $items = $wpdb->prefix . 'pca_store_items';
+                $stationery = $wpdb->get_results("
+                    SELECT id, name, selling_price, current_stock
+                    FROM $items
+                    WHERE department='stationery' AND status='active'
+                    ORDER BY name ASC
+                ");
 
-                    $stationery = $wpdb->get_results("
-                        SELECT id, name, selling_price, current_stock
-                        FROM $items
-                        WHERE department='stationery'
-                        ORDER BY name ASC
-                    ");
+                foreach ($stationery as $s) {
+                    echo "<option value='{$s->id}' data-price='{$s->selling_price}' data-stock='{$s->current_stock}'>
+                            {$s->name} (Stock: {$s->current_stock})
+                          </option>";
+                }
+                ?>
+            </select>
+        </td>
+    </tr>
 
-                    foreach ($stationery as $s) {
-                        echo "<option value='{$s->id}' data-price='{$s->selling_price}' data-stock='{$s->current_stock}'>
-                                {$s->name} (Stock: {$s->current_stock})
-                              </option>";
-                    }
-                    ?>
-                </select>
-            </td>
-        </tr>
+    <tr>
+        <th><label>Quantity</label></th>
+        <td><input type="number" id="pca-sale-qty" value="1"></td>
+    </tr>
 
-        <tr>
-            <th><label>Quantity</label></th>
-            <td><input type="number" id="pca-sale-stationery-qty" value="1"></td>
-        </tr>
+    <tr>
+        <th><label>Price</label></th>
+        <td><input type="number" id="pca-sale-price" readonly></td>
+    </tr>
 
-        <tr>
-            <th><label>Price</label></th>
-            <td><input type="number" id="pca-sale-stationery-price" readonly></td>
-        </tr>
+    <tr>
+        <th><label>Receipt Number</label></th>
+        <td><input type="text" id="pca-sale-receipt"></td>
+    </tr>
 
-    </table>
+    <tr>
+        <th><label>Payment Method</label></th>
+        <td>
+            <select id="pca-sale-method">
+                <option value="cash">Cash</option>
+                <option value="transfer">Transfer</option>
+                <option value="pos">POS</option>
+            </select>
+        </td>
+    </tr>
 
-    <p>
-        <button class="button button-primary" id="pca-add-stationery-to-cart">Add to Cart</button>
-    </p>
+    <tr>
+        <th><label>Notes</label></th>
+        <td><textarea id="pca-sale-notes" class="large-text"></textarea></td>
+    </tr>
 
-</div>
-
-<hr>
-
-<h3>Cart</h3>
-
-<table class="wp-list-table widefat fixed striped" id="pca-sale-cart">
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Discount</th>
-            <th>Total</th>
-            <th width="80">Remove</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
 </table>
 
+<input type="hidden" id="pca-sale-department" value="stationery">
+
 <p>
-    <button class="button button-primary" id="pca-complete-sale">Complete Sale</button>
+    <button class="button button-primary" id="pca-record-sale-btn">Record Sale</button>
 </p>
