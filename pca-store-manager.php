@@ -79,3 +79,9 @@ add_action('admin_enqueue_scripts', function($hook) {
 });
 
 
+add_action('wp_ajax_pca_debug_test', function() {
+    wp_send_json_success([
+        'settings_controller_exists' => class_exists('PCA_Store_Settings_Controller'),
+        'actions_registered' => has_action('wp_ajax_pca_settings_save_school'),
+    ]);
+});
