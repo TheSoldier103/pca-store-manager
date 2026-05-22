@@ -225,3 +225,101 @@ jQuery(function($){
     });
 
 });
+
+// SAVE SCHOOL
+jQuery(document).on('click', '#pca-save-school', function(){
+
+    let data = {
+        action: 'pca_settings_save_school',
+        name: jQuery('#pca-school-name').val()
+    };
+
+    jQuery.post(ajaxurl, data, function(response){
+        alert(response.data.message);
+        location.reload();
+    });
+});
+
+// DELETE SCHOOL
+jQuery(document).on('click', '.pca-delete-school', function(e){
+    e.preventDefault();
+
+    if (!confirm('Delete this school?')) return;
+
+    let id = jQuery(this).data('id');
+
+    jQuery.post(ajaxurl, {
+        action: 'pca_settings_delete_school',
+        id: id
+    }, function(response){
+        alert(response.data.message);
+        location.reload();
+    });
+});
+
+
+// SAVE DEPARTMENT
+jQuery(document).on('click', '#pca-save-department', function(){
+
+    let data = {
+        action: 'pca_settings_save_department',
+        name: jQuery('#pca-dept-name').val(),
+        code: jQuery('#pca-dept-code').val()
+    };
+
+    jQuery.post(ajaxurl, data, function(response){
+        alert(response.data.message);
+        location.reload();
+    });
+});
+
+// DELETE DEPARTMENT
+jQuery(document).on('click', '.pca-delete-department', function(e){
+    e.preventDefault();
+
+    if (!confirm('Delete this department?')) return;
+
+    let id = jQuery(this).data('id');
+
+    jQuery.post(ajaxurl, {
+        action: 'pca_settings_delete_department',
+        id: id
+    }, function(response){
+        alert(response.data.message);
+        location.reload();
+    });
+});
+
+jQuery(function($){
+
+    $('#pca-save-roles').on('click', function(){
+
+        let data = {
+            action: 'pca_settings_save_roles',
+            can_edit_stock: $('#pca-role-edit-stock').is(':checked') ? 1 : 0,
+            can_view_reports: $('#pca-role-view-reports').is(':checked') ? 1 : 0,
+            can_manage_settings: $('#pca-role-manage-settings').is(':checked') ? 1 : 0
+        };
+
+        $.post(ajaxurl, data, function(response){
+            alert(response.data.message);
+        });
+    });
+
+});
+
+jQuery(function($){
+
+    $('#pca-save-advanced').on('click', function(){
+
+        let data = {
+            action: 'pca_settings_save_advanced',
+            debug_mode: $('#pca-advanced-debug').is(':checked') ? 1 : 0
+        };
+
+        $.post(ajaxurl, data, function(response){
+            alert(response.data.message);
+        });
+    });
+
+});

@@ -1,3 +1,14 @@
+<?php if (!get_option('pca_roles_can_edit_stock')): ?>
+
+    <div class="notice notice-error">
+        <p>You do not have permission to edit stock.</p>
+    </div>
+
+    <?php return; ?>
+
+<?php endif; ?>
+
+
 <h2 class="title">Record Damage / Loss</h2>
 
 <table class="form-table">
