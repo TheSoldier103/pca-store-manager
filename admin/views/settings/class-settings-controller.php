@@ -51,6 +51,8 @@ class PCA_Store_Settings_Controller {
         $wpdb->show_errors();
         global $wpdb;
         $table = $wpdb->prefix . 'pca_store_schools';
+        error_log("SAVE SCHOOL FIRED");
+
 
         $id   = intval($_POST['id'] ?? 0);
         $name = sanitize_text_field($_POST['name']);
@@ -80,6 +82,8 @@ class PCA_Store_Settings_Controller {
         }
 
         wp_send_json_success(['message' => 'School saved', 'id' => $id]);
+        error_log("SAVE SCHOOL FIRED");
+
     }
 
     public static function delete_school() {
