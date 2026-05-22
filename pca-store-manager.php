@@ -22,3 +22,15 @@ add_action( 'plugins_loaded', function() {
     PCA_Store_Permissions::init();
     PCA_Store_Admin_Menu::init();
 });
+
+function pca_store_manager_upgrade_check() {
+    $current = get_option('pca_store_db_version');
+
+    // First install or upgrade
+    if ($current !== '1.0.0') {
+        PCA_Store_Activator::create_tables();
+        update_option('pca_store_db_version', '1.0.0');
+    }
+}
+add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
+
