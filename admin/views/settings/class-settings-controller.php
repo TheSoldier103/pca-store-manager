@@ -3,27 +3,25 @@
 class PCA_Store_Settings_Controller {
 
     public static function init() {
-        // Schools
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         add_action('wp_ajax_pca_settings_save_school', [__CLASS__, 'save_school']);
         add_action('wp_ajax_pca_settings_delete_school', [__CLASS__, 'delete_school']);
 
-        // Campuses
         add_action('wp_ajax_pca_settings_save_campus', [__CLASS__, 'save_campus']);
         add_action('wp_ajax_pca_settings_delete_campus', [__CLASS__, 'delete_campus']);
 
-        // Departments
         add_action('wp_ajax_pca_settings_save_department', [__CLASS__, 'save_department']);
         add_action('wp_ajax_pca_settings_delete_department', [__CLASS__, 'delete_department']);
 
-        // Receipt format
         add_action('wp_ajax_pca_settings_save_receipt', [__CLASS__, 'save_receipt_settings']);
-
-        // Roles & permissions (simple flag)
         add_action('wp_ajax_pca_settings_save_roles', [__CLASS__, 'save_roles_settings']);
-
-        // Advanced
         add_action('wp_ajax_pca_settings_save_advanced', [__CLASS__, 'save_advanced_settings']);
     }
+
 
     /* ---------- SCHOOLS ---------- */
 
