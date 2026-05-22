@@ -36,7 +36,7 @@ register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
 
 /*
 |--------------------------------------------------------------------------
-| LOAD PERMISSIONS + MENU (plugins_loaded)
+| INITIALISE PERMISSIONS + MENU
 |--------------------------------------------------------------------------
 */
 add_action('plugins_loaded', function () {
@@ -46,19 +46,15 @@ add_action('plugins_loaded', function () {
 
 /*
 |--------------------------------------------------------------------------
-| REGISTER ALL AJAX CONTROLLERS (admin_init)
+| REGISTER CONTROLLERS IMMEDIATELY
 |--------------------------------------------------------------------------
-| This is the FIX.
-| admin_init ALWAYS fires on admin-ajax.php.
-| init DOES NOT always fire on admin-ajax.php.
+| No hooks, no timing issues: actions are registered as soon as plugin loads.
 |--------------------------------------------------------------------------
 */
-add_action('admin_init', function () {
-    PCA_Store_Settings_Controller::init();
-    PCA_Store_Items_Controller::init();
-    PCA_Store_Stock_Controller::init();
-    PCA_Store_Reports_Controller::init();
-});
+PCA_Store_Settings_Controller::init();
+PCA_Store_Items_Controller::init();
+PCA_Store_Stock_Controller::init();
+PCA_Store_Reports_Controller::init();
 
 /*
 |--------------------------------------------------------------------------
