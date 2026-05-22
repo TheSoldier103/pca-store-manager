@@ -4,7 +4,7 @@ class PCA_Store_Activator {
 
     public static function activate() {
         self::create_tables();
-        update_option('pca_store_db_version', '1.0');
+        update_option('pca_store_db_version', '1.5.22');
     }
 
     protected static function create_tables() {
