@@ -1,5 +1,8 @@
 <?php
 
+error_log("SETTINGS CONTROLLER INIT CALLED");
+
+
 class PCA_Store_Settings_Controller {
 
     public static function init() {
@@ -7,6 +10,9 @@ class PCA_Store_Settings_Controller {
         if (!current_user_can('manage_options')) {
             return;
         }
+
+        error_log("SAVE SCHOOL CALLBACK REACHED");
+
 
         add_action('wp_ajax_pca_settings_save_school', [__CLASS__, 'save_school']);
         add_action('wp_ajax_pca_settings_delete_school', [__CLASS__, 'delete_school']);
@@ -52,6 +58,8 @@ class PCA_Store_Settings_Controller {
         global $wpdb;
         $table = $wpdb->prefix . 'pca_store_schools';
         error_log("SAVE SCHOOL FIRED");
+        error_log("SAVE SCHOOL CALLBACK REACHED");
+
 
 
         $id   = intval($_POST['id'] ?? 0);
