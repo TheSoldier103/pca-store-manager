@@ -7,12 +7,7 @@ class PCA_Store_Settings_Controller {
 
     public static function init() {
 
-        if (!current_user_can('manage_options')) {
-            return;
-        }
-
-        error_log("SAVE SCHOOL CALLBACK REACHED");
-
+        error_log("SETTINGS CONTROLLER INIT CALLED");
 
         add_action('wp_ajax_pca_settings_save_school', [__CLASS__, 'save_school']);
         add_action('wp_ajax_pca_settings_delete_school', [__CLASS__, 'delete_school']);
@@ -54,7 +49,13 @@ class PCA_Store_Settings_Controller {
 
 
     public static function save_school() {
-        $wpdb->show_errors();
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error([
+                'message' => 'Permission denied'
+            ], 403);
+        }
+        
         global $wpdb;
         $table = $wpdb->prefix . 'pca_store_schools';
         error_log("SAVE SCHOOL FIRED");
