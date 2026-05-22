@@ -78,7 +78,7 @@ class PCA_Store_Admin_Menu {
             'manage_options',
             'pca-store-reports',
             // [$this, 'render_reports_page']
-            [__CLASS__, 'render_reports_page']
+            [__CLASS__, 'render_reports']
         );
 
         // Audit Log
