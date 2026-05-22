@@ -16,3 +16,22 @@ jQuery(document).ready(function($){
     });
 
 });
+
+jQuery(document).ready(function($){
+
+    // Open modal
+    $('#pca-add-supplier-btn').on('click', function(){
+        $('#pca-add-supplier-modal').show();
+    });
+
+    // Close modal
+    $('#pca-close-supplier-modal').on('click', function(){
+        $('#pca-add-supplier-modal').hide();
+    });
+
+    // Save (backend coming later)
+    $('#pca-save-supplier').on('click', function(){
+        alert('Saving supplier... (backend coming later)');
+    });
+
+});
