@@ -234,11 +234,12 @@ jQuery(document).on('click', '#pca-save-school', function(){
         name: jQuery('#pca-school-name').val()
     };
 
-    jQuery.post(ajaxurl, data, function(response){
+    jQuery.post(pcaStore.ajaxurl, data, function(response){
         alert(response.data.message);
         location.reload();
     });
 });
+
 
 // DELETE SCHOOL
 jQuery(document).on('click', '.pca-delete-school', function(e){
@@ -248,13 +249,14 @@ jQuery(document).on('click', '.pca-delete-school', function(e){
 
     let id = jQuery(this).data('id');
 
-    jQuery.post(ajaxurl, {
+    jQuery.post(pcaStore.ajaxurl, {
         action: 'pca_settings_delete_school',
         id: id
     }, function(response){
         alert(response.data.message);
         location.reload();
     });
+
 });
 
 

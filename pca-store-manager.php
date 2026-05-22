@@ -18,16 +18,16 @@ require_once PCA_STORE_MANAGER_PATH . 'admin/class-admin-menu.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controller.php';
-PCA_Store_Items_Controller::init();
+
 
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
-PCA_Store_Stock_Controller::init();
+
 
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
-PCA_Store_Reports_Controller::init();
+
 
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
-PCA_Store_Settings_Controller::init();
+
 
 
 register_activation_hook( __FILE__, [ 'PCA_Store_Activator', 'activate' ] );
@@ -35,6 +35,10 @@ register_activation_hook( __FILE__, [ 'PCA_Store_Activator', 'activate' ] );
 add_action( 'plugins_loaded', function() {
     PCA_Store_Permissions::init();
     PCA_Store_Admin_Menu::init();
+    PCA_Store_Settings_Controller::init();
+    PCA_Store_Items_Controller::init();
+    PCA_Store_Stock_Controller::init();
+    PCA_Store_Reports_Controller::init();
 });
 
 function pca_store_manager_upgrade_check() {
@@ -61,6 +65,12 @@ add_action('admin_enqueue_scripts', function($hook) {
         ['jquery'],
         PCA_STORE_VERSION,
         true
+    );
+
+    wp_localize_script(
+        'pca-store-admin-js',
+        'pcaStore',
+        ['ajaxurl' => admin_url('admin-ajax.php')]
     );
 });
 

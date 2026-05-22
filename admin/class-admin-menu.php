@@ -107,10 +107,11 @@ class PCA_Store_Admin_Menu {
             'pca-store-dashboard',
             'Settings',
             'Settings',
-            'pca_store_manage_settings',
+            'manage_options',
             'pca-store-settings',
             [__CLASS__, 'render_settings']
         );
+
     }
 
     // Render functions
