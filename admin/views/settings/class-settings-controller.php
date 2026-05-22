@@ -50,6 +50,7 @@ class PCA_Store_Settings_Controller {
 
 
     public static function save_school() {
+        $wpdb->show_errors();
         global $wpdb;
         $table = $wpdb->prefix . 'pca_store_schools';
 
