@@ -27,6 +27,28 @@ class PCA_Store_Settings_Controller {
 
     /* ---------- SCHOOLS ---------- */
 
+    // public static function save_school() {
+    //     global $wpdb;
+    //     $table = $wpdb->prefix . 'pca_store_schools';
+
+    //     $id   = intval($_POST['id'] ?? 0);
+    //     $name = sanitize_text_field($_POST['name']);
+
+    //     if (!$name) {
+    //         wp_send_json_error(['message' => 'School name is required']);
+    //     }
+
+    //     if ($id) {
+    //         $wpdb->update($table, ['name' => $name], ['id' => $id]);
+    //     } else {
+    //         $wpdb->insert($table, ['name' => $name]);
+    //         $id = $wpdb->insert_id;
+    //     }
+
+    //     wp_send_json_success(['message' => 'School saved', 'id' => $id]);
+    // }
+
+
     public static function save_school() {
         global $wpdb;
         $table = $wpdb->prefix . 'pca_store_schools';
@@ -41,7 +63,20 @@ class PCA_Store_Settings_Controller {
         if ($id) {
             $wpdb->update($table, ['name' => $name], ['id' => $id]);
         } else {
-            $wpdb->insert($table, ['name' => $name]);
+            $slug = sanitize_title($name); // generates a URL-safe slug from the name
+
+            // Handle duplicate slugs
+            $existing = $wpdb->get_var(
+                $wpdb->prepare("SELECT COUNT(*) FROM $table WHERE slug = %s", $slug)
+            );
+            if ($existing) {
+                $slug = $slug . '-' . time();
+            }
+
+            $wpdb->insert($table, [
+                'name' => $name,
+                'slug' => $slug,
+            ]);
             $id = $wpdb->insert_id;
         }
 
