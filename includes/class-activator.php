@@ -7,7 +7,7 @@ class PCA_Store_Activator {
         update_option('pca_store_db_version', '1.5.22');
     }
 
-    protected static function create_tables() {
+    public static function create_tables() {
         global $wpdb;
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
