@@ -71,13 +71,13 @@ class PCA_Store_Admin_Menu {
         //     );
         // }
 
+        // Reports
         add_submenu_page(
-            'pca-store',
+            'pca-store-dashboard',
             'Reports',
             'Reports',
-            'manage_options',
+            'pca_store_view_reports',
             'pca-store-reports',
-            // [$this, 'render_reports_page']
             [__CLASS__, 'render_reports']
         );
 
