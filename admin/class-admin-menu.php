@@ -59,17 +59,26 @@ class PCA_Store_Admin_Menu {
             [__CLASS__, 'render_suppliers']
         );
 
-        // Reports
-        if (get_option('pca_roles_can_view_reports')) {
-            add_submenu_page(
-                'pca-store',
-                'Reports',
-                'Reports',
-                'manage_options',
-                'pca-store-reports',
-                [$this, 'render_reports_page']
-            );
-        }
+        // // Reports
+        // if (get_option('pca_roles_can_view_reports')) {
+        //     add_submenu_page(
+        //         'pca-store',
+        //         'Reports',
+        //         'Reports',
+        //         'manage_options',
+        //         'pca-store-reports',
+        //         [$this, 'render_reports_page']
+        //     );
+        // }
+
+        add_submenu_page(
+            'pca-store',
+            'Reports',
+            'Reports',
+            'manage_options',
+            'pca-store-reports',
+            [$this, 'render_reports_page']
+        );
 
         // Audit Log
         add_submenu_page(
