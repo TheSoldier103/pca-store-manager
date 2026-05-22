@@ -2,7 +2,7 @@
 /**
  * Plugin Name: PCA Store Manager
  * Description: Multi-campus bookshop and uniform manager for PCA.
- * Version: 1.5.23
+ * Version: 1.5.24
  * Author: PCA
  */
 
@@ -48,7 +48,7 @@ add_action('plugins_loaded', function () {
 |--------------------------------------------------------------------------
 | REGISTER CONTROLLERS IMMEDIATELY
 |--------------------------------------------------------------------------
-| No hooks, no timing issues: actions are registered as soon as plugin loads.
+| This is the FIX. No hooks. No timing issues.
 |--------------------------------------------------------------------------
 */
 PCA_Store_Settings_Controller::init();
