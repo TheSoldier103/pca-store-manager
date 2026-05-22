@@ -25,29 +25,6 @@ class PCA_Store_Settings_Controller {
 
 
     /* ---------- SCHOOLS ---------- */
-
-    // public static function save_school() {
-    //     global $wpdb;
-    //     $table = $wpdb->prefix . 'pca_store_schools';
-
-    //     $id   = intval($_POST['id'] ?? 0);
-    //     $name = sanitize_text_field($_POST['name']);
-
-    //     if (!$name) {
-    //         wp_send_json_error(['message' => 'School name is required']);
-    //     }
-
-    //     if ($id) {
-    //         $wpdb->update($table, ['name' => $name], ['id' => $id]);
-    //     } else {
-    //         $wpdb->insert($table, ['name' => $name]);
-    //         $id = $wpdb->insert_id;
-    //     }
-
-    //     wp_send_json_success(['message' => 'School saved', 'id' => $id]);
-    // }
-
-
     public static function save_school() {
 
         if (!current_user_can('manage_options')) {
@@ -55,8 +32,10 @@ class PCA_Store_Settings_Controller {
                 'message' => 'Permission denied'
             ], 403);
         }
-        
+
         global $wpdb;
+
+        // $wpdb->show_errors();
         $table = $wpdb->prefix . 'pca_store_schools';
         error_log("SAVE SCHOOL FIRED");
         error_log("SAVE SCHOOL CALLBACK REACHED");
@@ -83,11 +62,19 @@ class PCA_Store_Settings_Controller {
                 $slug = $slug . '-' . time();
             }
 
-            $wpdb->insert($table, [
+            $wpdb->insert($table, [show_err
                 'name' => $name,
                 'slug' => $slug,
             ]);
+
+            if ($wpdb->last_error) {
+                wp_send_json_error([
+                    'message' => $wpdb->last_error
+                ]);
+            }
             $id = $wpdb->insert_id;
+
+
         }
 
         wp_send_json_success(['message' => 'School saved', 'id' => $id]);
