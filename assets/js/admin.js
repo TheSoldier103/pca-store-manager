@@ -181,3 +181,47 @@ jQuery(function($){
     });
 
 });
+
+
+function pcaLoadReport(url, target) {
+    jQuery.get(url, function(response){
+        if (response.success) {
+            jQuery(target).html(JSON.stringify(response.data, null, 2));
+        }
+    });
+}
+
+jQuery(function($){
+
+    $('#pca-save-campus').on('click', function(){
+
+        let data = {
+            action: 'pca_settings_save_campus',
+            name: $('#pca-campus-name').val(),
+            school_id: $('#pca-campus-school').val(),
+            status: $('#pca-campus-status').val()
+        };
+
+        $.post(ajaxurl, data, function(response){
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+    $(document).on('click', '.pca-delete-campus', function(e){
+        e.preventDefault();
+
+        if (!confirm('Delete this campus?')) return;
+
+        let id = $(this).data('id');
+
+        $.post(ajaxurl, {
+            action: 'pca_settings_delete_campus',
+            id: id
+        }, function(response){
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+});

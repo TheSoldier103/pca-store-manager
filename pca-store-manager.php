@@ -23,6 +23,12 @@ PCA_Store_Items_Controller::init();
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
 PCA_Store_Stock_Controller::init();
 
+require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
+PCA_Store_Reports_Controller::init();
+
+require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
+PCA_Store_Settings_Controller::init();
+
 
 register_activation_hook( __FILE__, [ 'PCA_Store_Activator', 'activate' ] );
 

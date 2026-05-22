@@ -1,26 +1,26 @@
-<h2 class="title">Record Book Sale</h2>
+<h2 class="title">Record Pack Sale</h2>
 
 <table class="form-table">
 
     <tr>
-        <th><label>Select Book</label></th>
+        <th><label>Select Pack</label></th>
         <td>
-            <select id="pca-sale-item" class="regular-text">
-                <option value="">Select Book</option>
+            <select id="pca-sale-item">
+                <option value="">Select Pack</option>
                 <?php
                 global $wpdb;
                 $items = $wpdb->prefix . 'pca_store_items';
 
-                $books = $wpdb->get_results("
-                    SELECT id, name, selling_price, current_stock
+                $packs = $wpdb->get_results("
+                    SELECT id, name, selling_price
                     FROM $items
-                    WHERE department='books' AND item_type='single' AND status='active'
+                    WHERE department='books' AND item_type='pack' AND status='active'
                     ORDER BY name ASC
                 ");
 
-                foreach ($books as $b) {
-                    echo "<option value='{$b->id}' data-price='{$b->selling_price}' data-stock='{$b->current_stock}'>
-                            {$b->name} (Stock: {$b->current_stock})
+                foreach ($packs as $p) {
+                    echo "<option value='{$p->id}' data-price='{$p->selling_price}'>
+                            {$p->name}
                           </option>";
                 }
                 ?>
@@ -39,13 +39,8 @@
     </tr>
 
     <tr>
-        <th><label>Discount (optional)</label></th>
-        <td><input type="number" id="pca-sale-discount" value="0"></td>
-    </tr>
-
-    <tr>
         <th><label>Receipt Number</label></th>
-        <td><input type="text" id="pca-sale-receipt" class="regular-text"></td>
+        <td><input type="text" id="pca-sale-receipt"></td>
     </tr>
 
     <tr>
