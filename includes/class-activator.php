@@ -61,8 +61,7 @@ class PCA_Store_Activator {
             is_active TINYINT(1) DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY code (code)
+            PRIMARY KEY (id)
         ) $charset;";
 
 
