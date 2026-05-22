@@ -29,26 +29,53 @@
     }
 </style>
 
-<!-- KPI CARDS -->
+<!-- BOOKS KPI CARDS -->
+<h2>📘 Books Overview</h2>
 <div class="pca-kpi-grid">
 
     <div class="pca-kpi-card">
-        <h3>Today's Sales</h3>
+        <h3>Today's Book Sales</h3>
         <div class="value">₦0.00</div>
     </div>
 
     <div class="pca-kpi-card">
-        <h3>Items Sold Today</h3>
+        <h3>Books Sold Today</h3>
         <div class="value">0</div>
     </div>
 
     <div class="pca-kpi-card">
-        <h3>Low Stock Items</h3>
+        <h3>Packs Sold Today</h3>
         <div class="value">0</div>
     </div>
 
     <div class="pca-kpi-card">
-        <h3>Total Stock Value</h3>
+        <h3>Low Stock (Books)</h3>
+        <div class="value">0</div>
+    </div>
+
+</div>
+
+<!-- UNIFORMS KPI CARDS -->
+<h2>👕 Uniforms Overview</h2>
+<div class="pca-kpi-grid">
+
+    <div class="pca-kpi-card">
+        <h3>Today's Uniform Sales</h3>
+        <div class="value">₦0.00</div>
+    </div>
+
+    <div class="pca-kpi-card">
+        <h3>Uniform Items Sold</h3>
+        <div class="value">0</div>
+    </div>
+
+    <div class="pca-kpi-card">
+        <h3>Low Stock (Uniforms)</h3>
+        <div class="value">0</div>
+    </div>
+
+    <div class="pca-kpi-card">
+        <h3>Total Uniform Stock Value</h3>
         <div class="value">₦0.00</div>
     </div>
 
@@ -59,10 +86,17 @@
     <h2>Quick Actions</h2>
 
     <p>
-        <a href="?page=pca-store-sales" class="button button-primary">Record Sale</a>
-        <a href="?page=pca-store-stock" class="button">Add Stock</a>
-        <a href="?page=pca-store-items" class="button">Manage Items</a>
-        <a href="?page=pca-store-suppliers" class="button">Suppliers</a>
+        <strong>Books:</strong>
+        <a href="?page=pca-store-sales&tab=books" class="button button-primary">Record Book Sale</a>
+        <a href="?page=pca-store-stock&tab=add" class="button">Add Book Stock</a>
+        <a href="?page=pca-store-items&tab=books" class="button">Manage Books</a>
+
+        <br><br>
+
+        <strong>Uniforms:</strong>
+        <a href="?page=pca-store-sales&tab=stationery" class="button button-primary">Record Uniform Sale</a>
+        <a href="?page=pca-store-stock&tab=add" class="button">Add Uniform Stock</a>
+        <a href="?page=pca-store-items&tab=stationery" class="button">Manage Uniforms</a>
     </p>
 </div>
 
@@ -70,6 +104,7 @@
 <div class="pca-section">
     <h2>Recent Sales</h2>
 
+    <h3>Books</h3>
     <table class="wp-list-table widefat fixed striped">
         <thead>
             <tr>
@@ -80,32 +115,24 @@
                 <th>Cashier</th>
             </tr>
         </thead>
-
         <tbody>
-            <?php
-            global $wpdb;
-            $sales = $wpdb->prefix . 'pca_store_sales';
+            <tr><td colspan="5">No recent book sales.</td></tr>
+        </tbody>
+    </table>
 
-            $rows = $wpdb->get_results("
-                SELECT * FROM $sales
-                ORDER BY sale_date DESC
-                LIMIT 10
-            ");
-
-            if ($rows) {
-                foreach ($rows as $s) {
-                    echo "<tr>
-                            <td>{$s->sale_date}</td>
-                            <td>{$s->receipt_no}</td>
-                            <td>{$s->department}</td>
-                            <td>₦" . number_format($s->total_amount, 2) . "</td>
-                            <td>{$s->sold_by}</td>
-                          </tr>";
-                }
-            } else {
-                echo '<tr><td colspan="5">No recent sales found.</td></tr>';
-            }
-            ?>
+    <h3>Uniforms</h3>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Receipt No</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Cashier</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="5">No recent uniform sales.</td></tr>
         </tbody>
     </table>
 </div>
@@ -114,41 +141,31 @@
 <div class="pca-section">
     <h2>Low Stock Snapshot</h2>
 
+    <h3>Books</h3>
     <table class="wp-list-table widefat fixed striped">
         <thead>
             <tr>
                 <th>Item</th>
-                <th>Department</th>
                 <th>Stock</th>
                 <th>Reorder Level</th>
             </tr>
         </thead>
-
         <tbody>
-            <?php
-            $items = $wpdb->prefix . 'pca_store_items';
+            <tr><td colspan="3">No low stock books.</td></tr>
+        </tbody>
+    </table>
 
-            $low = $wpdb->get_results("
-                SELECT name, department, current_stock, reorder_level
-                FROM $items
-                WHERE current_stock <= reorder_level
-                ORDER BY current_stock ASC
-                LIMIT 10
-            ");
-
-            if ($low) {
-                foreach ($low as $i) {
-                    echo "<tr>
-                            <td>{$i->name}</td>
-                            <td>{$i->department}</td>
-                            <td>{$i->current_stock}</td>
-                            <td>{$i->reorder_level}</td>
-                          </tr>";
-                }
-            } else {
-                echo '<tr><td colspan="4">No low stock items.</td></tr>';
-            }
-            ?>
+    <h3>Uniforms</h3>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Stock</th>
+                <th>Reorder Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="3">No low stock uniforms.</td></tr>
         </tbody>
     </table>
 </div>
