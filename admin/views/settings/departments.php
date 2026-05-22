@@ -29,7 +29,7 @@
     <tbody>
         <?php
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_departments';
+        $table = $wpdb->prefix . 'pca_store_departments';
         $rows = $wpdb->get_results("SELECT * FROM $table ORDER BY name ASC");
 
         if ($rows) {

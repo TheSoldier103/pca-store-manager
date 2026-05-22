@@ -103,7 +103,7 @@ class PCA_Store_Settings_Controller {
 
     public static function save_department() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_departments';
+        $table = $wpdb->prefix . 'pca_store_departments';
 
         $id   = intval($_POST['id'] ?? 0);
         $name = sanitize_text_field($_POST['name']);
@@ -130,7 +130,7 @@ class PCA_Store_Settings_Controller {
 
     public static function delete_department() {
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_departments';
+        $table = $wpdb->prefix . 'pca_store_departments';
         $id    = intval($_POST['id']);
 
         $wpdb->delete($table, ['id' => $id]);

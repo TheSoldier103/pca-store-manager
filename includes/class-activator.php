@@ -52,6 +52,21 @@ class PCA_Store_Activator {
         ) $charset;";
 
         // ---------------------------------------------------------
+        // Departments
+        // ---------------------------------------------------------
+        $tables[] = "CREATE TABLE {$prefix}departments (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name VARCHAR(255) NOT NULL,
+            code VARCHAR(50) NOT NULL UNIQUE,
+            is_active TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY code (code)
+        ) $charset;";
+
+
+        // ---------------------------------------------------------
         // Items
         // ---------------------------------------------------------
         $tables[] = "CREATE TABLE {$prefix}items (
