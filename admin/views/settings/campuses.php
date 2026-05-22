@@ -12,7 +12,7 @@
                 <option value="">Select School</option>
                 <?php
                 global $wpdb;
-                $schools_table = $wpdb->prefix . 'pca__store_schools';
+                $schools_table = $wpdb->prefix . 'pca_store_schools';
                 $schools = $wpdb->get_results("SELECT id, name FROM $schools_table ORDER BY name ASC");
                 foreach ($schools as $s) {
                     echo "<option value='{$s->id}'>{$s->name}</option>";
