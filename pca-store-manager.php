@@ -29,7 +29,7 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 // require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
 // require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
-PCA_Store_Settings_Controller::init();
+// PCA_Store_Settings_Controller::init();
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +45,7 @@ register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
 */
 add_action('plugins_loaded', function () {
     // PCA_Store_Permissions::init();
+    PCA_Store_Settings_Controller::init();
     PCA_Store_Admin_Menu::init();
 });
 
