@@ -62,11 +62,12 @@
                 echo "<tr>
                         <td>{$c->name}</td>
                         <td>{$c->school_name}</td>
-                        echo "<td>" . ($c->is_active ? 'Active' : 'Inactive') . "</td>";
+                        <td>" . ($c->is_active ? 'Active' : 'Inactive') . "</td>
                         <td>
                             <a href='#' class='pca-delete-campus' data-id='{$c->id}'>Delete</a>
                         </td>
-                      </tr>";
+                    </tr>";
+
             }
         } else {
             echo '<tr><td colspan="4">No campuses yet.</td></tr>';
