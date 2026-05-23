@@ -166,6 +166,8 @@ jQuery(document).ready(function($){
             return $(this).text().trim().toLowerCase() === 'books';
         }).prop('selected', true);
 
+        $('#pca-item-department').trigger('change');
+
         toggleItemFields();
 
         $('#pca-item-modal-title').text('Add New Book');
@@ -183,6 +185,8 @@ jQuery(document).ready(function($){
         $('#pca-item-department option').filter(function(){
             return $(this).text().trim().toLowerCase() === 'stationery';
         }).prop('selected', true);
+
+        $('#pca-item-department').trigger('change');
 
         toggleItemFields();
 
