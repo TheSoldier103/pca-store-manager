@@ -129,8 +129,8 @@ add_action('wp_ajax_pca_debug_test', function () {
     global $wp_filter;
 
     wp_send_json_success([
-        'settings_controller_exists' => class_exists('PCA_Store_Settings_Controller'),
         'actions_registered' => has_action('wp_ajax_pca_settings_save_school'),
-        
+        'settings_controller_exists' => class_exists('PCA_Store_Settings_Controller'),
+        'actions2_registered' => has_action('wp_ajax_pca_settings_delete_school'),
     ]);
 });
