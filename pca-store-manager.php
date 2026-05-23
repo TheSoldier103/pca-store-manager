@@ -71,29 +71,29 @@ function pca_store_manager_upgrade_check()
 }
 
 
-// /*
-// |--------------------------------------------------------------------------
-// | ADMIN SCRIPTS
-// |--------------------------------------------------------------------------
-// */
-// add_action('admin_enqueue_scripts', function ($hook) {
+/*
+|--------------------------------------------------------------------------
+| ADMIN SCRIPTS
+|--------------------------------------------------------------------------
+*/
+add_action('admin_enqueue_scripts', function ($hook) {
 
-//     if (strpos($hook, 'pca-store') === false) {
-//         return;
-//     }
+    if (strpos($hook, 'pca-store') === false) {
+        return;
+    }
 
-//     wp_enqueue_script(
-//         'pca-store-admin-js',
-//         PCA_STORE_URL . 'assets/js/admin.js',
-//         ['jquery'],
-//         PCA_STORE_VERSION,
-//         true
-//     );
+    wp_enqueue_script(
+        'pca-store-admin-js',
+        PCA_STORE_URL . 'assets/js/admin.js',
+        ['jquery'],
+        PCA_STORE_VERSION,
+        true
+    );
 
-//     wp_localize_script(
-//         'pca-store-admin-js',
-//         'pcaStore',
-//         ['ajaxurl' => admin_url('admin-ajax.php')]
-//     );
-// });
+    wp_localize_script(
+        'pca-store-admin-js',
+        'pcaStore',
+        ['ajaxurl' => admin_url('admin-ajax.php')]
+    );
+});
 
