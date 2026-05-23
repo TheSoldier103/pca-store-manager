@@ -22,9 +22,9 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/class-permissions.php';
 require_once PCA_STORE_MANAGER_PATH . 'admin/class-admin-menu.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 
-require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controller.php';
-require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
-require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
+// require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controller.php';
+// require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
+// require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
 PCA_Store_Settings_Controller::init();
 
