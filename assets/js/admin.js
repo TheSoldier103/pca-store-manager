@@ -124,6 +124,37 @@ jQuery(document).ready(function($){
     });
 
     /* ---------------------------------------------
+        LOAD SUPPLIERS WHEN DEPARTMENT CHANGES
+    --------------------------------------------- */
+    $('#pca-item-department').on('change', function(){
+
+        const deptId = $(this).val();
+
+        // Clear supplier dropdown
+        $('#pca-item-supplier').html('<option value="">Loading...</option>');
+
+        $.get(ajaxurl, {
+            action: 'pca_get_suppliers_by_department',
+            department_id: deptId
+        }, function(response){
+
+            let html = '<option value="">Select Supplier</option>';
+
+            if (response.success && response.data.suppliers.length > 0) {
+                response.data.suppliers.forEach(function(s){
+                    html += `<option value="${s.id}">${s.name}</option>`;
+                });
+            }
+
+            $('#pca-item-supplier').html(html);
+        });
+
+        // Also toggle fields
+        toggleItemFields();
+    });
+
+
+    /* ---------------------------------------------
        OPEN SINGLE ITEM MODAL (Books)
     --------------------------------------------- */
     $(document).on('click', '#pca-add-book-btn', function(e){
