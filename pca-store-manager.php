@@ -26,6 +26,7 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controll
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
+PCA_Store_Settings_Controller::init();
 
 /*
 |--------------------------------------------------------------------------
@@ -56,13 +57,13 @@ add_action('plugins_loaded', function () {
 // PCA_Store_Stock_Controller::init();
 // PCA_Store_Reports_Controller::init();
 
-add_action('init', function () {
+// add_action('init', function () {
 
-    error_log('MAIN INIT FIRED');
+//     error_log('MAIN INIT FIRED');
 
-    PCA_Store_Settings_Controller::init();
+//     PCA_Store_Settings_Controller::init();
 
-});
+// });
 
 /*
 |--------------------------------------------------------------------------
