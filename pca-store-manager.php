@@ -111,9 +111,20 @@ add_action('admin_enqueue_scripts', function ($hook) {
 | DEBUG ENDPOINT
 |--------------------------------------------------------------------------
 */
+// add_action('wp_ajax_pca_debug_test', function () {
+//     wp_send_json_success([
+//         'settings_controller_exists' => class_exists('PCA_Store_Settings_Controller'),
+//         'actions_registered' => has_action('wp_ajax_pca_settings_save_school'),
+//     ]);
+// });
+
 add_action('wp_ajax_pca_debug_test', function () {
+
+    global $wp_filter;
+
     wp_send_json_success([
         'settings_controller_exists' => class_exists('PCA_Store_Settings_Controller'),
+        'all_ajax_hooks' => array_keys($wp_filter),
         'actions_registered' => has_action('wp_ajax_pca_settings_save_school'),
     ]);
 });
