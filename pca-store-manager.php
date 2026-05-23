@@ -33,7 +33,7 @@ PCA_Store_Settings_Controller::init();
 | ACTIVATION
 |--------------------------------------------------------------------------
 */
-register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
+// register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
 
 /*
 |--------------------------------------------------------------------------
@@ -79,7 +79,7 @@ function pca_store_manager_upgrade_check()
         update_option('pca_store_db_version', '1.0.0');
     }
 }
-add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
+// add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
 
 /*
 |--------------------------------------------------------------------------
