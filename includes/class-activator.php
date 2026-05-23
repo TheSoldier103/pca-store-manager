@@ -57,13 +57,13 @@ class PCA_Store_Activator {
         $tables[] = "CREATE TABLE {$prefix}departments (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             name VARCHAR(255) NOT NULL,
-            code VARCHAR(50) NOT NULL UNIQUE,
+            code VARCHAR(50) NOT NULL,
             is_active TINYINT(1) DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            UNIQUE KEY code (code)
         ) $charset;";
-
 
         // ---------------------------------------------------------
         // Items
@@ -72,7 +72,7 @@ class PCA_Store_Activator {
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             school_id BIGINT UNSIGNED NOT NULL,
             campus_id BIGINT UNSIGNED NOT NULL,
-            department VARCHAR(50) NOT NULL,
+            department_id BIGINT UNSIGNED NOT NULL,
             sku VARCHAR(50) NULL,
             name VARCHAR(255) NOT NULL,
             item_type VARCHAR(100) NULL,
@@ -95,12 +95,11 @@ class PCA_Store_Activator {
             PRIMARY KEY (id),
             KEY school_id (school_id),
             KEY campus_id (campus_id),
-            KEY department (department),
+            KEY department_id (department_id),
             KEY supplier_id (supplier_id),
             KEY status (status),
             KEY name (name)
         ) $charset;";
-
 
         // ---------------------------------------------------------
         // Pack Items
@@ -116,7 +115,6 @@ class PCA_Store_Activator {
             KEY child_item_id (child_item_id)
         ) $charset;";
 
-
         // ---------------------------------------------------------
         // Suppliers
         // ---------------------------------------------------------
@@ -124,7 +122,7 @@ class PCA_Store_Activator {
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             school_id BIGINT UNSIGNED NOT NULL,
             campus_id BIGINT UNSIGNED NULL,
-            department VARCHAR(50) NULL,
+            department_id BIGINT UNSIGNED NULL,
             name VARCHAR(255) NOT NULL,
             contact_person VARCHAR(255) NULL,
             phone VARCHAR(100) NULL,
@@ -139,7 +137,7 @@ class PCA_Store_Activator {
             PRIMARY KEY (id),
             KEY school_id (school_id),
             KEY campus_id (campus_id),
-            KEY department (department)
+            KEY department_id (department_id)
         ) $charset;";
 
         // ---------------------------------------------------------
@@ -149,8 +147,8 @@ class PCA_Store_Activator {
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             school_id BIGINT UNSIGNED NOT NULL,
             campus_id BIGINT UNSIGNED NOT NULL,
-            receipt_no VARCHAR(100) NOT NULL UNIQUE,
-            department VARCHAR(50) NOT NULL,
+            department_id BIGINT UNSIGNED NOT NULL,
+            receipt_no VARCHAR(100) NOT NULL,
             sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             payment_method VARCHAR(50) NOT NULL,
             student_name VARCHAR(255) NULL,
@@ -167,9 +165,10 @@ class PCA_Store_Activator {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
+            UNIQUE KEY receipt_no (receipt_no),
             KEY school_id (school_id),
             KEY campus_id (campus_id),
-            KEY department (department),
+            KEY department_id (department_id),
             KEY sale_date (sale_date),
             KEY sold_by (sold_by),
             KEY payment_method (payment_method),
@@ -201,7 +200,7 @@ class PCA_Store_Activator {
             school_id BIGINT UNSIGNED NOT NULL,
             campus_id BIGINT UNSIGNED NOT NULL,
             item_id BIGINT UNSIGNED NOT NULL,
-            department VARCHAR(50) NOT NULL,
+            department_id BIGINT UNSIGNED NOT NULL,
             movement_type VARCHAR(50) NOT NULL,
             quantity INT NOT NULL,
             stock_before INT NOT NULL,
@@ -217,6 +216,7 @@ class PCA_Store_Activator {
             KEY school_id (school_id),
             KEY campus_id (campus_id),
             KEY item_id (item_id),
+            KEY department_id (department_id),
             KEY movement_type (movement_type),
             KEY created_by (created_by)
         ) $charset;";
@@ -228,7 +228,7 @@ class PCA_Store_Activator {
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             school_id BIGINT UNSIGNED NULL,
             campus_id BIGINT UNSIGNED NULL,
-            department VARCHAR(50) NULL,
+            department_id BIGINT UNSIGNED NULL,
             user_id BIGINT UNSIGNED NOT NULL,
             action VARCHAR(100) NOT NULL,
             object_type VARCHAR(100) NOT NULL,
@@ -244,6 +244,7 @@ class PCA_Store_Activator {
             KEY object_type (object_type),
             KEY school_id (school_id),
             KEY campus_id (campus_id),
+            KEY department_id (department_id),
             KEY created_at (created_at)
         ) $charset;";
 
@@ -255,13 +256,14 @@ class PCA_Store_Activator {
             user_id BIGINT UNSIGNED NOT NULL,
             school_id BIGINT UNSIGNED NULL,
             campus_id BIGINT UNSIGNED NULL,
-            department VARCHAR(50) NULL,
+            department_id BIGINT UNSIGNED NULL,
             role_key VARCHAR(100) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY user_id (user_id),
             KEY school_id (school_id),
-            KEY campus_id (campus_id)
+            KEY campus_id (campus_id),
+            KEY department_id (department_id)
         ) $charset;";
 
         // ---------------------------------------------------------
