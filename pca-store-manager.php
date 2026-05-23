@@ -89,11 +89,5 @@ add_action('admin_enqueue_scripts', function ($hook) {
         PCA_STORE_VERSION,
         true
     );
-
-    wp_localize_script(
-        'pca-store-admin-js',
-        'pcaStore',
-        ['ajaxurl' => admin_url('admin-ajax.php')]
-    );
 });
 
