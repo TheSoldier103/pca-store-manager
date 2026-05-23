@@ -28,3 +28,6 @@ switch ($active_tab) {
         include __DIR__ . '/items/lowstock-list.php';
         break;
 }
+
+include __DIR__ . '/items/add-item-modal.php';
+include __DIR__ . '/items/add-pack-modal.php';
