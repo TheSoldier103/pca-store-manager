@@ -8,9 +8,12 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('PCA_STORE_VERSION', '0.1.0');
+
+define('PCA_STORE_VERSION', '1.5.23');
+define('PCA_STORE_DB_VERSION', '1.5.23');
 define('PCA_STORE_MANAGER_PATH', plugin_dir_path(__FILE__));
 define('PCA_STORE_URL', plugin_dir_url(__FILE__));
+
 
 /*
 |--------------------------------------------------------------------------
@@ -74,9 +77,10 @@ function pca_store_manager_upgrade_check()
 {
     $current = get_option('pca_store_db_version');
 
-    if ($current !== '1.0.0') {
+    if ($current !== PCA_STORE_DB_VERSION) {
         PCA_Store_Activator::create_tables();
-        update_option('pca_store_db_version', '1.0.0');
+        // update_option('pca_store_db_version', '1.0.0');
+        update_option('pca_store_db_version', PCA_STORE_DB_VERSION);
     }
 }
 // add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
