@@ -1,69 +1,106 @@
-<h2 class="title">Book Packs</h2>
+<?php
+if (!defined('ABSPATH')) exit;
 
-<button class="button button-primary" id="pca-add-pack-btn">Add New Pack</button>
+global $wpdb;
 
-<table class="wp-list-table widefat fixed striped">
-    <thead>
+$dept_table      = $wpdb->prefix . 'pca_store_departments';
+$suppliers_table = $wpdb->prefix . 'pca_store_suppliers';
+
+$departments = $wpdb->get_results("SELECT id, name FROM $dept_table WHERE is_active = 1 ORDER BY name ASC");
+$suppliers   = $wpdb->get_results("SELECT id, name FROM $suppliers_table WHERE is_active = 1 ORDER BY name ASC");
+?>
+
+<div id="pca-add-item-modal" style="display:none;">
+
+    <h2 id="pca-item-modal-title">Add Item</h2>
+
+    <table class="form-table">
+
         <tr>
-            <th>Pack Name</th>
-            <th>Class</th>
-            <th>Books</th>
-            <th>Price</th>
-            <th>Virtual Stock</th>
-            <th width="120">Actions</th>
+            <th><label>Item Name</label></th>
+            <td><input type="text" id="pca-item-name" class="regular-text"></td>
         </tr>
-    </thead>
-    <tbody>
-        <?php
-        global $wpdb;
-        $items = $wpdb->prefix . 'pca_store_items';
-        $packs = $wpdb->prefix . 'pca_store_item_packs';
 
-        $pack_items = $wpdb->get_results("
-            SELECT i.*, COUNT(p.child_item_id) AS book_count
-            FROM $items i
-            LEFT JOIN $packs p ON p.pack_id = i.id
-            WHERE i.department = 'books'
-            AND i.item_type = 'pack'
-            GROUP BY i.id
-            ORDER BY i.name ASC
-        ");
+        <tr>
+            <th><label>Department</label></th>
+            <td>
+                <select id="pca-item-department">
+                    <option value="">Select Department</option>
+                    <?php foreach ($departments as $d): ?>
+                        <option value="<?php echo esc_attr($d->id); ?>">
+                            <?php echo esc_html($d->name); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
 
-        if ($pack_items) {
-            foreach ($pack_items as $pack) {
+        <tr>
+            <th><label>Supplier</label></th>
+            <td>
+                <select id="pca-item-supplier">
+                    <option value="">Select Supplier</option>
+                    <?php foreach ($suppliers as $s): ?>
+                        <option value="<?php echo esc_attr($s->id); ?>">
+                            <?php echo esc_html($s->name); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
 
-                // Calculate virtual stock
-                $child_items = $wpdb->get_results("
-                    SELECT child_item_id, quantity
-                    FROM $packs
-                    WHERE pack_id = $pack->id
-                ");
+        <tr>
+            <th><label>Selling Price</label></th>
+            <td><input type="number" id="pca-item-price" class="regular-text" step="0.01"></td>
+        </tr>
 
-                $virtual_stock = 999999;
-                foreach ($child_items as $child) {
-                    $stock = $wpdb->get_var("
-                        SELECT current_stock FROM $items
-                        WHERE id = $child->child_item_id
-                    ");
-                    $possible = floor($stock / $child->quantity);
-                    $virtual_stock = min($virtual_stock, $possible);
-                }
+        <tr>
+            <th><label>Reorder Level</label></th>
+            <td><input type="number" id="pca-item-reorder" class="regular-text"></td>
+        </tr>
 
-                echo '<tr>';
-                echo '<td>' . esc_html($pack->name) . '</td>';
-                echo '<td>' . esc_html($pack->class_level) . '</td>';
-                echo '<td>' . intval($pack->book_count) . '</td>';
-                echo '<td>₦' . number_format($pack->selling_price, 2) . '</td>';
-                echo '<td>' . intval($virtual_stock) . '</td>';
-                echo '<td>
-                        <a href="#" class="button">Edit</a>
-                        <a href="#" class="button button-danger">Delete</a>
-                      </td>';
-                echo '</tr>';
-            }
-        } else {
-            echo '<tr><td colspan="6">No packs found.</td></tr>';
-        }
-        ?>
-    </tbody>
-</table>
+        <!-- BOOK FIELDS -->
+        <tr class="pca-book-field" style="display:none;">
+            <th><label>Class Level</label></th>
+            <td><input type="text" id="pca-item-class" class="regular-text"></td>
+        </tr>
+
+        <tr class="pca-book-field" style="display:none;">
+            <th><label>Subject</label></th>
+            <td><input type="text" id="pca-item-subject" class="regular-text"></td>
+        </tr>
+
+        <!-- UNIFORM FIELDS -->
+        <tr class="pca-uniform-field" style="display:none;">
+            <th><label>Size (optional)</label></th>
+            <td><input type="text" id="pca-item-size" class="regular-text"></td>
+        </tr>
+
+        <tr class="pca-uniform-field" style="display:none;">
+            <th><label>Gender (optional)</label></th>
+            <td>
+                <select id="pca-item-gender">
+                    <option value="">None</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="unisex">Unisex</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr class="pca-uniform-field" style="display:none;">
+            <th><label>Color (optional)</label></th>
+            <td><input type="text" id="pca-item-color" class="regular-text"></td>
+        </tr>
+
+    </table>
+
+    <input type="hidden" id="pca-item-id" value="">
+    <input type="hidden" id="pca-item-type" value="single">
+
+    <p>
+        <button class="button button-primary" id="pca-save-item">Save Item</button>
+        <button class="button" id="pca-close-item-modal">Cancel</button>
+    </p>
+
+</div>

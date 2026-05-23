@@ -21,7 +21,7 @@
 
         $books = $wpdb->get_results("
             SELECT * FROM $table
-            WHERE department = 'books'
+            WHERE department_id = X
             AND item_type = 'single'
             ORDER BY name ASC
         ");

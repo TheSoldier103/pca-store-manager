@@ -23,7 +23,7 @@
             SELECT i.*, COUNT(p.child_item_id) AS book_count
             FROM $items i
             LEFT JOIN $packs p ON p.pack_id = i.id
-            WHERE i.department = 'books'
+            WHERE department_id = X
             AND i.item_type = 'pack'
             GROUP BY i.id
             ORDER BY i.name ASC
