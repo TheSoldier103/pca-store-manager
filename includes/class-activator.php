@@ -22,7 +22,7 @@ class PCA_Store_Activator {
         $tables[] = "CREATE TABLE {$prefix}schools (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             name VARCHAR(255) NOT NULL,
-            slug VARCHAR(100) NOT NULL UNIQUE,
+            slug VARCHAR(100) NOT NULL,
             address TEXT NULL,
             phone VARCHAR(100) NULL,
             email VARCHAR(255) NULL,
@@ -30,7 +30,7 @@ class PCA_Store_Activator {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            KEY slug (slug)
+            UNIQUE KEY slug (slug)
         ) $charset;";
 
         // ---------------------------------------------------------
