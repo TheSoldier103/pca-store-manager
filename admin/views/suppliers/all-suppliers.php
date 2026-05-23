@@ -29,7 +29,8 @@
             foreach ($suppliers as $s) {
                 echo '<tr>';
                 echo '<td>' . esc_html($s->name) . '</td>';
-                echo '<td>' . esc_html($s->department) . '</td>';
+                $dept_name = $wpdb->get_var("SELECT name FROM {$prefix}departments WHERE id = $s->department_id");
+                echo '<td>' . esc_html($dept_name) . '</td>';
                 echo '<td>' . esc_html($s->contact_person) . '</td>';
                 echo '<td>' . esc_html($s->phone) . '</td>';
                 echo '<td>' . esc_html($s->email) . '</td>';

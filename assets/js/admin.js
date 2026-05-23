@@ -19,22 +19,112 @@ jQuery(document).ready(function($){
 
 jQuery(document).ready(function($){
 
-    // Open modal
-    $('#pca-add-supplier-btn').on('click', function(){
+    // Open modal (new supplier)
+    $('#pca-add-supplier-btn').on('click', function(e){
+        e.preventDefault();
+        $('#pca-supplier-id').val('');
+        $('#pca-supplier-name').val('');
+        $('#pca-supplier-department').val('');
+        $('#pca-supplier-contact').val('');
+        $('#pca-supplier-phone').val('');
+        $('#pca-supplier-email').val('');
+        $('#pca-supplier-address').val('');
+        $('#pca-supplier-notes').val('');
+        $('#pca-supplier-status').val('1');
+        $('#pca-supplier-modal-title').text('Add Supplier');
         $('#pca-add-supplier-modal').show();
     });
 
     // Close modal
-    $('#pca-close-supplier-modal').on('click', function(){
+    $('#pca-close-supplier-modal').on('click', function(e){
+        e.preventDefault();
         $('#pca-add-supplier-modal').hide();
     });
 
-    // Save (backend coming later)
-    $('#pca-save-supplier').on('click', function(){
-        alert('Saving supplier... (backend coming later)');
+    // Edit supplier
+    $(document).on('click', '.pca-edit-supplier', function(e){
+        e.preventDefault();
+        const id = $(this).data('id');
+
+        $.get(ajaxurl, {
+            action: 'pca_get_supplier',
+            id: id
+        }, function(response){
+            if (!response || !response.success) {
+                alert(response && response.data && response.data.message ? response.data.message : 'Error loading supplier');
+                return;
+            }
+
+            const s = response.data.supplier;
+
+            $('#pca-supplier-id').val(s.id);
+            $('#pca-supplier-name').val(s.name);
+            $('#pca-supplier-department').val(s.department_id);
+            $('#pca-supplier-contact').val(s.contact_person);
+            $('#pca-supplier-phone').val(s.phone);
+            $('#pca-supplier-email').val(s.email);
+            $('#pca-supplier-address').val(s.address);
+            $('#pca-supplier-notes').val(s.notes);
+            $('#pca-supplier-status').val(s.is_active ? '1' : '0');
+            $('#pca-supplier-modal-title').text('Edit Supplier');
+            $('#pca-add-supplier-modal').show();
+        });
+    });
+
+    // Save supplier
+    $('#pca-save-supplier').on('click', function(e){
+        e.preventDefault();
+
+        const data = {
+            action: 'pca_save_supplier',
+            id: $('#pca-supplier-id').val(),
+            name: $('#pca-supplier-name').val(),
+            department_id: $('#pca-supplier-department').val(),
+            contact_person: $('#pca-supplier-contact').val(),
+            phone: $('#pca-supplier-phone').val(),
+            email: $('#pca-supplier-email').val(),
+            address: $('#pca-supplier-address').val(),
+            notes: $('#pca-supplier-notes').val(),
+            is_active: $('#pca-supplier-status').val()
+        };
+
+        $.post(ajaxurl, data, function(response){
+            if (!response || !response.success) {
+                alert(response && response.data && response.data.message ? response.data.message : 'Error saving supplier');
+                return;
+            }
+
+            alert(response.data.message || 'Supplier saved');
+            window.location.reload();
+        });
+    });
+
+    // Delete supplier
+    $(document).on('click', '.pca-delete-supplier', function(e){
+        e.preventDefault();
+
+        if (!confirm('Are you sure you want to delete this supplier?')) {
+            return;
+        }
+
+        const id = $(this).data('id');
+
+        $.post(ajaxurl, {
+            action: 'pca_delete_supplier',
+            id: id
+        }, function(response){
+            if (!response || !response.success) {
+                alert(response && response.data && response.data.message ? response.data.message : 'Error deleting supplier');
+                return;
+            }
+
+            alert(response.data.message || 'Supplier deleted');
+            window.location.reload();
+        });
     });
 
 });
+
 
 // Save item
 jQuery(document).on('click', '#pca-save-item', function() {

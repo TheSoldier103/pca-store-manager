@@ -29,6 +29,8 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-items-controll
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-stock-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-reports-controller.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
+require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-suppliers-controller.php';
+
 
 /*
 |--------------------------------------------------------------------------
@@ -47,8 +49,12 @@ add_action('plugins_loaded', function () {
     // Admin menu
     PCA_Store_Admin_Menu::init();
 
-    // Settings controller (registers AJAX actions)
+    // Other controller (registers AJAX actions)
     PCA_Store_Settings_Controller::init();
+    PCA_Store_Items_Controller::init();
+    PCA_Store_Stock_Controller::init();
+    PCA_Store_Reports_Controller::init();
+    PCA_Store_Suppliers_Controller::init();
 
     // DB upgrade
     pca_store_manager_upgrade_check();

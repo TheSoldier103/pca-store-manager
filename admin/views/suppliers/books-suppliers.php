@@ -22,7 +22,7 @@
 
         $suppliers = $wpdb->get_results("
             SELECT * FROM $table
-            WHERE department = 'books'
+            WHERE department_id = (SELECT id FROM {$prefix}departments WHERE code = 'books')
             ORDER BY name ASC
         ");
 
