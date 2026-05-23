@@ -228,35 +228,31 @@ jQuery(function($){
 
 // SAVE SCHOOL
 jQuery(document).on('click', '#pca-save-school', function(){
-
     let data = {
         action: 'pca_settings_save_school',
         name: jQuery('#pca-school-name').val()
     };
 
-    jQuery.post(pcaStore.ajaxurl, data, function(response){
+    jQuery.post(ajaxurl, data, function(response){  // <-- was pcaStore.ajaxurl
         alert(response.data.message);
         location.reload();
     });
 });
 
-
 // DELETE SCHOOL
 jQuery(document).on('click', '.pca-delete-school', function(e){
     e.preventDefault();
-
     if (!confirm('Delete this school?')) return;
 
     let id = jQuery(this).data('id');
 
-    jQuery.post(pcaStore.ajaxurl, {
+    jQuery.post(ajaxurl, {                          // <-- was pcaStore.ajaxurl
         action: 'pca_settings_delete_school',
         id: id
     }, function(response){
         alert(response.data.message);
         location.reload();
     });
-
 });
 
 
