@@ -123,6 +123,181 @@ jQuery(document).ready(function($){
         });
     });
 
+    /* ---------------------------------------------
+       OPEN SINGLE ITEM MODAL (Books)
+    --------------------------------------------- */
+    $(document).on('click', '#pca-add-book-btn', function(e){
+        e.preventDefault();
+        resetItemModal();
+
+        // Preselect Books department
+        $('#pca-item-department option').filter(function(){
+            return $(this).text().trim().toLowerCase() === 'books';
+        }).prop('selected', true);
+
+        toggleItemFields();
+
+        $('#pca-item-modal-title').text('Add New Book');
+        $('#pca-add-item-modal').show();
+    });
+
+    /* ---------------------------------------------
+       OPEN SINGLE ITEM MODAL (Stationery)
+    --------------------------------------------- */
+    $(document).on('click', '#pca-add-stationery-btn', function(e){
+        e.preventDefault();
+        resetItemModal();
+
+        // Preselect Stationery department
+        $('#pca-item-department option').filter(function(){
+            return $(this).text().trim().toLowerCase() === 'stationery';
+        }).prop('selected', true);
+
+        toggleItemFields();
+
+        $('#pca-item-modal-title').text('Add New Stationery');
+        $('#pca-add-item-modal').show();
+    });
+
+    /* ---------------------------------------------
+       OPEN PACK MODAL
+    --------------------------------------------- */
+    $(document).on('click', '#pca-add-pack-btn', function(e){
+        e.preventDefault();
+
+        resetPackModal();
+
+        $('#pca-pack-modal-title').text('Add New Pack');
+        $('#pca-add-pack-modal').show();
+    });
+
+    /* ---------------------------------------------
+       CLOSE MODALS
+    --------------------------------------------- */
+    $('#pca-close-item-modal').on('click', function(){
+        $('#pca-add-item-modal').hide();
+    });
+
+    $('#pca-close-pack-modal').on('click', function(){
+        $('#pca-add-pack-modal').hide();
+    });
+
+    /* ---------------------------------------------
+       TOGGLE FIELDS WHEN DEPARTMENT CHANGES
+    --------------------------------------------- */
+    $('#pca-item-department').on('change', function(){
+        toggleItemFields();
+    });
+
+    function toggleItemFields() {
+        const selectedName = $('#pca-item-department option:selected').text().trim().toLowerCase();
+
+        // Hide all conditional fields first
+        $('.pca-book-field').hide();
+        $('.pca-uniform-field').hide();
+
+        if (selectedName === 'books') {
+            $('.pca-book-field').show();
+        }
+
+        if (selectedName === 'uniforms') {
+            $('.pca-uniform-field').show();
+        }
+    }
+
+    /* ---------------------------------------------
+       RESET SINGLE ITEM MODAL
+    --------------------------------------------- */
+    function resetItemModal() {
+        $('#pca-item-id').val('');
+        $('#pca-item-name').val('');
+        $('#pca-item-department').val('');
+        $('#pca-item-supplier').val('');
+        $('#pca-item-price').val('');
+        $('#pca-item-reorder').val('');
+        $('#pca-item-class').val('');
+        $('#pca-item-subject').val('');
+        $('#pca-item-size').val('');
+        $('#pca-item-gender').val('');
+        $('#pca-item-color').val('');
+        $('#pca-item-type').val('single');
+    }
+
+    /* ---------------------------------------------
+       RESET PACK MODAL
+    --------------------------------------------- */
+    function resetPackModal() {
+        $('#pca-pack-id').val('');
+        $('#pca-pack-name').val('');
+        $('#pca-pack-class').val('');
+        $('#pca-pack-price').val('');
+        $('#pca-pack-reorder').val('');
+
+        // Reset all qty fields to 1
+        $('.pca-pack-qty').val(1);
+    }
+
+    /* ---------------------------------------------
+       SAVE SINGLE ITEM
+    --------------------------------------------- */
+    $('#pca-save-item').on('click', function(e){
+        e.preventDefault();
+
+        const data = {
+            action: 'pca_store_save_item',
+            item_type: 'single',
+            id: $('#pca-item-id').val(),
+            name: $('#pca-item-name').val(),
+            department_id: $('#pca-item-department').val(),
+            supplier_id: $('#pca-item-supplier').val(),
+            selling_price: $('#pca-item-price').val(),
+            reorder_level: $('#pca-item-reorder').val(),
+            class_level: $('#pca-item-class').val(),
+            subject: $('#pca-item-subject').val(),
+            size: $('#pca-item-size').val(),
+            gender: $('#pca-item-gender').val(),
+            color: $('#pca-item-color').val(),
+        };
+
+        $.post(ajaxurl, data, function(response){
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+    /* ---------------------------------------------
+       SAVE PACK
+    --------------------------------------------- */
+    $('#pca-save-pack').on('click', function(e){
+        e.preventDefault();
+
+        let packItems = [];
+
+        $('.pca-pack-row').each(function(){
+            packItems.push({
+                id: $(this).data('id'),
+                qty: $(this).find('.pca-pack-qty').val()
+            });
+        });
+
+        const data = {
+            action: 'pca_store_save_item',
+            item_type: 'pack',
+            id: $('#pca-pack-id').val(),
+            name: $('#pca-pack-name').val(),
+            department_id: $('#pca-pack-department-id').val(),
+            selling_price: $('#pca-pack-price').val(),
+            reorder_level: $('#pca-pack-reorder').val(),
+            class_level: $('#pca-pack-class').val(),
+            pack_items: packItems
+        };
+
+        $.post(ajaxurl, data, function(response){
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
 });
 
 
