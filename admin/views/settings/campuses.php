@@ -62,7 +62,7 @@
                 echo "<tr>
                         <td>{$c->name}</td>
                         <td>{$c->school_name}</td>
-                        <td><?= $c->is_active ? 'Active' : 'Inactive' ?></td>
+                        echo "<td>" . ($c->is_active ? 'Active' : 'Inactive') . "</td>";
                         <td>
                             <a href='#' class='pca-delete-campus' data-id='{$c->id}'>Delete</a>
                         </td>
