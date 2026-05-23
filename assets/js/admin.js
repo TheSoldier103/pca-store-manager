@@ -295,9 +295,15 @@ jQuery(document).ready(function($){
         };
 
         $.post(ajaxurl, data, function(response){
+            if (!response.success) {
+                alert(response.data.message);
+                return; // STOP HERE
+            }
+
             alert(response.data.message);
             location.reload();
         });
+
     });
 
     /* ---------------------------------------------

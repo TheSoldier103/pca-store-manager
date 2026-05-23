@@ -45,9 +45,9 @@
                 echo '<td>₦' . number_format($book->selling_price, 2) . '</td>';
                 echo '<td>' . intval($book->current_stock) . '</td>';
                 echo '<td>' . esc_html($book->status) . '</td>';
-                echo '<td>
-                        <a href="#" class="button">Edit</a>
-                        <a href="#" class="button button-danger">Delete</a>
+                echo '<td style="white-space: nowrap;">
+                        <a href="#" class="button pca-edit-item" data-id="<?php echo $item->id; ?>">Edit</a>
+                        <a href="#" class="button button-danger pca-delete-item" data-id="<?php echo $item->id; ?>">Delete</a>
                       </td>';
                 echo '</tr>';
             }
