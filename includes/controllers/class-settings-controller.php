@@ -19,35 +19,47 @@ class PCA_Store_Settings_Controller {
     }
 
 
-    /* ---------- ROLES & PERMISSIONS ---------- */
+    // /* ---------- ROLES & PERMISSIONS ---------- */
 
-    public static function save_roles_settings() {
+    // public static function save_roles_settings() {
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Permission denied'], 403);
-        }
+    //     if (!current_user_can('manage_options')) {
+    //         wp_send_json_error(['message' => 'Permission denied'], 403);
+    //     }
 
-        update_option('pca_roles_can_edit_stock',      !empty($_POST['can_edit_stock'])      ? 1 : 0);
-        update_option('pca_roles_can_view_reports',    !empty($_POST['can_view_reports'])    ? 1 : 0);
-        update_option('pca_roles_can_manage_settings', !empty($_POST['can_manage_settings']) ? 1 : 0);
+    //     update_option('pca_roles_can_edit_stock',      !empty($_POST['can_edit_stock'])      ? 1 : 0);
+    //     update_option('pca_roles_can_view_reports',    !empty($_POST['can_view_reports'])    ? 1 : 0);
+    //     update_option('pca_roles_can_manage_settings', !empty($_POST['can_manage_settings']) ? 1 : 0);
 
-        wp_send_json_success(['message' => 'Roles & permissions saved']);
-    }
+    //     wp_send_json_success(['message' => 'Roles & permissions saved']);
+    // }
 
 
-    /* ---------- ADVANCED ---------- */
+    // /* ---------- ADVANCED ---------- */
 
-    public static function save_advanced_settings() {
+    // public static function save_advanced_settings() {
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'Permission denied'], 403);
-        }
+    //     if (!current_user_can('manage_options')) {
+    //         wp_send_json_error(['message' => 'Permission denied'], 403);
+    //     }
 
-        update_option('pca_advanced_debug_mode', !empty($_POST['debug_mode']) ? 1 : 0);
+    //     update_option('pca_advanced_debug_mode', !empty($_POST['debug_mode']) ? 1 : 0);
 
-        wp_send_json_success(['message' => 'Advanced settings saved']);
-    }
+    //     wp_send_json_success(['message' => 'Advanced settings saved']);
+    // }
 
+    // public static function save_roles_settings() {
+
+    //     $can_edit_stock      = !empty($_POST['can_edit_stock']) ? 1 : 0;
+    //     $can_view_reports    = !empty($_POST['can_view_reports']) ? 1 : 0;
+    //     $can_manage_settings = !empty($_POST['can_manage_settings']) ? 1 : 0;
+
+    //     update_option('pca_roles_can_edit_stock', $can_edit_stock);
+    //     update_option('pca_roles_can_view_reports', $can_view_reports);
+    //     update_option('pca_roles_can_manage_settings', $can_manage_settings);
+
+    //     wp_send_json_success(['message' => 'Roles & permissions saved']);
+    // }
 
     /* ---------- SCHOOLS ---------- */
 
