@@ -103,11 +103,21 @@ class PCA_Store_Admin_Menu {
         //     );
         // }
 
+        // add_submenu_page(
+        //     'pca-store-dashboard',
+        //     'Settings',
+        //     'Settings',
+        //     'manage_options',
+        //     'pca-store-settings',
+        //     [__CLASS__, 'render_settings']
+        // );
+
+        // Settings
         add_submenu_page(
             'pca-store-dashboard',
             'Settings',
             'Settings',
-            'manage_options',
+            'pca_store_manage_settings',
             'pca-store-settings',
             [__CLASS__, 'render_settings']
         );
