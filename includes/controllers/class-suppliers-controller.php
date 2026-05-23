@@ -9,6 +9,8 @@ class PCA_Store_Suppliers_Controller {
         add_action('wp_ajax_pca_save_supplier',   [__CLASS__, 'save_supplier']);
         add_action('wp_ajax_pca_delete_supplier', [__CLASS__, 'delete_supplier']);
         add_action('wp_ajax_pca_get_supplier',    [__CLASS__, 'get_supplier']);
+        add_action('wp_ajax_pca_get_suppliers_by_department', [__CLASS__, 'get_suppliers_by_department']);
+
     }
 
     public static function save_supplier() {
@@ -125,4 +127,28 @@ class PCA_Store_Suppliers_Controller {
 
         wp_send_json_success(['supplier' => $supplier]);
     }
+
+    public static function get_suppliers_by_department() {
+        global $wpdb;
+
+        $department_id = intval($_GET['department_id'] ?? 0);
+        $table = $wpdb->prefix . 'pca_store_suppliers';
+
+        if (!$department_id) {
+            wp_send_json_success(['suppliers' => []]);
+        }
+
+        $suppliers = $wpdb->get_results(
+            $wpdb->prepare("
+                SELECT id, name 
+                FROM $table
+                WHERE department_id = %d
+                AND is_active = 1
+                ORDER BY name ASC
+            ", $department_id)
+        );
+
+        wp_send_json_success(['suppliers' => $suppliers]);
+    }
+
 }

@@ -40,12 +40,8 @@ $suppliers   = $wpdb->get_results("SELECT id, name FROM $suppliers_table WHERE i
             <td>
                 <select id="pca-item-supplier">
                     <option value="">Select Supplier</option>
-                    <?php foreach ($suppliers as $s): ?>
-                        <option value="<?php echo esc_attr($s->id); ?>">
-                            <?php echo esc_html($s->name); ?>
-                        </option>
-                    <?php endforeach; ?>
                 </select>
+
             </td>
         </tr>
 
