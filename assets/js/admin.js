@@ -256,6 +256,7 @@ jQuery(document).ready(function($){
         $('#pca-item-gender').val('');
         $('#pca-item-color').val('');
         $('#pca-item-type').val('single');
+        $('#pca-item-department').trigger('change');
     }
 
     /* ---------------------------------------------
