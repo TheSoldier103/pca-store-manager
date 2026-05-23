@@ -17,14 +17,24 @@
     <tbody>
         <?php
         global $wpdb;
-        $table = $wpdb->prefix . 'pca_store_items';
 
-        $books = $wpdb->get_results("
-            SELECT * FROM $table
-            WHERE department_id = X
-            AND item_type = 'single'
-            ORDER BY name ASC
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+
+        // Get Books department_id dynamically
+        $books_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table 
+            WHERE LOWER(name) = 'books' 
+            LIMIT 1
         ");
+
+        $books = $wpdb->get_results($wpdb->prepare("
+            SELECT * FROM $items_table
+            WHERE department_id = %d
+            AND item_type = 'single'
+            AND status != 'deleted'
+            ORDER BY name ASC
+        ", $books_dept_id));
 
         if ($books) {
             foreach ($books as $book) {
