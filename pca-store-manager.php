@@ -31,6 +31,12 @@ require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/controllers/class-settings-controller.php';
 // PCA_Store_Settings_Controller::init();
 
+add_action('plugins_loaded', function() {
+    PCA_Store_Settings_Controller::init();
+    PCA_Store_Admin_Menu::init();
+    pca_store_manager_upgrade_check();
+});
+
 /*
 |--------------------------------------------------------------------------
 | ACTIVATION
@@ -43,11 +49,11 @@ register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
 | INITIALISE PERMISSIONS + MENU
 |--------------------------------------------------------------------------
 */
-add_action('plugins_loaded', function () {
-    // PCA_Store_Permissions::init();
-    PCA_Store_Settings_Controller::init();
-    PCA_Store_Admin_Menu::init();
-});
+// add_action('plugins_loaded', function () {
+//     // PCA_Store_Permissions::init();
+//     PCA_Store_Settings_Controller::init();
+//     PCA_Store_Admin_Menu::init();
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -84,7 +90,7 @@ function pca_store_manager_upgrade_check()
         update_option('pca_store_db_version', PCA_STORE_DB_VERSION);
     }
 }
-add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
+// add_action('plugins_loaded', 'pca_store_manager_upgrade_check');
 
 /*
 |--------------------------------------------------------------------------
