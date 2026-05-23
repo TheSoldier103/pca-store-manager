@@ -62,9 +62,9 @@ if ($selected_department_id) {
     ?>
 </h2>
 
-<p>
+<!-- <p>
     <button class="button button-primary" id="pca-add-supplier-btn">Add Supplier</button>
-</p>
+</p> -->
 
 <table class="wp-list-table widefat fixed striped">
     <thead>
