@@ -18,7 +18,7 @@ define('PCA_STORE_URL', plugin_dir_url(__FILE__));
 |--------------------------------------------------------------------------
 */
 require_once PCA_STORE_MANAGER_PATH . 'includes/class-activator.php';
-require_once PCA_STORE_MANAGER_PATH . 'includes/class-permissions.php';
+// require_once PCA_STORE_MANAGER_PATH . 'includes/class-permissions.php';
 require_once PCA_STORE_MANAGER_PATH . 'admin/class-admin-menu.php';
 require_once PCA_STORE_MANAGER_PATH . 'includes/class-admin-tabs.php';
 
@@ -41,7 +41,7 @@ register_activation_hook(__FILE__, ['PCA_Store_Activator', 'activate']);
 |--------------------------------------------------------------------------
 */
 add_action('plugins_loaded', function () {
-    PCA_Store_Permissions::init();
+    // PCA_Store_Permissions::init();
     PCA_Store_Admin_Menu::init();
 });
 
