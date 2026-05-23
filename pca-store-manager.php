@@ -51,10 +51,18 @@ add_action('plugins_loaded', function () {
 | This is the FIX. No hooks. No timing issues.
 |--------------------------------------------------------------------------
 */
-PCA_Store_Settings_Controller::init();
-PCA_Store_Items_Controller::init();
-PCA_Store_Stock_Controller::init();
-PCA_Store_Reports_Controller::init();
+// PCA_Store_Settings_Controller::init();
+// PCA_Store_Items_Controller::init();
+// PCA_Store_Stock_Controller::init();
+// PCA_Store_Reports_Controller::init();
+
+add_action('init', function () {
+
+    error_log('MAIN INIT FIRED');
+
+    PCA_Store_Settings_Controller::init();
+
+});
 
 /*
 |--------------------------------------------------------------------------
