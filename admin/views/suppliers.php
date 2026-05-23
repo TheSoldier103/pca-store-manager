@@ -62,9 +62,12 @@ if ($selected_department_id) {
     ?>
 </h2>
 
-<!-- <p>
-    <button class="button button-primary" id="pca-add-supplier-btn">Add Supplier</button>
-</p> -->
+<?php if ($active_tab === 'all'): ?>
+    <p>
+        <button class="button button-primary" id="pca-add-supplier-btn">Add Supplier</button>
+    </p>
+<?php endif; ?>
+
 
 <table class="wp-list-table widefat fixed striped">
     <thead>
