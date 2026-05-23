@@ -343,36 +343,36 @@ jQuery(document).ready(function($){
 });
 
 
-// Save item
-jQuery(document).on('click', '#pca-save-item', function() {
+// // Save item
+// jQuery(document).on('click', '#pca-save-item', function() {
 
-    let data = {
-        action: 'pca_store_save_item',
-        item_type: jQuery('#pca-item-type').val(),
-        name: jQuery('#pca-item-name').val(),
-        price: jQuery('#pca-item-price').val(),
-        reorder_level: jQuery('#pca-item-reorder').val(),
-        department: jQuery('#pca-item-department').val(),
-        supplier_id: jQuery('#pca-item-supplier').val(),
-    };
+//     let data = {
+//         action: 'pca_store_save_item',
+//         item_type: jQuery('#pca-item-type').val(),
+//         name: jQuery('#pca-item-name').val(),
+//         price: jQuery('#pca-item-price').val(),
+//         reorder_level: jQuery('#pca-item-reorder').val(),
+//         department: jQuery('#pca-item-department').val(),
+//         supplier_id: jQuery('#pca-item-supplier').val(),
+//     };
 
-    // Pack items
-    if (data.item_type === 'pack') {
-        data.pack_items = [];
+//     // Pack items
+//     if (data.item_type === 'pack') {
+//         data.pack_items = [];
 
-        jQuery('.pca-pack-row').each(function() {
-            data.pack_items.push({
-                id: jQuery(this).data('id'),
-                qty: jQuery(this).find('.pca-pack-qty').val()
-            });
-        });
-    }
+//         jQuery('.pca-pack-row').each(function() {
+//             data.pack_items.push({
+//                 id: jQuery(this).data('id'),
+//                 qty: jQuery(this).find('.pca-pack-qty').val()
+//             });
+//         });
+//     }
 
-    jQuery.post(ajaxurl, data, function(response) {
-        alert(response.data.message);
-        location.reload();
-    });
-});
+//     jQuery.post(ajaxurl, data, function(response) {
+//         alert(response.data.message);
+//         location.reload();
+//     });
+// });
 
 // ADD STOCK
 jQuery(document).on('click', '#pca-save-stock', function() {
