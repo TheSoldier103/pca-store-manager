@@ -253,10 +253,10 @@ jQuery(document).ready(function($){
         e.preventDefault();
 
         resetPackModal();
-        loadPackBooks();
 
         $('#pca-pack-modal-title').text('Add New Pack');
         $('#pca-add-pack-modal').show();
+        loadPackBooks();
     });
 
     /* ---------------------------------------------
@@ -680,6 +680,7 @@ function loadPackBooks() {
     });
 }
 
-$('#pca-pack-class-filter').on('change', loadPackBooks);
-$('#pca-pack-subject-filter').on('change', loadPackBooks);
+$(document).on('change', '#pca-pack-class-filter', loadPackBooks);
+$(document).on('change', '#pca-pack-subject-filter', loadPackBooks);
+
 
