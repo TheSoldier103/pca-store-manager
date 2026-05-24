@@ -181,6 +181,11 @@ class PCA_Store_Items_Controller {
 
             $pack_items = $_POST['pack_items'] ?? [];
 
+            if ($item_type === 'pack' && empty($pack_items)) {
+                wp_send_json_error(['message' => 'A pack must contain at least one item']);
+            }
+
+
             foreach ($pack_items as $child) {
                 $wpdb->insert($packs_table, [
                     'pack_id'       => $item_id,

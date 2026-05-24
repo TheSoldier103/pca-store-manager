@@ -246,6 +246,39 @@ jQuery(document).ready(function($){
         $('#pca-add-item-modal').show();
     });
 
+
+    function loadPackBooks() {
+        const classLevel = $('#pca-pack-class-filter').val();
+        const subject = $('#pca-pack-subject-filter').val();
+
+        $.get(ajaxurl, {
+            action: 'pca_store_get_books_for_pack',
+            class: classLevel,
+            subject: subject
+        }, function(response){
+
+            if (!response.success) return;
+
+            let html = '<table class="widefat"><thead><tr><th>Book</th><th>Qty</th></tr></thead><tbody>';
+
+            response.data.books.forEach(book => {
+                html += `
+                    <tr class="pca-pack-row" data-id="${book.id}">
+                        <td>${book.name} (${book.class_level || ''} ${book.subject ? ' - ' + book.subject : ''})</td>
+                        <td><input type="number" class="pca-pack-qty" value="1" min="1"></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            $('#pca-pack-book-list').html(html);
+        });
+    }
+
+    $(document).on('change', '#pca-pack-class-filter', loadPackBooks);
+    $(document).on('change', '#pca-pack-subject-filter', loadPackBooks);
+
     /* ---------------------------------------------
        OPEN PACK MODAL
     --------------------------------------------- */
@@ -650,37 +683,5 @@ jQuery(function($){
     });
 
 });
-
-function loadPackBooks() {
-    const classLevel = $('#pca-pack-class-filter').val();
-    const subject = $('#pca-pack-subject-filter').val();
-
-    $.get(ajaxurl, {
-        action: 'pca_store_get_books_for_pack',
-        class: classLevel,
-        subject: subject
-    }, function(response){
-
-        if (!response.success) return;
-
-        let html = '<table class="widefat"><thead><tr><th>Book</th><th>Qty</th></tr></thead><tbody>';
-
-        response.data.books.forEach(book => {
-            html += `
-                <tr class="pca-pack-row" data-id="${book.id}">
-                    <td>${book.name} (${book.class_level || ''} ${book.subject ? ' - ' + book.subject : ''})</td>
-                    <td><input type="number" class="pca-pack-qty" value="1" min="1"></td>
-                </tr>
-            `;
-        });
-
-        html += '</tbody></table>';
-
-        $('#pca-pack-book-list').html(html);
-    });
-}
-
-$(document).on('change', '#pca-pack-class-filter', loadPackBooks);
-$(document).on('change', '#pca-pack-subject-filter', loadPackBooks);
 
 
