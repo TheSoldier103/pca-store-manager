@@ -50,6 +50,10 @@
                         <a href="#" class="button pca-edit-item" data-id="<?php echo $book->id; ?>">Edit</a>
                         <a href="#" class="button button-danger pca-delete-item" data-id="<?php echo $book->id; ?>">Delete</a>
                       </td>';
+                echo '<td style="white-space: nowrap;">';
+                echo '<a href="#" class="button pca-edit-item" data-id="' . $book->id . '">Edit</a> ';
+                echo '<a href="#" class="button button-danger pca-delete-item" data-id="' . $book->id . '">Delete</a>';
+                echo '</td>';
                 echo '</tr>';
             }
         } else {
