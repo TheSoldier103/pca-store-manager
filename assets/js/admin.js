@@ -46,6 +46,30 @@ jQuery(document).ready(function($){
         });
     });
 
+    $(document).on('click', '.pca-delete-item', function(e){
+        e.preventDefault();
+
+        if (!confirm('Are you sure you want to delete this item?')) {
+            return;
+        }
+
+        const id = $(this).data('id');
+
+        $.post(ajaxurl, {
+            action: 'pca_store_delete_item',
+            id: id
+        }, function(response){
+            if (!response.success) {
+                alert(response.data.message);
+                return;
+            }
+
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+
 
     // Open modal (new supplier)
     $('#pca-add-supplier-btn').on('click', function(e){

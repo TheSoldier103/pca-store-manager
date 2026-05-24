@@ -161,12 +161,18 @@ class PCA_Store_Items_Controller {
         $items_table = $wpdb->prefix . 'pca_store_items';
         $id = intval($_POST['id']);
 
+        if (!$id) {
+            wp_send_json_error(['message' => 'Invalid item ID']);
+        }
+
         $wpdb->update($items_table, [
-            'status' => 'deleted'
+            'status' => 'deleted',
+            'updated_at' => current_time('mysql')
         ], ['id' => $id]);
 
-        wp_send_json_success(['message' => 'Item deleted']);
+        wp_send_json_success(['message' => 'Item deleted successfully']);
     }
+
 
     /**
      * Load pack composition for editing

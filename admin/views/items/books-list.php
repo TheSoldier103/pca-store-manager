@@ -43,7 +43,7 @@
                 echo '<td>' . esc_html($book->name) . '</td>';
                 echo '<td>' . esc_html($book->class_level) . '</td>';
                 echo '<td>' . esc_html($book->subject) . '</td>';
-                echo '<td>₦' . number_format($book->selling_price, 2) . '</td>';
+                echo '<td>₦' . number_format($book->selling_price) . '</td>';
                 echo '<td>' . intval($book->current_stock) . '</td>';
                 echo '<td>' . esc_html($book->status) . '</td>';
                 echo '<td style="white-space: nowrap;">';
