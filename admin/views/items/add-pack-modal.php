@@ -33,23 +33,30 @@ $child_items = $wpdb->get_results("
             <th><label>Class Level</label></th>
             <td>
                 <select id="pca-pack-class-filter">
-                    <option value="">Select Class</option>
-                    <option value="JSS1">JSS1</option>
-                    <option value="JSS2">JSS2</option>
-                    <option value="JSS3">JSS3</option>
-                    <option value="SS1">SS1</option>
-                    <option value="SS2">SS2</option>
-                    <option value="SS3">SS3</option>
+                    <option value="">All Classes</option>
+                    <?php foreach ($class_levels as $cl): ?>
+                        <option value="<?php echo esc_attr($cl); ?>">
+                            <?php echo esc_html($cl); ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </td>
         </tr>
 
         <tr>
-            <th><label>Subject (optional)</label></th>
+            <th><label>Subject</label></th>
             <td>
-                <input type="text" id="pca-pack-subject-filter" placeholder="e.g. Mathematics">
+                <select id="pca-pack-subject-filter">
+                    <option value="">All Subjects</option>
+                    <?php foreach ($subjects as $sub): ?>
+                        <option value="<?php echo esc_attr($sub); ?>">
+                            <?php echo esc_html($sub); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </td>
         </tr>
+
 
 
         <tr>
