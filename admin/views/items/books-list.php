@@ -47,11 +47,8 @@
                 echo '<td>' . intval($book->current_stock) . '</td>';
                 echo '<td>' . esc_html($book->status) . '</td>';
                 echo '<td style="white-space: nowrap;">';
-                echo '<a href="#" class="pca-edit-item" data-id="' . $book->id . '">Edit</a> ' | ;
-                echo '<a href="#" class="button-danger pca-delete-item" data-id="' . $book->id . '">Delete</a>';
-                
-
-                
+                echo '<a href="#" class="pca-edit-item" data-id="' . $book->id . '">Edit</a> | ';
+                echo '<a href="#" class="button-danger pca-delete-item" data-id="' . $book->id . '">Delete</a>';                
                 echo '</td>';
                 echo '</tr>';
             }

@@ -71,8 +71,8 @@
                 echo '<td>' . intval($virtual_stock) . '</td>';
 
                 echo '<td style="white-space: nowrap;">';
-                echo '<a href="#" class="button pca-edit-pack" data-id="' . $pack->id . '">Edit</a> ';
-                echo '<a href="#" class="button button-danger pca-delete-pack" data-id="' . $pack->id . '">Delete</a>';
+                echo '<a href="#" class="pca-edit-pack" data-id="' . $pack->id . '">Edit</a> | ';
+                echo '<a href="#" class="button-danger pca-delete-pack" data-id="' . $pack->id . '">Delete</a>';
                 echo '</td>';
 
                 echo '</tr>';

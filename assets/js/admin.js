@@ -253,6 +253,7 @@ jQuery(document).ready(function($){
         e.preventDefault();
 
         resetPackModal();
+        loadPackBooks();
 
         $('#pca-pack-modal-title').text('Add New Pack');
         $('#pca-add-pack-modal').show();

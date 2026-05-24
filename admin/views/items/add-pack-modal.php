@@ -3,19 +3,37 @@ if (!defined('ABSPATH')) exit;
 
 global $wpdb;
 
-$dept_table = $wpdb->prefix . 'pca_store_departments';
+$dept_table  = $wpdb->prefix . 'pca_store_departments';
 $items_table = $wpdb->prefix . 'pca_store_items';
 
-// Only allow packs under Books for now
-$book_dept_id = $wpdb->get_var("SELECT id FROM $dept_table WHERE name = 'Books' LIMIT 1");
-
-$child_items = $wpdb->get_results("
-    SELECT id, name, selling_price
-    FROM $items_table
-    WHERE department_id = $book_dept_id
-    AND item_type = 'single'
-    ORDER BY name ASC
+// Books department
+$book_dept_id = $wpdb->get_var("
+    SELECT id FROM $dept_table 
+    WHERE LOWER(name) = 'books'
+    LIMIT 1
 ");
+
+// Distinct class levels
+$class_levels = $wpdb->get_col($wpdb->prepare("
+    SELECT DISTINCT class_level
+    FROM $items_table
+    WHERE department_id = %d
+    AND item_type = 'single'
+    AND class_level IS NOT NULL
+    AND class_level != ''
+    ORDER BY class_level ASC
+", $book_dept_id));
+
+// Distinct subjects
+$subjects = $wpdb->get_col($wpdb->prepare("
+    SELECT DISTINCT subject
+    FROM $items_table
+    WHERE department_id = %d
+    AND item_type = 'single'
+    AND subject IS NOT NULL
+    AND subject != ''
+    ORDER BY subject ASC
+", $book_dept_id));
 ?>
 
 <div id="pca-add-pack-modal" style="display:none;">
@@ -30,7 +48,7 @@ $child_items = $wpdb->get_results("
         </tr>
 
         <tr>
-            <th><label>Class Level</label></th>
+            <th><label>Class Filter</label></th>
             <td>
                 <select id="pca-pack-class-filter">
                     <option value="">All Classes</option>
@@ -44,7 +62,7 @@ $child_items = $wpdb->get_results("
         </tr>
 
         <tr>
-            <th><label>Subject</label></th>
+            <th><label>Subject Filter</label></th>
             <td>
                 <select id="pca-pack-subject-filter">
                     <option value="">All Subjects</option>
@@ -57,27 +75,9 @@ $child_items = $wpdb->get_results("
             </td>
         </tr>
 
-
-
         <tr>
-            <th><label>Set Class Level</label></th>
+            <th><label>Pack Class Level</label></th>
             <td><input type="text" id="pca-pack-class" class="regular-text"></td>
-        </tr>
-
-        <tr>
-            <th><label>Pack Items</label></th>
-            <td>
-                <div id="pca-pack-items-container">
-                    <?php foreach ($child_items as $item): ?>
-                        <div class="pca-pack-row" data-id="<?php echo $item->id; ?>">
-                            <strong><?php echo esc_html($item->name); ?></strong>
-                            (₦<?php echo number_format($item->selling_price, 2); ?>)
-                            Qty:
-                            <input type="number" class="pca-pack-qty" value="1" min="1">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </td>
         </tr>
 
         <tr>
@@ -94,7 +94,7 @@ $child_items = $wpdb->get_results("
 
     <h3>Books in this Pack</h3>
     <div id="pca-pack-book-list"></div>
-    
+
     <input type="hidden" id="pca-pack-id" value="">
     <input type="hidden" id="pca-pack-department-id" value="<?php echo $book_dept_id; ?>">
     <input type="hidden" id="pca-pack-type" value="pack">
