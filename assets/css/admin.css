@@ -1,0 +1,14 @@
+.pca-items-table td,
+.pca-items-table th {
+    padding: 6px 8px !important;
+    white-space: nowrap;
+}
+
+.pca-items-table td:nth-child(1) {
+    white-space: normal; /* allow item name to wrap */
+    max-width: 200px;
+}
+
+.pca-actions {
+    white-space: nowrap;
+}

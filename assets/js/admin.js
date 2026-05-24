@@ -1,23 +1,51 @@
-// jQuery(document).ready(function($){
-
-//     // Open modal
-//     $('#pca-add-stationery-btn').on('click', function(){
-//         $('#pca-add-stationery-modal').show();
-//     });
-
-//     // Close modal
-//     $('#pca-close-stationery-modal').on('click', function(){
-//         $('#pca-add-stationery-modal').hide();
-//     });
-
-//     // Save (backend will be added later)
-//     $('#pca-save-stationery').on('click', function(){
-//         alert('Saving stationery... (backend coming later)');
-//     });
-
-// });
-
 jQuery(document).ready(function($){
+
+    $(document).on('click', '.pca-edit-item', function(e){
+        e.preventDefault();
+
+        const id = $(this).data('id');
+
+        $.get(ajaxurl, {
+            action: 'pca_store_get_item',
+            id: id
+        }, function(response){
+
+            if (!response.success) {
+                alert(response.data.message);
+                return;
+            }
+
+            const item = response.data.item;
+
+            resetItemModal();
+
+            $('#pca-item-id').val(item.id);
+            $('#pca-item-name').val(item.name);
+            $('#pca-item-price').val(item.selling_price);
+            $('#pca-item-reorder').val(item.reorder_level);
+
+            // Set department
+            $('#pca-item-department').val(item.department_id).trigger('change');
+
+            // Set supplier
+            setTimeout(() => {
+                $('#pca-item-supplier').val(item.supplier_id);
+            }, 300);
+
+            // Book fields
+            $('#pca-item-class').val(item.class_level);
+            $('#pca-item-subject').val(item.subject);
+
+            // Uniform fields
+            $('#pca-item-size').val(item.size);
+            $('#pca-item-gender').val(item.gender);
+            $('#pca-item-color').val(item.color);
+
+            $('#pca-item-modal-title').text('Edit Item');
+            $('#pca-add-item-modal').show();
+        });
+    });
+
 
     // Open modal (new supplier)
     $('#pca-add-supplier-btn').on('click', function(e){
@@ -342,37 +370,6 @@ jQuery(document).ready(function($){
 
 });
 
-
-// // Save item
-// jQuery(document).on('click', '#pca-save-item', function() {
-
-//     let data = {
-//         action: 'pca_store_save_item',
-//         item_type: jQuery('#pca-item-type').val(),
-//         name: jQuery('#pca-item-name').val(),
-//         price: jQuery('#pca-item-price').val(),
-//         reorder_level: jQuery('#pca-item-reorder').val(),
-//         department: jQuery('#pca-item-department').val(),
-//         supplier_id: jQuery('#pca-item-supplier').val(),
-//     };
-
-//     // Pack items
-//     if (data.item_type === 'pack') {
-//         data.pack_items = [];
-
-//         jQuery('.pca-pack-row').each(function() {
-//             data.pack_items.push({
-//                 id: jQuery(this).data('id'),
-//                 qty: jQuery(this).find('.pca-pack-qty').val()
-//             });
-//         });
-//     }
-
-//     jQuery.post(ajaxurl, data, function(response) {
-//         alert(response.data.message);
-//         location.reload();
-//     });
-// });
 
 // ADD STOCK
 jQuery(document).on('click', '#pca-save-stock', function() {

@@ -6,7 +6,42 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_save_item', [__CLASS__, 'save_item']);
         add_action('wp_ajax_pca_store_delete_item', [__CLASS__, 'delete_item']);
         add_action('wp_ajax_pca_store_get_pack_items', [__CLASS__, 'get_pack_items']);
+        add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
+
     }
+
+    public static function get_item() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+
+        $id = intval($_GET['id']);
+
+        $item = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $items_table WHERE id = %d LIMIT 1
+        ", $id));
+
+        if (!$item) {
+            wp_send_json_error(['message' => 'Item not found']);
+        }
+
+        // If pack, load children
+        $children = [];
+        if ($item->item_type === 'pack') {
+            $children = $wpdb->get_results($wpdb->prepare("
+                SELECT child_item_id, quantity 
+                FROM $packs_table 
+                WHERE pack_id = %d
+            ", $id));
+        }
+
+        wp_send_json_success([
+            'item' => $item,
+            'children' => $children
+        ]);
+    }
+
 
     /**
      * Save item (single book, pack, or stationery)
@@ -53,24 +88,48 @@ class PCA_Store_Items_Controller {
             wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
         }
 
-        // Insert item
-        $wpdb->insert($items_table, [
-            'name'           => $name,
-            'department_id'  => $department_id,
-            'supplier_id'    => $supplier_id ?: null,
-            'selling_price'  => $selling_price,
-            'reorder_level'  => $reorder_level,
-            'item_type'      => $item_type,
-            'class_level'    => $class_level,
-            'subject'        => $subject,
-            'size'           => $size,
-            'gender'         => $gender,
-            'color'          => $color,
-            'status'         => 'active',
-            'created_at'     => current_time('mysql'),
-        ]);
 
-        $item_id = $wpdb->insert_id;
+        $id = intval($_POST['id']);
+
+        if ($id > 0) {
+            // UPDATE
+            $wpdb->update($items_table, [
+                'name'           => $name,
+                'department_id'  => $department_id,
+                'supplier_id'    => $supplier_id ?: null,
+                'selling_price'  => $selling_price,
+                'reorder_level'  => $reorder_level,
+                'class_level'    => $class_level,
+                'subject'        => $subject,
+                'size'           => $size,
+                'gender'         => $gender,
+                'color'          => $color,
+                'updated_at'     => current_time('mysql'),
+            ], ['id' => $id]);
+
+            $item_id = $id;
+
+        } else {
+            // INSERT
+            $wpdb->insert($items_table, [
+                'name'           => $name,
+                'department_id'  => $department_id,
+                'supplier_id'    => $supplier_id ?: null,
+                'selling_price'  => $selling_price,
+                'reorder_level'  => $reorder_level,
+                'item_type'      => $item_type,
+                'class_level'    => $class_level,
+                'subject'        => $subject,
+                'size'           => $size,
+                'gender'         => $gender,
+                'color'          => $color,
+                'status'         => 'active',
+                'created_at'     => current_time('mysql'),
+            ]);
+
+            $item_id = $wpdb->insert_id;
+        }
+
 
         // Save pack items
         if ($item_type === 'pack') {

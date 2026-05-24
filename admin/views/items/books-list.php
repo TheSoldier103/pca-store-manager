@@ -2,7 +2,8 @@
 
 <button class="button button-primary" id="pca-add-book-btn">Add New Book</button>
 
-<table class="wp-list-table widefat fixed striped">
+<table class="wp-list-table widefat fixed striped pca-items-table">
+
     <thead>
         <tr>
             <th>Name</th>
