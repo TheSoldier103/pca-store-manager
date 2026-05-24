@@ -18,7 +18,7 @@ class PCA_Store_Items_Controller {
         $items_table = $wpdb->prefix . 'pca_store_items';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
 
-        $class = sanitize_text_field($_GET['class'] ?? '');
+        $class   = sanitize_text_field($_GET['class'] ?? '');
         $subject = sanitize_text_field($_GET['subject'] ?? '');
 
         $books_dept_id = $wpdb->get_var("
@@ -27,7 +27,10 @@ class PCA_Store_Items_Controller {
             LIMIT 1
         ");
 
-        $where = ["department_id = $books_dept_id", "item_type = 'single'"];
+        $where = [
+            $wpdb->prepare("department_id = %d", $books_dept_id),
+            "item_type = 'single'"
+        ];
 
         if ($class !== '') {
             $where[] = $wpdb->prepare("class_level = %s", $class);
@@ -48,6 +51,7 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['books' => $books]);
     }
+
 
 
 
