@@ -667,7 +667,7 @@ function loadPackBooks() {
         response.data.books.forEach(book => {
             html += `
                 <tr class="pca-pack-row" data-id="${book.id}">
-                    <td>${book.name} (${book.class_level} - ${book.subject})</td>
+                    <td>${book.name} (${book.class_level || ''} ${book.subject ? ' - ' + book.subject : ''})</td>
                     <td><input type="number" class="pca-pack-qty" value="1" min="1"></td>
                 </tr>
             `;
@@ -680,4 +680,5 @@ function loadPackBooks() {
 }
 
 $('#pca-pack-class-filter').on('change', loadPackBooks);
-$('#pca-pack-subject-filter').on('keyup', loadPackBooks);
+$('#pca-pack-subject-filter').on('change', loadPackBooks);
+

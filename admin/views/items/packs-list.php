@@ -2,7 +2,7 @@
 
 <button class="button button-primary" id="pca-add-pack-btn">Add New Pack</button>
 
-<table class="wp-list-table widefat fixed striped">
+<table class="wp-list-table widefat fixed striped pca-items-table">
     <thead>
         <tr>
             <th>Pack Name</th>
@@ -28,6 +28,7 @@
             LIMIT 1
         ");
 
+        // Fetch packs
         $pack_items = $wpdb->get_results($wpdb->prepare("
             SELECT i.*, COUNT(p.child_item_id) AS book_count
             FROM $items_table i
@@ -39,23 +40,25 @@
             ORDER BY i.name ASC
         ", $books_dept_id));
 
-
         if ($pack_items) {
             foreach ($pack_items as $pack) {
 
                 // Calculate virtual stock
-                $child_items = $wpdb->get_results("
+                $child_items = $wpdb->get_results($wpdb->prepare("
                     SELECT child_item_id, quantity
-                    FROM $packs
-                    WHERE pack_id = $pack->id
-                ");
+                    FROM $packs_table
+                    WHERE pack_id = %d
+                ", $pack->id));
 
                 $virtual_stock = 999999;
+
                 foreach ($child_items as $child) {
-                    $stock = $wpdb->get_var("
-                        SELECT current_stock FROM $items
-                        WHERE id = $child->child_item_id
-                    ");
+                    $stock = $wpdb->get_var($wpdb->prepare("
+                        SELECT current_stock 
+                        FROM $items_table
+                        WHERE id = %d
+                    ", $child->child_item_id));
+
                     $possible = floor($stock / $child->quantity);
                     $virtual_stock = min($virtual_stock, $possible);
                 }
@@ -66,10 +69,12 @@
                 echo '<td>' . intval($pack->book_count) . '</td>';
                 echo '<td>₦' . number_format($pack->selling_price, 2) . '</td>';
                 echo '<td>' . intval($virtual_stock) . '</td>';
-                echo '<td>
-                        <a href="#" class="button">Edit</a>
-                        <a href="#" class="button button-danger">Delete</a>
-                      </td>';
+
+                echo '<td style="white-space: nowrap;">';
+                echo '<a href="#" class="button pca-edit-pack" data-id="' . $pack->id . '">Edit</a> ';
+                echo '<a href="#" class="button button-danger pca-delete-pack" data-id="' . $pack->id . '">Delete</a>';
+                echo '</td>';
+
                 echo '</tr>';
             }
         } else {

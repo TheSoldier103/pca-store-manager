@@ -21,7 +21,6 @@ class PCA_Store_Items_Controller {
         $class = sanitize_text_field($_GET['class'] ?? '');
         $subject = sanitize_text_field($_GET['subject'] ?? '');
 
-        // Get Books department_id
         $books_dept_id = $wpdb->get_var("
             SELECT id FROM $dept_table 
             WHERE LOWER(name) = 'books'
@@ -30,15 +29,15 @@ class PCA_Store_Items_Controller {
 
         $where = ["department_id = $books_dept_id", "item_type = 'single'"];
 
-        if ($class) {
+        if ($class !== '') {
             $where[] = $wpdb->prepare("class_level = %s", $class);
         }
 
-        if ($subject) {
-            $where[] = $wpdb->prepare("subject LIKE %s", "%$subject%");
+        if ($subject !== '') {
+            $where[] = $wpdb->prepare("subject = %s", $subject);
         }
 
-        $where_sql = implode(" AND ", $where);
+        $where_sql = implode(' AND ', $where);
 
         $books = $wpdb->get_results("
             SELECT id, name, class_level, subject 
@@ -49,6 +48,7 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['books' => $books]);
     }
+
 
 
     public static function get_item() {
