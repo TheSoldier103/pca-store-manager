@@ -7,8 +7,49 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_delete_item', [__CLASS__, 'delete_item']);
         add_action('wp_ajax_pca_store_get_pack_items', [__CLASS__, 'get_pack_items']);
         add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
+        add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
+
 
     }
+
+    public static function get_books_for_pack() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+
+        $class = sanitize_text_field($_GET['class'] ?? '');
+        $subject = sanitize_text_field($_GET['subject'] ?? '');
+
+        // Get Books department_id
+        $books_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table 
+            WHERE LOWER(name) = 'books'
+            LIMIT 1
+        ");
+
+        $where = ["department_id = $books_dept_id", "item_type = 'single'"];
+
+        if ($class) {
+            $where[] = $wpdb->prepare("class_level = %s", $class);
+        }
+
+        if ($subject) {
+            $where[] = $wpdb->prepare("subject LIKE %s", "%$subject%");
+        }
+
+        $where_sql = implode(" AND ", $where);
+
+        $books = $wpdb->get_results("
+            SELECT id, name, class_level, subject 
+            FROM $items_table
+            WHERE $where_sql
+            ORDER BY name ASC
+        ");
+
+        wp_send_json_success(['books' => $books]);
+    }
+
 
     public static function get_item() {
         global $wpdb;

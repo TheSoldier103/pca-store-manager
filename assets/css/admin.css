@@ -14,17 +14,18 @@
 }
 
 .pca-items-table .button {
-    padding: 2px 6px !important;
-    font-size: 11px !important;
-    line-height: 1 !important;
+    padding: 3px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
     height: auto !important;
     margin-right: 4px !important;
 }
 
 .pca-items-table td {
-    padding: 4px 6px !important;
+    padding: 6px 8px !important;
 }
 
 .pca-items-table th {
-    padding: 6px 6px !important;
+    padding: 8px 8px !important;
 }
+

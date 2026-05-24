@@ -16,18 +16,29 @@
     <tbody>
         <?php
         global $wpdb;
-        $items = $wpdb->prefix . 'pca_store_items';
-        $packs = $wpdb->prefix . 'pca_store_item_packs';
 
-        $pack_items = $wpdb->get_results("
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+
+        // Get Books department_id dynamically
+        $books_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table 
+            WHERE LOWER(name) = 'books'
+            LIMIT 1
+        ");
+
+        $pack_items = $wpdb->get_results($wpdb->prepare("
             SELECT i.*, COUNT(p.child_item_id) AS book_count
-            FROM $items i
-            LEFT JOIN $packs p ON p.pack_id = i.id
-            WHERE department_id = X
+            FROM $items_table i
+            LEFT JOIN $packs_table p ON p.pack_id = i.id
+            WHERE i.department_id = %d
             AND i.item_type = 'pack'
+            AND i.status != 'deleted'
             GROUP BY i.id
             ORDER BY i.name ASC
-        ");
+        ", $books_dept_id));
+
 
         if ($pack_items) {
             foreach ($pack_items as $pack) {

@@ -31,6 +31,29 @@ $child_items = $wpdb->get_results("
 
         <tr>
             <th><label>Class Level</label></th>
+            <td>
+                <select id="pca-pack-class-filter">
+                    <option value="">Select Class</option>
+                    <option value="JSS1">JSS1</option>
+                    <option value="JSS2">JSS2</option>
+                    <option value="JSS3">JSS3</option>
+                    <option value="SS1">SS1</option>
+                    <option value="SS2">SS2</option>
+                    <option value="SS3">SS3</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <th><label>Subject (optional)</label></th>
+            <td>
+                <input type="text" id="pca-pack-subject-filter" placeholder="e.g. Mathematics">
+            </td>
+        </tr>
+
+
+        <tr>
+            <th><label>Set Class Level</label></th>
             <td><input type="text" id="pca-pack-class" class="regular-text"></td>
         </tr>
 
@@ -62,6 +85,9 @@ $child_items = $wpdb->get_results("
 
     </table>
 
+    <h3>Books in this Pack</h3>
+    <div id="pca-pack-book-list"></div>
+    
     <input type="hidden" id="pca-pack-id" value="">
     <input type="hidden" id="pca-pack-department-id" value="<?php echo $book_dept_id; ?>">
     <input type="hidden" id="pca-pack-type" value="pack">
