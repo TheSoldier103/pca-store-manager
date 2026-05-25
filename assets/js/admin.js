@@ -445,8 +445,8 @@ jQuery(document).ready(function($){
             selling_price: $('#pca-pack-price').val()   || 0,
             reorder_level: $('#pca-pack-reorder').val() || 0,
             class_level:   $('#pca-pack-class').val(),
-            // pack_items:    items,   // array of { id, name, qty }
-            pack_items: JSON.stringify(items),
+            pack_items:    items,   // array of { id, name, qty }
+            // pack_items: JSON.stringify(items),
         }, function(response) {
             if (response.success) {
                 $('#pca-add-pack-modal').hide();
@@ -565,40 +565,40 @@ jQuery(document).ready(function($){
 
     });
 
-    /* ---------------------------------------------
-       SAVE PACK
-    --------------------------------------------- */
-    $('#pca-save-pack').on('click', function(e){
-        e.preventDefault();
+    // /* ---------------------------------------------
+    //    SAVE PACK
+    // --------------------------------------------- */
+    // $('#pca-save-pack').on('click', function(e){
+    //     e.preventDefault();
 
-        let packItems = [];
+    //     let packItems = [];
 
-        $('.pca-pack-row').each(function(){
-            packItems.push({
-                id: $(this).data('id'),
-                qty: $(this).find('.pca-pack-qty').val()
-            });
-        });
+    //     $('.pca-pack-row').each(function(){
+    //         packItems.push({
+    //             id: $(this).data('id'),
+    //             qty: $(this).find('.pca-pack-qty').val()
+    //         });
+    //     });
 
-        const data = {
-            action: 'pca_store_save_item',
-            item_type: 'pack',
-            id: $('#pca-pack-id').val(),
-            name: $('#pca-pack-name').val(),
-            department_id: $('#pca-pack-department-id').val(),
-            selling_price: $('#pca-pack-price').val(),
-            reorder_level: $('#pca-pack-reorder').val(),
-            class_level: $('#pca-pack-class').val(),
-            // pack_items: packItems
-            pack_items: JSON.stringify(items)
+    //     const data = {
+    //         action: 'pca_store_save_item',
+    //         item_type: 'pack',
+    //         id: $('#pca-pack-id').val(),
+    //         name: $('#pca-pack-name').val(),
+    //         department_id: $('#pca-pack-department-id').val(),
+    //         selling_price: $('#pca-pack-price').val(),
+    //         reorder_level: $('#pca-pack-reorder').val(),
+    //         class_level: $('#pca-pack-class').val(),
+    //         // pack_items: packItems
+    //         pack_items: JSON.stringify(items)
             
-        };
+    //     };
 
-        $.post(ajaxurl, data, function(response){
-            alert(response.data.message);
-            location.reload();
-        });
-    });
+    //     $.post(ajaxurl, data, function(response){
+    //         alert(response.data.message);
+    //         location.reload();
+    //     });
+    // });
 
 });
 
