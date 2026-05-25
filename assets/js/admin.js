@@ -87,6 +87,31 @@ jQuery(document).ready(function($){
         });
     });
 
+    $(document).on('click', '.pca-delete-pack', function(e){
+        e.preventDefault();
+
+        const packId = $(this).data('id');
+
+        if (!confirm('Are you sure you want to delete this pack?')) {
+            return;
+        }
+
+        $.post(ajaxurl, {
+            action: 'pca_store_delete_pack',
+            pack_id: packId
+        }, function(response){
+            if (response.success) {
+                alert('Pack deleted successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + (response.data?.message || 'Could not delete pack.'));
+            }
+        }).fail(function(){
+            alert('Server error. Please try again.');
+        });
+    });
+
+
 
 
     // Open modal (new supplier)

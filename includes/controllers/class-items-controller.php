@@ -9,8 +9,7 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
         add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
         add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
-
-
+        add_action('wp_ajax_pca_store_delete_pack', [__CLASS__, 'delete_pack']);
 
     }
 
@@ -52,6 +51,31 @@ class PCA_Store_Items_Controller {
             'items' => $items
         ]);
     }
+
+    public static function delete_pack() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+
+        $pack_id = intval($_POST['pack_id'] ?? 0);
+
+        if ($pack_id <= 0) {
+            wp_send_json_error(['message' => 'Invalid pack ID']);
+        }
+
+        // Soft delete the pack item
+        $wpdb->update($items_table, [
+            'status'     => 'deleted',
+            'updated_at' => current_time('mysql')
+        ], ['id' => $pack_id]);
+
+        // Remove pack children (hard delete)
+        $wpdb->delete($packs_table, ['pack_id' => $pack_id]);
+
+        wp_send_json_success(['message' => 'Pack deleted']);
+    }
+
 
 
     public static function get_books_for_pack() {
