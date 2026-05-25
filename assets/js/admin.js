@@ -450,8 +450,8 @@ jQuery(document).ready(function($){
             if (response.success) {
                 $('#pca-add-pack-modal').hide();
                 resetPackModal();
-                // TODO: refresh your packs list here, e.g.:
-                loadPacksList();
+                alert(response.data.message);
+                location.reload();
             } else {
                 alert('Error: ' + (response.data?.message || 'Could not save pack.'));
             }
