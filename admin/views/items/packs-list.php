@@ -1,7 +1,7 @@
 <h2 class="title">Book Packs</h2>
 <button class="button button-primary" id="pca-add-pack-btn">Add New Pack</button>
 
-<!-- <style>
+<style>
 .pca-pack-toggle {
     background: none;
     border: none;
@@ -47,7 +47,7 @@
     color: #999;
     font-style: italic;
 }
-</style> -->
+</style>
 
 <table class="wp-list-table widefat fixed striped pca-items-table">
     <thead>
