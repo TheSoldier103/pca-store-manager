@@ -121,8 +121,8 @@ class PCA_Store_Items_Controller {
         // --- Validate pack has items BEFORE touching the DB ---
         $pack_items = [];
         if ($item_type === 'pack') {
-            $raw = $_POST['pack_items'] ?? [];
-            // $raw = json_decode( stripslashes( $_POST['pack_items'] ?? '[]' ), true ) ?: [];
+            // $raw = $_POST['pack_items'] ?? [];
+            $raw = json_decode( stripslashes( $_POST['pack_items'] ?? '[]' ), true ) ?: [];
 
             // Sanitize each child
             foreach ($raw as $child) {
