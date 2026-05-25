@@ -463,8 +463,8 @@ jQuery(document).ready(function($){
             selling_price: $('#pca-pack-price').val()   || 0,
             reorder_level: $('#pca-pack-reorder').val() || 0,
             class_level:   $('#pca-pack-class').val(),
-            // pack_items:    items,   // array of { id, name, qty }
-            pack_items: JSON.stringify(items),
+            pack_items:    items,   // array of { id, name, qty }
+            // pack_items: JSON.stringify(items),
 
         }, function(response) {
             if (response.success) {
