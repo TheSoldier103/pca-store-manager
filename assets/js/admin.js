@@ -411,57 +411,57 @@ jQuery(document).ready(function($){
         $('#pca-add-pack-modal').show();
     });
 
-    // /* ---------------------------------------------------------
-    //     Save Pack  ← THIS WAS MISSING
-    // --------------------------------------------------------- */
-    // $(document).on('click', '#pca-save-pack', function(e) {
-    //     e.preventDefault();
+    /* ---------------------------------------------------------
+        Save Pack  ← THIS WAS MISSING
+    --------------------------------------------------------- */
+    $(document).on('click', '#pca-save-pack', function(e) {
+        e.preventDefault();
 
-    //     const name  = $('#pca-pack-name').val().trim();
-    //     const deptId = $('#pca-pack-department-id').val();
-    //     const packId = $('#pca-pack-id').val();
-    //     const items  = Object.values(selectedPackItems);
+        const name  = $('#pca-pack-name').val().trim();
+        const deptId = $('#pca-pack-department-id').val();
+        const packId = $('#pca-pack-id').val();
+        const items  = Object.values(selectedPackItems);
 
-    //     // Client-side validation
-    //     if (!name) {
-    //         alert('Please enter a pack name.');
-    //         $('#pca-pack-name').focus();
-    //         return;
-    //     }
-    //     if (items.length === 0) {
-    //         alert('Please select at least one book for this pack.');
-    //         return;
-    //     }
+        // Client-side validation
+        if (!name) {
+            alert('Please enter a pack name.');
+            $('#pca-pack-name').focus();
+            return;
+        }
+        if (items.length === 0) {
+            alert('Please select at least one book for this pack.');
+            return;
+        }
 
-    //     const $btn = $(this).prop('disabled', true).text('Saving…');
+        const $btn = $(this).prop('disabled', true).text('Saving…');
 
-    //     $.post(ajaxurl, {
-    //         action:        'pca_store_save_item',
-    //         id:            packId,
-    //         item_type:     'pack',
-    //         name:          name,
-    //         department_id: deptId,
-    //         supplier_id:   0,
-    //         selling_price: $('#pca-pack-price').val()   || 0,
-    //         reorder_level: $('#pca-pack-reorder').val() || 0,
-    //         class_level:   $('#pca-pack-class').val(),
-    //         pack_items:    items,   // array of { id, name, qty }
-    //         // pack_items: JSON.stringify(items),
-    //     }, function(response) {
-    //         if (response.success) {
-    //             $('#pca-add-pack-modal').hide();
-    //             resetPackModal();
-    //             // TODO: refresh your packs list here, e.g.:
-    //             // loadPacksList();
-    //         } else {
-    //             alert('Error: ' + (response.data?.message || 'Could not save pack.'));
-    //         }
-    //     }).fail(function() {
-    //         alert('Server error. Please try again.');
-    //     }).always(function() {
-    //         $btn.prop('disabled', false).text('Save Pack');
-    //     });
-    // });
+        $.post(ajaxurl, {
+            action:        'pca_store_save_item',
+            id:            packId,
+            item_type:     'pack',
+            name:          name,
+            department_id: deptId,
+            supplier_id:   0,
+            selling_price: $('#pca-pack-price').val()   || 0,
+            reorder_level: $('#pca-pack-reorder').val() || 0,
+            class_level:   $('#pca-pack-class').val(),
+            pack_items:    items,   // array of { id, name, qty }
+            // pack_items: JSON.stringify(items),
+        }, function(response) {
+            if (response.success) {
+                $('#pca-add-pack-modal').hide();
+                resetPackModal();
+                // TODO: refresh your packs list here, e.g.:
+                // loadPacksList();
+            } else {
+                alert('Error: ' + (response.data?.message || 'Could not save pack.'));
+            }
+        }).fail(function() {
+            alert('Server error. Please try again.');
+        }).always(function() {
+            $btn.prop('disabled', false).text('Save Pack');
+        });
+    });
 
     /* ---------------------------------------------------------
         Close Modals
@@ -565,40 +565,40 @@ jQuery(document).ready(function($){
 
     });
 
-    /* ---------------------------------------------
-       SAVE PACK
-    --------------------------------------------- */
-    $('#pca-save-pack').on('click', function(e){
-        e.preventDefault();
+//     /* ---------------------------------------------
+//        SAVE PACK
+//     --------------------------------------------- */
+//     $('#pca-save-pack').on('click', function(e){
+//         e.preventDefault();
 
-        let packItems = [];
+//         let packItems = [];
 
-        $('.pca-pack-row').each(function(){
-            packItems.push({
-                id: $(this).data('id'),
-                qty: $(this).find('.pca-pack-qty').val()
-            });
-        });
+//         $('.pca-pack-row').each(function(){
+//             packItems.push({
+//                 id: $(this).data('id'),
+//                 qty: $(this).find('.pca-pack-qty').val()
+//             });
+//         });
 
-        const data = {
-            action: 'pca_store_save_item',
-            item_type: 'pack',
-            id: $('#pca-pack-id').val(),
-            name: $('#pca-pack-name').val(),
-            department_id: $('#pca-pack-department-id').val(),
-            selling_price: $('#pca-pack-price').val(),
-            reorder_level: $('#pca-pack-reorder').val(),
-            class_level: $('#pca-pack-class').val(),
-            pack_items: packItems
-            // pack_items: JSON.stringify(items)
+//         const data = {
+//             action: 'pca_store_save_item',
+//             item_type: 'pack',
+//             id: $('#pca-pack-id').val(),
+//             name: $('#pca-pack-name').val(),
+//             department_id: $('#pca-pack-department-id').val(),
+//             selling_price: $('#pca-pack-price').val(),
+//             reorder_level: $('#pca-pack-reorder').val(),
+//             class_level: $('#pca-pack-class').val(),
+//             pack_items: packItems
+//             // pack_items: JSON.stringify(items)
             
-        };
+//         };
 
-        $.post(ajaxurl, data, function(response){
-            alert(response.data.message);
-            location.reload();
-        });
-    });
+//         $.post(ajaxurl, data, function(response){
+//             alert(response.data.message);
+//             location.reload();
+//         });
+//     });
 
 });
 
