@@ -91,125 +91,244 @@ class PCA_Store_Items_Controller {
     /**
      * Save item (single book, pack, or stationery)
      */
+    // public static function save_item() {
+    //     global $wpdb;
+
+    //     $items_table = $wpdb->prefix . 'pca_store_items';
+    //     $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+
+    //     $item_type      = sanitize_text_field($_POST['item_type']);
+    //     $name           = sanitize_text_field($_POST['name']);
+    //     $department_id  = intval($_POST['department_id']);
+    //     $supplier_id    = intval($_POST['supplier_id']);
+    //     $selling_price  = floatval($_POST['selling_price']);
+    //     $reorder_level  = intval($_POST['reorder_level']);
+
+    //     $class_level    = sanitize_text_field($_POST['class_level'] ?? '');
+    //     $subject        = sanitize_text_field($_POST['subject'] ?? '');
+    //     $size           = sanitize_text_field($_POST['size'] ?? '');
+    //     $gender         = sanitize_text_field($_POST['gender'] ?? '');
+    //     $color          = sanitize_text_field($_POST['color'] ?? '');
+
+    //     // Validate
+    //     if (!$name) {
+    //         wp_send_json_error(['message' => 'Item name is required']);
+    //     }
+
+    //     if (!$department_id) {
+    //         wp_send_json_error(['message' => 'Department is required']);
+    //     }
+
+    //     // Prevent duplicates: same name + same supplier + same department
+    //     $duplicate = $wpdb->get_var($wpdb->prepare(
+    //         "SELECT COUNT(*) FROM $items_table 
+    //         WHERE name = %s 
+    //         AND supplier_id = %d 
+    //         AND department_id = %d 
+    //         AND status != 'deleted'",
+    //         $name, $supplier_id, $department_id
+    //     ));
+
+    //     if ($duplicate > 0) {
+    //         wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
+    //     }
+
+
+    //     $id = intval($_POST['id']);
+
+    //     if ($id > 0) {
+    //         // UPDATE
+    //         $wpdb->update($items_table, [
+    //             'name'           => $name,
+    //             'department_id'  => $department_id,
+    //             'supplier_id'    => $supplier_id ?: null,
+    //             'selling_price'  => $selling_price,
+    //             'reorder_level'  => $reorder_level,
+    //             'class_level'    => $class_level,
+    //             'subject'        => $subject,
+    //             'size'           => $size,
+    //             'gender'         => $gender,
+    //             'color'          => $color,
+    //             'updated_at'     => current_time('mysql'),
+    //         ], ['id' => $id]);
+
+    //         $item_id = $id;
+
+    //     } else {
+    //         // INSERT
+    //         $wpdb->insert($items_table, [
+    //             'name'           => $name,
+    //             'department_id'  => $department_id,
+    //             'supplier_id'    => $supplier_id ?: null,
+    //             'selling_price'  => $selling_price,
+    //             'reorder_level'  => $reorder_level,
+    //             'item_type'      => $item_type,
+    //             'class_level'    => $class_level,
+    //             'subject'        => $subject,
+    //             'size'           => $size,
+    //             'gender'         => $gender,
+    //             'color'          => $color,
+    //             'status'         => 'active',
+    //             'created_at'     => current_time('mysql'),
+    //         ]);
+
+    //         $item_id = $wpdb->insert_id;
+    //     }
+
+
+    //     // Save pack items
+    //     if ($item_type === 'pack') {
+
+    //         $pack_items = $_POST['pack_items'] ?? [];
+
+    //         if ($item_type === 'pack' && empty($pack_items)) {
+    //             wp_send_json_error(['message' => 'A pack must contain at least one item']);
+    //         }
+
+
+    //         foreach ($pack_items as $child) {
+    //             $wpdb->insert($packs_table, [
+    //                 'pack_id'       => $item_id,
+    //                 'child_item_id' => intval($child['id']),
+    //                 'quantity'      => intval($child['qty']),
+    //             ]);
+    //         }
+
+    //         // Clear old items (if editing)
+    //         $wpdb->delete($packs_table, ['pack_id' => $pack_id]);
+
+    //         // Insert new items
+    //         foreach ($pack_items as $item) {
+    //             $wpdb->insert($packs_table, [
+    //                 'pack_id'       => $pack_id,
+    //                 'child_item_id' => intval($item['id']),
+    //                 'quantity'      => intval($item['qty'])
+    //             ]);
+    //         }
+    //     }
+
+    //     wp_send_json_success([
+    //         'message' => 'Item saved successfully',
+    //         'item_id' => $item_id
+    //     ]);
+    // }
+
     public static function save_item() {
         global $wpdb;
 
         $items_table = $wpdb->prefix . 'pca_store_items';
         $packs_table = $wpdb->prefix . 'pca_store_item_packs';
 
+        $id             = intval($_POST['id'] ?? 0);
         $item_type      = sanitize_text_field($_POST['item_type']);
         $name           = sanitize_text_field($_POST['name']);
         $department_id  = intval($_POST['department_id']);
-        $supplier_id    = intval($_POST['supplier_id']);
-        $selling_price  = floatval($_POST['selling_price']);
-        $reorder_level  = intval($_POST['reorder_level']);
-
+        $supplier_id    = intval($_POST['supplier_id'] ?? 0);
+        $selling_price  = floatval($_POST['selling_price'] ?? 0);
+        $reorder_level  = intval($_POST['reorder_level'] ?? 0);
         $class_level    = sanitize_text_field($_POST['class_level'] ?? '');
         $subject        = sanitize_text_field($_POST['subject'] ?? '');
         $size           = sanitize_text_field($_POST['size'] ?? '');
         $gender         = sanitize_text_field($_POST['gender'] ?? '');
         $color          = sanitize_text_field($_POST['color'] ?? '');
 
-        // Validate
+        // --- Validate required fields ---
         if (!$name) {
             wp_send_json_error(['message' => 'Item name is required']);
         }
-
         if (!$department_id) {
             wp_send_json_error(['message' => 'Department is required']);
         }
 
-        // Prevent duplicates: same name + same supplier + same department
-        $duplicate = $wpdb->get_var($wpdb->prepare(
+        // --- Validate pack has items BEFORE touching the DB ---
+        $pack_items = [];
+        if ($item_type === 'pack') {
+            $raw = $_POST['pack_items'] ?? [];
+
+            // Sanitize each child
+            foreach ($raw as $child) {
+                $child_id  = intval($child['id'] ?? 0);
+                $child_qty = intval($child['qty'] ?? 1);
+                if ($child_id > 0 && $child_qty > 0) {
+                    $pack_items[] = ['id' => $child_id, 'qty' => $child_qty];
+                }
+            }
+
+            if (empty($pack_items)) {
+                wp_send_json_error(['message' => 'A pack must contain at least one item']);
+            }
+        }
+
+        // --- Duplicate check (exclude self when editing) ---
+        $dup_query = $wpdb->prepare(
             "SELECT COUNT(*) FROM $items_table 
             WHERE name = %s 
             AND supplier_id = %d 
             AND department_id = %d 
             AND status != 'deleted'",
             $name, $supplier_id, $department_id
-        ));
-
-        if ($duplicate > 0) {
+        );
+        if ($id > 0) {
+            $dup_query .= $wpdb->prepare(' AND id != %d', $id);
+        }
+        if ($wpdb->get_var($dup_query) > 0) {
             wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
         }
 
-
-        $id = intval($_POST['id']);
-
+        // --- Insert or Update ---
         if ($id > 0) {
-            // UPDATE
             $wpdb->update($items_table, [
-                'name'           => $name,
-                'department_id'  => $department_id,
-                'supplier_id'    => $supplier_id ?: null,
-                'selling_price'  => $selling_price,
-                'reorder_level'  => $reorder_level,
-                'class_level'    => $class_level,
-                'subject'        => $subject,
-                'size'           => $size,
-                'gender'         => $gender,
-                'color'          => $color,
-                'updated_at'     => current_time('mysql'),
+                'name'          => $name,
+                'department_id' => $department_id,
+                'supplier_id'   => $supplier_id ?: null,
+                'selling_price' => $selling_price,
+                'reorder_level' => $reorder_level,
+                'class_level'   => $class_level,
+                'subject'       => $subject,
+                'size'          => $size,
+                'gender'        => $gender,
+                'color'         => $color,
+                'updated_at'    => current_time('mysql'),
             ], ['id' => $id]);
 
             $item_id = $id;
-
         } else {
-            // INSERT
             $wpdb->insert($items_table, [
-                'name'           => $name,
-                'department_id'  => $department_id,
-                'supplier_id'    => $supplier_id ?: null,
-                'selling_price'  => $selling_price,
-                'reorder_level'  => $reorder_level,
-                'item_type'      => $item_type,
-                'class_level'    => $class_level,
-                'subject'        => $subject,
-                'size'           => $size,
-                'gender'         => $gender,
-                'color'          => $color,
-                'status'         => 'active',
-                'created_at'     => current_time('mysql'),
+                'name'          => $name,
+                'department_id' => $department_id,
+                'supplier_id'   => $supplier_id ?: null,
+                'selling_price' => $selling_price,
+                'reorder_level' => $reorder_level,
+                'item_type'     => $item_type,
+                'class_level'   => $class_level,
+                'subject'       => $subject,
+                'size'          => $size,
+                'gender'        => $gender,
+                'color'         => $color,
+                'status'        => 'active',
+                'created_at'    => current_time('mysql'),
             ]);
 
             $item_id = $wpdb->insert_id;
         }
 
-
-        // Save pack items
+        // --- Save pack children (delete-then-insert, once, with $item_id) ---
         if ($item_type === 'pack') {
-
-            $pack_items = $_POST['pack_items'] ?? [];
-
-            if ($item_type === 'pack' && empty($pack_items)) {
-                wp_send_json_error(['message' => 'A pack must contain at least one item']);
-            }
-
+            // Always clear existing children first (handles both add and edit)
+            $wpdb->delete($packs_table, ['pack_id' => $item_id]);
 
             foreach ($pack_items as $child) {
                 $wpdb->insert($packs_table, [
                     'pack_id'       => $item_id,
-                    'child_item_id' => intval($child['id']),
-                    'quantity'      => intval($child['qty']),
-                ]);
-            }
-
-            // Clear old items (if editing)
-            $wpdb->delete($packs_table, ['pack_id' => $pack_id]);
-
-            // Insert new items
-            foreach ($pack_items as $item) {
-                $wpdb->insert($packs_table, [
-                    'pack_id'       => $pack_id,
-                    'child_item_id' => intval($item['id']),
-                    'quantity'      => intval($item['qty'])
+                    'child_item_id' => $child['id'],
+                    'quantity'      => $child['qty'],
                 ]);
             }
         }
 
         wp_send_json_success([
             'message' => 'Item saved successfully',
-            'item_id' => $item_id
+            'item_id' => $item_id,
         ]);
     }
 

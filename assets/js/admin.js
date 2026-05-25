@@ -247,40 +247,43 @@ jQuery(document).ready(function($){
     });
 
 
-    // function loadPackBooks() {
-    //     const classLevel = $('#pca-pack-class-filter').val();
-    //     const subject = $('#pca-pack-subject-filter').val();
+    // /* ---------------------------------------------------------
+    //     Persistent Selected Items
+    // --------------------------------------------------------- */
+    // let selectedPackItems = {}; 
+    // // Structure: { 12: { id:12, name:"Book", qty:1 }, ... }
 
-    //     $.get(ajaxurl, {
-    //         action: 'pca_store_get_books_for_pack',
-    //         class: classLevel,
-    //         subject: subject
-    //     }, function(response){
+    // /* ---------------------------------------------------------
+    // Render Selected Books Table
+    // --------------------------------------------------------- */
+    // function renderSelectedBooks() {
+    //     let tbody = $('#pca-selected-books-body');
+    //     tbody.empty();
 
-    //         if (!response.success) return;
-
-    //         let html = '<table class="widefat"><thead><tr><th>Book</th><th>Qty</th></tr></thead><tbody>';
-
-    //         response.data.books.forEach(book => {
-    //             html += `
-    //                 <tr class="pca-pack-row" data-id="${book.id}">
-    //                     <td>${book.name} (${book.class_level || ''} ${book.subject ? ' - ' + book.subject : ''})</td>
-    //                     <td><input type="number" class="pca-pack-qty" value="1" min="1"></td>
-    //                 </tr>
-    //             `;
-    //         });
-
-    //         html += '</tbody></table>';
-
-    //         $('#pca-pack-book-list').html(html);
+    //     Object.values(selectedPackItems).forEach(item => {
+    //         tbody.append(`
+    //             <tr data-id="${item.id}">
+    //                 <td>${item.name}</td>
+    //                 <td>
+    //                     <input type="number" class="pca-selected-qty" 
+    //                         data-id="${item.id}" value="${item.qty}" min="1">
+    //                 </td>
+    //                 <td>
+    //                     <button class="button pca-remove-selected" data-id="${item.id}">X</button>
+    //                 </td>
+    //             </tr>
+    //         `);
     //     });
     // }
 
+    // /* ---------------------------------------------------------
+    // Load Filtered Books
+    // --------------------------------------------------------- */
     // function loadPackBooks() {
     //     const classLevel = $('#pca-pack-class-filter').val();
     //     const subject = $('#pca-pack-subject-filter').val();
 
-    //     // If no filters selected → show nothing
+    //     // No filters → show nothing
     //     if (!classLevel && !subject) {
     //         $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
     //         return;
@@ -294,13 +297,24 @@ jQuery(document).ready(function($){
 
     //         if (!response.success) return;
 
-    //         let html = '<table class="widefat"><thead><tr><th>Book</th><th>Qty</th></tr></thead><tbody>';
+    //         let html = `
+    //             <table class="widefat">
+    //                 <thead>
+    //                     <tr><th>Select</th><th>Book</th></tr>
+    //                 </thead>
+    //                 <tbody>
+    //         `;
 
     //         response.data.books.forEach(book => {
+    //             const checked = selectedPackItems[book.id] ? 'checked' : '';
+
     //             html += `
-    //                 <tr class="pca-pack-row" data-id="${book.id}">
+    //                 <tr>
+    //                     <td>
+    //                         <input type="checkbox" class="pca-pack-select" 
+    //                             data-id="${book.id}" data-name="${book.name}" ${checked}>
+    //                     </td>
     //                     <td>${book.name} (${book.class_level || ''}${book.subject ? ' - ' + book.subject : ''})</td>
-    //                     <td><input type="number" class="pca-pack-qty" value="1" min="1"></td>
     //                 </tr>
     //             `;
     //         });
@@ -311,101 +325,226 @@ jQuery(document).ready(function($){
     //     });
     // }
 
+    // /* ---------------------------------------------------------
+    // Checkbox: Add/Remove Selected Books
+    // --------------------------------------------------------- */
+    // $(document).on('change', '.pca-pack-select', function(){
+    //     const id = $(this).data('id');
+    //     const name = $(this).data('name');
 
+    //     if ($(this).is(':checked')) {
+    //         // Add to selected list
+    //         selectedPackItems[id] = { id, name, qty: 1 };
+    //     } else {
+    //         // Remove from selected list
+    //         delete selectedPackItems[id];
+    //     }
+
+    //     renderSelectedBooks();
+    // });
+
+    // /* ---------------------------------------------------------
+    // Remove from Selected Books (sync checkbox)
+    // --------------------------------------------------------- */
+    // $(document).on('click', '.pca-remove-selected', function(e){
+    //     e.preventDefault();
+
+    //     const id = $(this).data('id');
+
+    //     // Remove from selected list
+    //     delete selectedPackItems[id];
+
+    //     // Uncheck in filtered list
+    //     $(`.pca-pack-select[data-id="${id}"]`).prop('checked', false);
+
+    //     renderSelectedBooks();
+    // });
+
+    // /* ---------------------------------------------------------
+    // Update Quantity
+    // --------------------------------------------------------- */
+    // $(document).on('input', '.pca-selected-qty', function(){
+    //     const id = $(this).data('id');
+    //     const qty = parseInt($(this).val());
+
+    //     if (qty > 0) {
+    //         selectedPackItems[id].qty = qty;
+    //     }
+    // });
+
+    // /* ---------------------------------------------------------
+    // Open Modal
+    // --------------------------------------------------------- */
+    // $(document).on('click', '#pca-add-pack-btn', function(e){
+    //     e.preventDefault();
+
+    //     selectedPackItems = {}; // reset
+    //     renderSelectedBooks();
+
+    //     $('#pca-add-pack-modal').show();
+    //     $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
+    // });
+
+    // /* ---------------------------------------------------------
+    // Filters
+    // --------------------------------------------------------- */
     // $(document).on('change', '#pca-pack-class-filter', loadPackBooks);
     // $(document).on('change', '#pca-pack-subject-filter', loadPackBooks);
+
+
+    // /* ---------------------------------------------
+    //    OPEN PACK MODAL
+    // --------------------------------------------- */
+    // $(document).on('click', '#pca-add-pack-btn', function(e){
+    //     e.preventDefault();
+
+    //     // resetPackModal();
+
+    //     // $('#pca-pack-modal-title').text('Add New Pack');
+    //     // $('#pca-add-pack-modal').show();
+    //     // loadPackBooks();
+
+    //     resetPackModal();
+    //     $('#pca-add-pack-modal').show();
+
+    //     // Show placeholder instead of loading books
+    //     $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
+
+    // });
+
+    // /* ---------------------------------------------
+    //    CLOSE MODALS
+    // --------------------------------------------- */
+    // $('#pca-close-item-modal').on('click', function(){
+    //     $('#pca-add-item-modal').hide();
+    // });
+
+    // $('#pca-close-pack-modal').on('click', function(){
+    //     $('#pca-add-pack-modal').hide();
+    // });
 
 
     /* ---------------------------------------------------------
         Persistent Selected Items
     --------------------------------------------------------- */
-    let selectedPackItems = {}; 
+    let selectedPackItems = {};
     // Structure: { 12: { id:12, name:"Book", qty:1 }, ... }
 
     /* ---------------------------------------------------------
-    Render Selected Books Table
+        Helpers
     --------------------------------------------------------- */
+    function resetPackModal() {
+        selectedPackItems = {};
+        $('#pca-pack-id').val('');
+        $('#pca-pack-name').val('');
+        $('#pca-pack-class').val('');
+        $('#pca-pack-price').val('');
+        $('#pca-pack-reorder').val('');
+        $('#pca-pack-class-filter').val('');
+        $('#pca-pack-subject-filter').val('');
+        $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
+        $('#pca-pack-save-feedback').text('').hide();
+        renderSelectedBooks();
+    }
+
     function renderSelectedBooks() {
-        let tbody = $('#pca-selected-books-body');
+        const tbody = $('#pca-selected-books-body');
+        const items = Object.values(selectedPackItems);
+
         tbody.empty();
 
-        Object.values(selectedPackItems).forEach(item => {
+        if (items.length === 0) {
+            tbody.append('<tr><td colspan="3"><em>No books selected yet.</em></td></tr>');
+            $('#pca-selected-count').text('(0)');
+            return;
+        }
+
+        items.forEach(item => {
             tbody.append(`
                 <tr data-id="${item.id}">
                     <td>${item.name}</td>
                     <td>
-                        <input type="number" class="pca-selected-qty" 
+                        <input type="number" class="pca-selected-qty small-text"
                             data-id="${item.id}" value="${item.qty}" min="1">
                     </td>
                     <td>
-                        <button class="button pca-remove-selected" data-id="${item.id}">X</button>
+                        <button class="button button-small pca-remove-selected" data-id="${item.id}">✕</button>
                     </td>
                 </tr>
             `);
         });
+
+        $('#pca-selected-count').text(`(${items.length})`);
     }
 
     /* ---------------------------------------------------------
-    Load Filtered Books
+        Load Filtered Books
     --------------------------------------------------------- */
     function loadPackBooks() {
         const classLevel = $('#pca-pack-class-filter').val();
-        const subject = $('#pca-pack-subject-filter').val();
+        const subject    = $('#pca-pack-subject-filter').val();
 
-        // No filters → show nothing
         if (!classLevel && !subject) {
             $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
             return;
         }
 
+        $('#pca-pack-book-list').html('<p><em>Loading…</em></p>');
+
         $.get(ajaxurl, {
             action: 'pca_store_get_books_for_pack',
             class: classLevel,
-            subject: subject
-        }, function(response){
+            subject: subject,
+        }, function(response) {
+            if (!response.success) {
+                $('#pca-pack-book-list').html('<p>Failed to load books.</p>');
+                return;
+            }
 
-            if (!response.success) return;
+            const books = response.data.books;
+
+            if (!books.length) {
+                $('#pca-pack-book-list').html('<p>No books found for these filters.</p>');
+                return;
+            }
 
             let html = `
-                <table class="widefat">
+                <table class="widefat striped">
                     <thead>
-                        <tr><th>Select</th><th>Book</th></tr>
+                        <tr><th width="30">✓</th><th>Book</th></tr>
                     </thead>
                     <tbody>
             `;
 
-            response.data.books.forEach(book => {
+            books.forEach(book => {
                 const checked = selectedPackItems[book.id] ? 'checked' : '';
-
+                const meta = [book.class_level, book.subject].filter(Boolean).join(' – ');
                 html += `
                     <tr>
                         <td>
-                            <input type="checkbox" class="pca-pack-select" 
+                            <input type="checkbox" class="pca-pack-select"
                                 data-id="${book.id}" data-name="${book.name}" ${checked}>
                         </td>
-                        <td>${book.name} (${book.class_level || ''}${book.subject ? ' - ' + book.subject : ''})</td>
+                        <td>${book.name}${meta ? ' <small>(' + meta + ')</small>' : ''}</td>
                     </tr>
                 `;
             });
 
             html += '</tbody></table>';
-
             $('#pca-pack-book-list').html(html);
         });
     }
 
     /* ---------------------------------------------------------
-    Checkbox: Add/Remove Selected Books
+        Checkbox: Add / Remove
     --------------------------------------------------------- */
-    $(document).on('change', '.pca-pack-select', function(){
-        const id = $(this).data('id');
+    $(document).on('change', '.pca-pack-select', function() {
+        const id   = $(this).data('id');
         const name = $(this).data('name');
 
         if ($(this).is(':checked')) {
-            // Add to selected list
             selectedPackItems[id] = { id, name, qty: 1 };
         } else {
-            // Remove from selected list
             delete selectedPackItems[id];
         }
 
@@ -413,84 +552,104 @@ jQuery(document).ready(function($){
     });
 
     /* ---------------------------------------------------------
-    Remove from Selected Books (sync checkbox)
+        Remove from Selected (sync checkbox)
     --------------------------------------------------------- */
-    $(document).on('click', '.pca-remove-selected', function(e){
+    $(document).on('click', '.pca-remove-selected', function(e) {
         e.preventDefault();
-
         const id = $(this).data('id');
-
-        // Remove from selected list
         delete selectedPackItems[id];
-
-        // Uncheck in filtered list
         $(`.pca-pack-select[data-id="${id}"]`).prop('checked', false);
-
         renderSelectedBooks();
     });
 
     /* ---------------------------------------------------------
-    Update Quantity
+        Update Quantity
     --------------------------------------------------------- */
-    $(document).on('input', '.pca-selected-qty', function(){
-        const id = $(this).data('id');
-        const qty = parseInt($(this).val());
-
-        if (qty > 0) {
+    $(document).on('input', '.pca-selected-qty', function() {
+        const id  = $(this).data('id');
+        const qty = parseInt($(this).val(), 10);
+        if (selectedPackItems[id] && qty > 0) {
             selectedPackItems[id].qty = qty;
         }
     });
 
     /* ---------------------------------------------------------
-    Open Modal
+        Filters
     --------------------------------------------------------- */
-    $(document).on('click', '#pca-add-pack-btn', function(e){
+    $(document).on('change', '#pca-pack-class-filter, #pca-pack-subject-filter', loadPackBooks);
+
+    /* ---------------------------------------------------------
+        Open Modal
+    --------------------------------------------------------- */
+    $(document).on('click', '#pca-add-pack-btn', function(e) {
         e.preventDefault();
-
-        selectedPackItems = {}; // reset
-        renderSelectedBooks();
-
+        resetPackModal();
+        $('#pca-pack-modal-title').text('Add New Pack');
         $('#pca-add-pack-modal').show();
-        $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
     });
 
     /* ---------------------------------------------------------
-    Filters
+        Save Pack  ← THIS WAS MISSING
     --------------------------------------------------------- */
-    $(document).on('change', '#pca-pack-class-filter', loadPackBooks);
-    $(document).on('change', '#pca-pack-subject-filter', loadPackBooks);
-
-
-    /* ---------------------------------------------
-       OPEN PACK MODAL
-    --------------------------------------------- */
-    $(document).on('click', '#pca-add-pack-btn', function(e){
+    $(document).on('click', '#pca-save-pack', function(e) {
         e.preventDefault();
 
-        // resetPackModal();
+        const name  = $('#pca-pack-name').val().trim();
+        const deptId = $('#pca-pack-department-id').val();
+        const packId = $('#pca-pack-id').val();
+        const items  = Object.values(selectedPackItems);
 
-        // $('#pca-pack-modal-title').text('Add New Pack');
-        // $('#pca-add-pack-modal').show();
-        // loadPackBooks();
+        // Client-side validation
+        if (!name) {
+            alert('Please enter a pack name.');
+            $('#pca-pack-name').focus();
+            return;
+        }
+        if (items.length === 0) {
+            alert('Please select at least one book for this pack.');
+            return;
+        }
 
-        resetPackModal();
-        $('#pca-add-pack-modal').show();
+        const $btn = $(this).prop('disabled', true).text('Saving…');
 
-        // Show placeholder instead of loading books
-        $('#pca-pack-book-list').html('<p>Select a class or subject to view books.</p>');
-
+        $.post(ajaxurl, {
+            action:        'pca_store_save_item',
+            id:            packId,
+            item_type:     'pack',
+            name:          name,
+            department_id: deptId,
+            supplier_id:   0,
+            selling_price: $('#pca-pack-price').val()   || 0,
+            reorder_level: $('#pca-pack-reorder').val() || 0,
+            class_level:   $('#pca-pack-class').val(),
+            pack_items:    items,   // array of { id, name, qty }
+        }, function(response) {
+            if (response.success) {
+                $('#pca-add-pack-modal').hide();
+                resetPackModal();
+                // TODO: refresh your packs list here, e.g.:
+                // loadPacksList();
+            } else {
+                alert('Error: ' + (response.data?.message || 'Could not save pack.'));
+            }
+        }).fail(function() {
+            alert('Server error. Please try again.');
+        }).always(function() {
+            $btn.prop('disabled', false).text('Save Pack');
+        });
     });
 
-    /* ---------------------------------------------
-       CLOSE MODALS
-    --------------------------------------------- */
-    $('#pca-close-item-modal').on('click', function(){
+    /* ---------------------------------------------------------
+        Close Modals
+    --------------------------------------------------------- */
+    $('#pca-close-item-modal').on('click', function() {
         $('#pca-add-item-modal').hide();
     });
 
-    $('#pca-close-pack-modal').on('click', function(){
+    $('#pca-close-pack-modal').on('click', function() {
         $('#pca-add-pack-modal').hide();
     });
+
 
     /* ---------------------------------------------
        TOGGLE FIELDS WHEN DEPARTMENT CHANGES
