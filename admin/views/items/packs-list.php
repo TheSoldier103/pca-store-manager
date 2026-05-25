@@ -1,54 +1,6 @@
 <h2 class="title">Book Packs</h2>
 <button class="button button-primary" id="pca-add-pack-btn">Add New Pack</button>
 
-<style>
-.pca-pack-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 0 6px 0 0;
-    color: #2271b1;
-    vertical-align: middle;
-    transition: transform 0.2s ease;
-}
-.pca-pack-toggle.open {
-    transform: rotate(45deg);
-}
-.pca-pack-children {
-    display: none;
-    background: #f9f9f9;
-}
-.pca-pack-children td {
-    padding: 0 !important;
-}
-.pca-pack-children-inner {
-    padding: 10px 20px 14px 36px;
-}
-.pca-pack-children-inner table {
-    width: auto;
-    min-width: 340px;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-.pca-pack-children-inner th {
-    text-align: left;
-    padding: 4px 16px 4px 0;
-    color: #666;
-    font-weight: 600;
-    border-bottom: 1px solid #ddd;
-}
-.pca-pack-children-inner td {
-    padding: 4px 16px 4px 0;
-    border-bottom: 1px solid #eee;
-}
-.pca-no-children {
-    color: #999;
-    font-style: italic;
-}
-</style>
-
 <table class="wp-list-table widefat fixed striped pca-items-table">
     <thead>
         <tr>
