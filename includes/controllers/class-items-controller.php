@@ -8,9 +8,51 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_pack_items', [__CLASS__, 'get_pack_items']);
         add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
         add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
+        add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
+
 
 
     }
+
+    public static function get_pack() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+
+        $pack_id = intval($_GET['pack_id'] ?? 0);
+        if ($pack_id <= 0) {
+            wp_send_json_error(['message' => 'Invalid pack ID']);
+        }
+
+        // Get pack details
+        $pack = $wpdb->get_row($wpdb->prepare("
+            SELECT id, name, class_level, selling_price, reorder_level, department_id
+            FROM $items_table
+            WHERE id = %d AND item_type = 'pack'
+        ", $pack_id));
+
+        if (!$pack) {
+            wp_send_json_error(['message' => 'Pack not found']);
+        }
+
+        // Get pack items
+        $items = $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                p.child_item_id AS id,
+                p.quantity AS qty,
+                i.name
+            FROM $packs_table p
+            LEFT JOIN $items_table i ON i.id = p.child_item_id
+            WHERE p.pack_id = %d
+        ", $pack_id));
+
+        wp_send_json_success([
+            'pack'  => $pack,
+            'items' => $items
+        ]);
+    }
+
 
     public static function get_books_for_pack() {
         global $wpdb;
@@ -136,22 +178,6 @@ class PCA_Store_Items_Controller {
                 wp_send_json_error(['message' => 'A pack must contain at least one item']);
             }
         }
-
-        // // --- Duplicate check (exclude self when editing) ---
-        // $dup_query = $wpdb->prepare(
-        //     "SELECT COUNT(*) FROM $items_table 
-        //     WHERE name = %s 
-        //     AND supplier_id = %d 
-        //     AND department_id = %d 
-        //     AND status != 'deleted'",
-        //     $name, $supplier_id, $department_id
-        // );
-        // if ($id > 0) {
-        //     $dup_query .= $wpdb->prepare(' AND id != %d', $id);
-        // }
-        // if ($wpdb->get_var($dup_query) > 0) {
-        //     wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
-        // }
 
         // --- Duplicate check (exclude self when editing) ---
         $dup_query = $wpdb->prepare(

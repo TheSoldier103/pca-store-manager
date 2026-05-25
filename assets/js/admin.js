@@ -463,7 +463,9 @@ jQuery(document).ready(function($){
             selling_price: $('#pca-pack-price').val()   || 0,
             reorder_level: $('#pca-pack-reorder').val() || 0,
             class_level:   $('#pca-pack-class').val(),
-            pack_items:    items,   // array of { id, name, qty }
+            // pack_items:    items,   // array of { id, name, qty }
+            pack_items: JSON.stringify(items),
+
         }, function(response) {
             if (response.success) {
                 $('#pca-add-pack-modal').hide();
@@ -490,6 +492,57 @@ jQuery(document).ready(function($){
     $('#pca-close-pack-modal').on('click', function() {
         $('#pca-add-pack-modal').hide();
     });
+
+    $(document).on('click', '.pca-edit-pack', function(e){
+        e.preventDefault();
+
+        const packId = $(this).data('id');
+
+        // Reset
+        selectedPackItems = {};
+        renderSelectedBooks();
+
+        $.get(ajaxurl, {
+            action: 'pca_store_get_pack',
+            pack_id: packId
+        }, function(response){
+
+            if (!response.success) {
+                alert('Could not load pack');
+                return;
+            }
+
+            const pack = response.data.pack;
+            const items = response.data.items;
+
+            // Fill modal fields
+            $('#pca-pack-id').val(pack.id);
+            $('#pca-pack-name').val(pack.name);
+            $('#pca-pack-class').val(pack.class_level);
+            $('#pca-pack-price').val(pack.selling_price);
+            $('#pca-pack-reorder').val(pack.reorder_level);
+
+            // Load selected items into memory
+            items.forEach(item => {
+                selectedPackItems[item.id] = {
+                    id: item.id,
+                    name: item.name,
+                    qty: item.qty
+                };
+            });
+
+            // Render selected table
+            renderSelectedBooks();
+
+            // Show modal
+            $('#pca-pack-modal-title').text('Edit Pack');
+            $('#pca-add-pack-modal').show();
+
+            // Load filtered books (checkboxes will auto-check)
+            loadPackBooks();
+        });
+    });
+
 
 
     /* ---------------------------------------------
