@@ -92,8 +92,24 @@ $subjects = $wpdb->get_col($wpdb->prepare("
 
     </table>
 
-    <h3>Books in this Pack</h3>
+    <h3>Available Books</h3>
     <div id="pca-pack-book-list"></div>
+
+    <h3>Selected Books</h3>
+    <table class="widefat" id="pca-selected-books-table">
+        <thead>
+            <tr>
+                <th>Book Name</th>
+                <th width="80">Qty</th>
+                <th width="60">Remove</th>
+            </tr>
+        </thead>
+        <tbody id="pca-selected-books-body">
+            <!-- Filled dynamically -->
+        </tbody>
+    </table>
+
+
 
     <input type="hidden" id="pca-pack-id" value="">
     <input type="hidden" id="pca-pack-department-id" value="<?php echo $book_dept_id; ?>">

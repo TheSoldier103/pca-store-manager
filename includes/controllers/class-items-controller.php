@@ -193,7 +193,18 @@ class PCA_Store_Items_Controller {
                     'quantity'      => intval($child['qty']),
                 ]);
             }
-        }
+
+            // Clear old items (if editing)
+            $wpdb->delete($packs_table, ['pack_id' => $pack_id]);
+
+            // Insert new items
+            foreach ($pack_items as $item) {
+                $wpdb->insert($packs_table, [
+                    'pack_id'       => $pack_id,
+                    'child_item_id' => intval($item['id']),
+                    'quantity'      => intval($item['qty'])
+                ]);
+            }
 
         wp_send_json_success([
             'message' => 'Item saved successfully',
