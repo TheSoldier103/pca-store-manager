@@ -1,6 +1,53 @@
 <h2 class="title">Book Packs</h2>
-
 <button class="button button-primary" id="pca-add-pack-btn">Add New Pack</button>
+
+<!-- <style>
+.pca-pack-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 6px 0 0;
+    color: #2271b1;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+.pca-pack-toggle.open {
+    transform: rotate(45deg);
+}
+.pca-pack-children {
+    display: none;
+    background: #f9f9f9;
+}
+.pca-pack-children td {
+    padding: 0 !important;
+}
+.pca-pack-children-inner {
+    padding: 10px 20px 14px 36px;
+}
+.pca-pack-children-inner table {
+    width: auto;
+    min-width: 340px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.pca-pack-children-inner th {
+    text-align: left;
+    padding: 4px 16px 4px 0;
+    color: #666;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+.pca-pack-children-inner td {
+    padding: 4px 16px 4px 0;
+    border-bottom: 1px solid #eee;
+}
+.pca-no-children {
+    color: #999;
+    font-style: italic;
+}
+</style> -->
 
 <table class="wp-list-table widefat fixed striped pca-items-table">
     <thead>
@@ -21,14 +68,12 @@
         $packs_table = $wpdb->prefix . 'pca_store_item_packs';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
 
-        // Get Books department_id dynamically
         $books_dept_id = $wpdb->get_var("
             SELECT id FROM $dept_table 
             WHERE LOWER(name) = 'books'
             LIMIT 1
         ");
 
-        // Fetch packs
         $pack_items = $wpdb->get_results($wpdb->prepare("
             SELECT i.*, COUNT(p.child_item_id) AS book_count
             FROM $items_table i
@@ -40,46 +85,97 @@
             ORDER BY i.name ASC
         ", $books_dept_id));
 
-        if ($pack_items) {
-            foreach ($pack_items as $pack) {
+        if ($pack_items):
+            foreach ($pack_items as $pack):
 
-                // Calculate virtual stock
-                $child_items = $wpdb->get_results($wpdb->prepare("
-                    SELECT child_item_id, quantity
-                    FROM $packs_table
-                    WHERE pack_id = %d
+                // Child items with names
+                $children = $wpdb->get_results($wpdb->prepare("
+                    SELECT p.quantity, i.name, i.current_stock
+                    FROM $packs_table p
+                    INNER JOIN $items_table i ON i.id = p.child_item_id
+                    WHERE p.pack_id = %d
+                    ORDER BY i.name ASC
                 ", $pack->id));
 
-                $virtual_stock = 999999;
-
-                foreach ($child_items as $child) {
-                    $stock = $wpdb->get_var($wpdb->prepare("
-                        SELECT current_stock 
-                        FROM $items_table
-                        WHERE id = %d
-                    ", $child->child_item_id));
-
-                    $possible = floor($stock / $child->quantity);
+                // Virtual stock
+                $virtual_stock = PHP_INT_MAX;
+                foreach ($children as $child) {
+                    $possible      = $child->quantity > 0 ? floor($child->current_stock / $child->quantity) : 0;
                     $virtual_stock = min($virtual_stock, $possible);
                 }
+                if ($virtual_stock === PHP_INT_MAX) $virtual_stock = 0;
 
-                echo '<tr>';
-                echo '<td>' . esc_html($pack->name) . '</td>';
-                echo '<td>' . esc_html($pack->class_level) . '</td>';
-                echo '<td>' . intval($pack->book_count) . '</td>';
-                echo '<td>₦' . number_format($pack->selling_price, 2) . '</td>';
-                echo '<td>' . intval($virtual_stock) . '</td>';
+                $row_id = 'pca-children-' . $pack->id;
+                ?>
 
-                echo '<td style="white-space: nowrap;">';
-                echo '<a href="#" class="pca-edit-pack" data-id="' . $pack->id . '">Edit</a> | ';
-                echo '<a href="#" class="button-danger pca-delete-pack" data-id="' . $pack->id . '">Delete</a>';
-                echo '</td>';
+                <tr class="pca-pack-row" data-id="<?php echo $pack->id; ?>">
+                    <td>
+                        <button class="pca-pack-toggle" 
+                            aria-expanded="false"
+                            aria-controls="<?php echo $row_id; ?>"
+                            title="Show books in this pack">+</button>
+                        <?php echo esc_html($pack->name); ?>
+                    </td>
+                    <td><?php echo esc_html($pack->class_level); ?></td>
+                    <td><?php echo intval($pack->book_count); ?></td>
+                    <td>₦<?php echo number_format($pack->selling_price, 2); ?></td>
+                    <td><?php echo intval($virtual_stock); ?></td>
+                    <td style="white-space:nowrap;">
+                        <a href="#" class="pca-edit-pack" data-id="<?php echo $pack->id; ?>">Edit</a> |
+                        <a href="#" class="button-danger pca-delete-pack" data-id="<?php echo $pack->id; ?>">Delete</a>
+                    </td>
+                </tr>
 
-                echo '</tr>';
-            }
-        } else {
-            echo '<tr><td colspan="6">No packs found.</td></tr>';
-        }
-        ?>
+                <tr class="pca-pack-children" id="<?php echo $row_id; ?>">
+                    <td colspan="6">
+                        <div class="pca-pack-children-inner">
+                            <?php if ($children): ?>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Book</th>
+                                            <th>Qty in Pack</th>
+                                            <th>Current Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($children as $child): ?>
+                                            <tr>
+                                                <td><?php echo esc_html($child->name); ?></td>
+                                                <td><?php echo intval($child->quantity); ?></td>
+                                                <td><?php echo intval($child->current_stock); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php else: ?>
+                                <span class="pca-no-children">No books assigned to this pack.</span>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+
+            <?php endforeach;
+        else: ?>
+            <tr><td colspan="6">No packs found.</td></tr>
+        <?php endif; ?>
     </tbody>
 </table>
+
+<script>
+$(document).on('click', '.pca-pack-toggle', function (e) {
+    e.preventDefault();
+
+    const $btn      = $(this);
+    const $row      = $btn.closest('tr');
+    const targetId  = $btn.attr('aria-controls');
+    const $children = $('#' + targetId);
+    const isOpen    = $btn.hasClass('open');
+
+    $btn.toggleClass('open', !isOpen)
+        .attr('aria-expanded', !isOpen)
+        .text(isOpen ? '+' : '–');
+
+    $children.stop(true, true).slideToggle(180);
+});
+</script>
