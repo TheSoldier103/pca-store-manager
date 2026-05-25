@@ -205,6 +205,7 @@ class PCA_Store_Items_Controller {
                     'quantity'      => intval($item['qty'])
                 ]);
             }
+        }
 
         wp_send_json_success([
             'message' => 'Item saved successfully',
