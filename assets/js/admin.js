@@ -589,7 +589,9 @@ jQuery(document).ready(function($){
             selling_price: $('#pca-pack-price').val(),
             reorder_level: $('#pca-pack-reorder').val(),
             class_level: $('#pca-pack-class').val(),
-            pack_items: packItems
+            // pack_items: packItems
+            pack_items: JSON.stringify(items)
+            
         };
 
         $.post(ajaxurl, data, function(response){
