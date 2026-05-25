@@ -1,5 +1,23 @@
 jQuery(document).ready(function($){
 
+    /* ---------------------------------------------------------
+        Pack row toggle
+    --------------------------------------------------------- */
+    $(document).on('click', '.pca-pack-toggle', function (e) {
+        e.preventDefault();
+
+        const $btn     = $(this);
+        const targetId = $btn.attr('aria-controls');
+        const $children = $('#' + targetId);
+        const isOpen   = $btn.hasClass('open');
+
+        $btn.toggleClass('open', !isOpen)
+            .attr('aria-expanded', String(!isOpen))
+            .text(isOpen ? '+' : '–');
+
+        $children.stop(true, true).slideToggle(180);
+    });
+
     $(document).on('click', '.pca-edit-item', function(e){
         e.preventDefault();
 

@@ -113,21 +113,3 @@
         <?php endif; ?>
     </tbody>
 </table>
-
-<script>
-$(document).on('click', '.pca-pack-toggle', function (e) {
-    e.preventDefault();
-
-    const $btn      = $(this);
-    const $row      = $btn.closest('tr');
-    const targetId  = $btn.attr('aria-controls');
-    const $children = $('#' + targetId);
-    const isOpen    = $btn.hasClass('open');
-
-    $btn.toggleClass('open', !isOpen)
-        .attr('aria-expanded', !isOpen)
-        .text(isOpen ? '+' : '–');
-
-    $children.stop(true, true).slideToggle(180);
-});
-</script>
