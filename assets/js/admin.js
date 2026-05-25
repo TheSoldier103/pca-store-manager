@@ -565,40 +565,6 @@ jQuery(document).ready(function($){
 
     });
 
-//     /* ---------------------------------------------
-//        SAVE PACK
-//     --------------------------------------------- */
-//     $('#pca-save-pack').on('click', function(e){
-//         e.preventDefault();
-
-//         let packItems = [];
-
-//         $('.pca-pack-row').each(function(){
-//             packItems.push({
-//                 id: $(this).data('id'),
-//                 qty: $(this).find('.pca-pack-qty').val()
-//             });
-//         });
-
-//         const data = {
-//             action: 'pca_store_save_item',
-//             item_type: 'pack',
-//             id: $('#pca-pack-id').val(),
-//             name: $('#pca-pack-name').val(),
-//             department_id: $('#pca-pack-department-id').val(),
-//             selling_price: $('#pca-pack-price').val(),
-//             reorder_level: $('#pca-pack-reorder').val(),
-//             class_level: $('#pca-pack-class').val(),
-//             pack_items: packItems
-//             // pack_items: JSON.stringify(items)
-            
-//         };
-
-//         $.post(ajaxurl, data, function(response){
-//             alert(response.data.message);
-//             location.reload();
-//         });
-//     });
 
 });
 
