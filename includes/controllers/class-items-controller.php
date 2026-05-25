@@ -203,6 +203,28 @@ class PCA_Store_Items_Controller {
             }
         }
 
+        // --- Auto-calc pack price if selling_price is empty or zero ---
+        if ($item_type === 'pack' && $selling_price <= 0) {
+
+            $total_price = 0;
+
+            foreach ($pack_items as $child) {
+                $child_id = intval($child['id']);
+                $qty      = intval($child['qty']);
+
+                $price = $wpdb->get_var($wpdb->prepare("
+                    SELECT selling_price FROM $items_table WHERE id = %d
+                ", $child_id));
+
+                if ($price !== null) {
+                    $total_price += ($price * $qty);
+                }
+            }
+
+            $selling_price = $total_price;
+}
+
+
         // --- Duplicate check (exclude self when editing) ---
         $dup_query = $wpdb->prepare(
             "SELECT COUNT(*) FROM $items_table 

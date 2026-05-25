@@ -343,6 +343,19 @@ jQuery(document).ready(function($){
         $('#pca-selected-count').text(`(${items.length})`);
     }
 
+    function autoCalcPackPrice() {
+        let total = 0;
+
+        Object.values(selectedPackItems).forEach(item => {
+            const price = parseFloat(item.price || 0);
+            const qty   = parseInt(item.qty || 1);
+            total += price * qty;
+        });
+
+        $('#pca-pack-price').val(total);
+    }
+
+
     /* ---------------------------------------------------------
         Load Filtered Books
     --------------------------------------------------------- */
@@ -389,7 +402,10 @@ jQuery(document).ready(function($){
                     <tr>
                         <td>
                             <input type="checkbox" class="pca-pack-select"
-                                data-id="${book.id}" data-name="${book.name}" ${checked}>
+                                data-id="${book.id}" 
+                                data-name="${book.name}" 
+                                data-price="${book.selling_price}" 
+                                ${checked}>
                         </td>
                         <td>${book.name}${meta ? ' <small>(' + meta + ')</small>' : ''}</td>
                     </tr>
@@ -409,12 +425,18 @@ jQuery(document).ready(function($){
         const name = $(this).data('name');
 
         if ($(this).is(':checked')) {
-            selectedPackItems[id] = { id, name, qty: 1 };
+            selectedPackItems[id] = { 
+                id, 
+                name, 
+                qty: 1,
+                price: parseFloat($(this).data('price'))
+            };
         } else {
             delete selectedPackItems[id];
         }
-
         renderSelectedBooks();
+        autoCalcPackPrice();
+
     });
 
     /* ---------------------------------------------------------
@@ -436,6 +458,8 @@ jQuery(document).ready(function($){
         const qty = parseInt($(this).val(), 10);
         if (selectedPackItems[id] && qty > 0) {
             selectedPackItems[id].qty = qty;
+            autoCalcPackPrice();
+
         }
     });
 

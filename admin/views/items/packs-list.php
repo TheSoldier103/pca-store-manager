@@ -50,12 +50,28 @@
                 ", $pack->id));
 
                 // Virtual stock
-                $virtual_stock = PHP_INT_MAX;
+                $virtual_stock = null;
+
                 foreach ($children as $child) {
-                    $possible      = $child->quantity > 0 ? floor($child->current_stock / $child->quantity) : 0;
-                    $virtual_stock = min($virtual_stock, $possible);
+
+                    // Treat missing or negative stock as zero
+                    $stock = max(0, intval($child->current_stock));
+                    $qty   = max(1, intval($child->quantity));
+
+                    $possible = floor($stock / $qty);
+
+                    if ($virtual_stock === null) {
+                        $virtual_stock = $possible;
+                    } else {
+                        $virtual_stock = min($virtual_stock, $possible);
+                    }
                 }
-                if ($virtual_stock === PHP_INT_MAX) $virtual_stock = 0;
+
+                // If no children → virtual stock = 0
+                if ($virtual_stock === null) {
+                    $virtual_stock = 0;
+                }
+
 
                 $row_id = 'pca-children-' . $pack->id;
                 ?>
