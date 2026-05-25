@@ -122,7 +122,6 @@ class PCA_Store_Items_Controller {
         $pack_items = [];
         if ($item_type === 'pack') {
             $raw = $_POST['pack_items'] ?? [];
-            // $raw = json_decode( stripslashes( $_POST['pack_items'] ?? '[]' ), true ) ?: [];
 
             // Sanitize each child
             foreach ($raw as $child) {
@@ -138,20 +137,34 @@ class PCA_Store_Items_Controller {
             }
         }
 
+        // // --- Duplicate check (exclude self when editing) ---
+        // $dup_query = $wpdb->prepare(
+        //     "SELECT COUNT(*) FROM $items_table 
+        //     WHERE name = %s 
+        //     AND supplier_id = %d 
+        //     AND department_id = %d 
+        //     AND status != 'deleted'",
+        //     $name, $supplier_id, $department_id
+        // );
+        // if ($id > 0) {
+        //     $dup_query .= $wpdb->prepare(' AND id != %d', $id);
+        // }
+        // if ($wpdb->get_var($dup_query) > 0) {
+        //     wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
+        // }
+
         // --- Duplicate check (exclude self when editing) ---
         $dup_query = $wpdb->prepare(
             "SELECT COUNT(*) FROM $items_table 
             WHERE name = %s 
-            AND supplier_id = %d 
-            AND department_id = %d 
             AND status != 'deleted'",
-            $name, $supplier_id, $department_id
+            $name
         );
         if ($id > 0) {
             $dup_query .= $wpdb->prepare(' AND id != %d', $id);
         }
         if ($wpdb->get_var($dup_query) > 0) {
-            wp_send_json_error(['message' => 'This item already exists for this supplier in this department']);
+            wp_send_json_error(['message' => 'An item with this name already exists']);
         }
 
         // --- Insert or Update ---

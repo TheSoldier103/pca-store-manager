@@ -412,7 +412,7 @@ jQuery(document).ready(function($){
     });
 
     /* ---------------------------------------------------------
-        Save Pack  ← THIS WAS MISSING
+        Save Pack
     --------------------------------------------------------- */
     $(document).on('click', '#pca-save-pack', function(e) {
         e.preventDefault();
@@ -446,13 +446,12 @@ jQuery(document).ready(function($){
             reorder_level: $('#pca-pack-reorder').val() || 0,
             class_level:   $('#pca-pack-class').val(),
             pack_items:    items,   // array of { id, name, qty }
-            // pack_items: JSON.stringify(items),
         }, function(response) {
             if (response.success) {
                 $('#pca-add-pack-modal').hide();
                 resetPackModal();
                 // TODO: refresh your packs list here, e.g.:
-                // loadPacksList();
+                loadPacksList();
             } else {
                 alert('Error: ' + (response.data?.message || 'Could not save pack.'));
             }
