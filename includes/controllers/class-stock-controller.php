@@ -65,7 +65,7 @@ class PCA_Store_Stock_Controller {
     public static function add_stock() {
         global $wpdb;
 
-        $stock_table = $wpdb->prefix . 'pca_item_stock';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
         $campus_id = intval($_POST['campus_id']);
         $item_id   = intval($_POST['item_id']);
