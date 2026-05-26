@@ -1,4 +1,4 @@
-<?php if (!get_option('pca_roles_can_edit_stock')): ?>
+<!-- <?php if (!get_option('pca_roles_can_edit_stock')): ?>
 
     <div class="notice notice-error">
         <p>You do not have permission to edit stock.</p>
@@ -6,7 +6,7 @@
 
     <?php return; ?>
 
-<?php endif; ?>
+<?php endif; ?> -->
 
 
 <h2 class="title">Add Stock</h2>
