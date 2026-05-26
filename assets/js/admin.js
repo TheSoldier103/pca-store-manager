@@ -593,7 +593,61 @@ jQuery(document).ready(function($){
     });
 
 
+    $(document).on('click', '#pca-import-books-btn', function(e){
+        e.preventDefault();
+        $('#pca-import-books-result').html('');
+        $('#pca-import-books-modal').show();
+    });
 
+    $(document).on('click', '#pca-close-import-books', function(){
+        $('#pca-import-books-modal').hide();
+    });
+
+    $(document).on('click', '#pca-upload-books-csv', function(e){
+        e.preventDefault();
+
+        const file = $('#pca-books-csv-file')[0].files[0];
+        if (!file) {
+            alert('Please select a CSV file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('action', 'pca_store_import_books');
+        formData.append('csv_file', file);
+
+        $('#pca-import-books-result').html('<p><em>Importing… please wait.</em></p>');
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response){
+                if (!response.success) {
+                    $('#pca-import-books-result').html('<p style="color:red;">' + response.data.message + '</p>');
+                    return;
+                }
+
+                const r = response.data;
+
+                $('#pca-import-books-result').html(`
+                    <p><strong>Import Complete</strong></p>
+                    <p>Added: ${r.added}</p>
+                    <p>Skipped (duplicates): ${r.skipped}</p>
+                    <p>Errors: ${r.errors}</p>
+                `);
+
+                if (r.added > 0) {
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }
+        });
+    });
+
+
+    
     /* ---------------------------------------------
        TOGGLE FIELDS WHEN DEPARTMENT CHANGES
     --------------------------------------------- */

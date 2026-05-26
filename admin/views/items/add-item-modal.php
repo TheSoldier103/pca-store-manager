@@ -100,3 +100,22 @@ $suppliers   = $wpdb->get_results("SELECT id, name FROM $suppliers_table WHERE i
     </p>
 
 </div>
+
+<div id="pca-import-books-modal" style="display:none;">
+
+    <h2>Import Books from CSV</h2>
+
+    <p>Select a CSV file with the following columns:</p>
+
+    <pre>name,selling_price,class_level,subject,reorder_level</pre>
+
+    <input type="file" id="pca-books-csv-file" accept=".csv">
+
+    <p>
+        <button class="button button-primary" id="pca-upload-books-csv">Upload</button>
+        <button class="button" id="pca-close-import-books">Cancel</button>
+    </p>
+
+    <div id="pca-import-books-result"></div>
+
+</div>

@@ -1,6 +1,7 @@
 <h2 class="title">Books Inventory</h2>
 
 <button class="button button-primary" id="pca-add-book-btn">Add New Book</button>
+<button class="button" id="pca-import-books-btn">Import CSV</button>
 
 <table class="wp-list-table widefat fixed striped pca-items-table">
 

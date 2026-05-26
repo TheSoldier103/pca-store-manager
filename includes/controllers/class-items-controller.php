@@ -10,6 +10,8 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
         add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
         add_action('wp_ajax_pca_store_delete_pack', [__CLASS__, 'delete_pack']);
+        add_action('wp_ajax_pca_store_import_books', [__CLASS__, 'import_books']);
+
 
     }
 
@@ -51,6 +53,80 @@ class PCA_Store_Items_Controller {
             'items' => $items
         ]);
     }
+
+    public static function import_books() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+
+        if (!isset($_FILES['csv_file'])) {
+            wp_send_json_error(['message' => 'No file uploaded']);
+        }
+
+        $file = $_FILES['csv_file']['tmp_name'];
+        $rows = array_map('str_getcsv', file($file));
+
+        if (count($rows) < 2) {
+            wp_send_json_error(['message' => 'CSV is empty']);
+        }
+
+        // Get Books department ID
+        $books_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table 
+            WHERE LOWER(name) = 'books'
+            LIMIT 1
+        ");
+
+        $header = array_map('trim', $rows[0]);
+        $added = $skipped = $errors = 0;
+
+        for ($i = 1; $i < count($rows); $i++) {
+            $row = array_combine($header, $rows[$i]);
+
+            if (!$row) { $errors++; continue; }
+
+            $name = trim($row['name'] ?? '');
+            $price = floatval($row['selling_price'] ?? 0);
+
+            if (!$name || $price <= 0) {
+                $errors++;
+                continue;
+            }
+
+            // Duplicate check
+            $exists = $wpdb->get_var($wpdb->prepare("
+                SELECT COUNT(*) FROM $items_table
+                WHERE name = %s AND status != 'deleted'
+            ", $name));
+
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+
+            $wpdb->insert($items_table, [
+                'name'          => $name,
+                'department_id' => $books_dept_id,
+                'item_type'     => 'single',
+                'selling_price' => $price,
+                'class_level'   => trim($row['class_level'] ?? ''),
+                'subject'       => trim($row['subject'] ?? ''),
+                'reorder_level' => intval($row['reorder_level'] ?? 0),
+                'status'        => 'active',
+                'created_at'    => current_time('mysql'),
+            ]);
+
+            $added++;
+        }
+
+        wp_send_json_success([
+            'added'   => $added,
+            'skipped' => $skipped,
+            'errors'  => $errors,
+        ]);
+    }
+
 
     public static function delete_pack() {
         global $wpdb;
@@ -117,8 +193,6 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['books' => $books]);
     }
-
-
 
 
     public static function get_item() {
