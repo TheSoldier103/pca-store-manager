@@ -59,7 +59,7 @@ class PCA_Store_Items_Controller {
 
         $items_table = $wpdb->prefix . 'pca_store_items';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
-        $stock_table = $wpdb->prefix . 'pca_item_stock';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
         if (!isset($_FILES['csv_file'])) {
             wp_send_json_error(['message' => 'No file uploaded']);
