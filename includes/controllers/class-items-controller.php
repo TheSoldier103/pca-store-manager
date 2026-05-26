@@ -59,7 +59,7 @@ class PCA_Store_Items_Controller {
 
         $items_table = $wpdb->prefix . 'pca_store_items';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
-        $stock_table = $wpdb->prefix . 'item_stock';
+        $stock_table = $wpdb->prefix . 'pca_item_stock';
 
         if (!isset($_FILES['csv_file'])) {
             wp_send_json_error(['message' => 'No file uploaded']);
@@ -83,11 +83,11 @@ class PCA_Store_Items_Controller {
         $added = $skipped = $errors = 0;
 
         for ($i = 1; $i < count($rows); $i++) {
-            $row = array_combine($header, $rows[$i]);
 
+            $row = array_combine($header, $rows[$i]);
             if (!$row) { $errors++; continue; }
 
-            $name = trim($row['name'] ?? '');
+            $name  = trim($row['name'] ?? '');
             $price = floatval($row['selling_price'] ?? 0);
 
             if (!$name || $price <= 0) {
@@ -95,11 +95,9 @@ class PCA_Store_Items_Controller {
                 continue;
             }
 
-            $stock_ughelli  = intval($row['stock_ughelli'] ?? 0);
-            $stock_okuokoko = intval($row['stock_okuokoko'] ?? 0);
-
-            if ($stock_ughelli < 0) $stock_ughelli = 0;
-            if ($stock_okuokoko < 0) $stock_okuokoko = 0;
+            // Campus stock
+            $stock_ughelli  = max(0, intval($row['stock_ughelli']  ?? 0));
+            $stock_okuokoko = max(0, intval($row['stock_okuokoko'] ?? 0));
 
             // Duplicate check
             $exists = $wpdb->get_var($wpdb->prepare("
@@ -112,6 +110,7 @@ class PCA_Store_Items_Controller {
                 continue;
             }
 
+            // Insert item
             $wpdb->insert($items_table, [
                 'name'          => $name,
                 'department_id' => $books_dept_id,
@@ -124,14 +123,16 @@ class PCA_Store_Items_Controller {
                 'created_at'    => current_time('mysql'),
             ]);
 
-            // Insert Ughelli
+            $item_id = $wpdb->insert_id; // ⭐ FIXED
+
+            // Insert Ughelli stock
             $wpdb->insert($stock_table, [
                 'item_id'   => $item_id,
                 'campus_id' => 1,
                 'stock'     => $stock_ughelli,
             ]);
 
-            // Insert Okuokoko
+            // Insert Okuokoko stock
             $wpdb->insert($stock_table, [
                 'item_id'   => $item_id,
                 'campus_id' => 2,
@@ -147,6 +148,7 @@ class PCA_Store_Items_Controller {
             'errors'  => $errors,
         ]);
     }
+
 
 
     public static function delete_pack() {
