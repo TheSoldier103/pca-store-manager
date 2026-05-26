@@ -23,18 +23,44 @@
         </tr>
 
         <tr>
+            <th><label>Class</label></th>
+            <td>
+                <select id="pca-stock-class" class="regular-text">
+                    <option value="">All Classes</option>
+                    <?php
+                    $items_table = $wpdb->prefix . 'pca_store_items';
+                    $classes = $wpdb->get_col("SELECT DISTINCT class_level FROM $items_table WHERE class_level IS NOT NULL AND class_level != '' ORDER BY class_level ASC");
+
+                    foreach ($classes as $c) {
+                        echo "<option value='{$c}'>{$c}</option>";
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <th><label>Subject</label></th>
+            <td>
+                <select id="pca-stock-subject" class="regular-text">
+                    <option value="">All Subjects</option>
+                    <?php
+                    $subjects = $wpdb->get_col("SELECT DISTINCT subject FROM $items_table WHERE subject IS NOT NULL AND subject != '' ORDER BY subject ASC");
+
+                    foreach ($subjects as $s) {
+                        echo "<option value='{$s}'>{$s}</option>";
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
+
+
+        <tr>
             <th><label>Select Item</label></th>
             <td>
                 <select id="pca-stock-item" class="regular-text">
                     <option value="">Select Item</option>
-                    <?php
-                    $items = $wpdb->prefix . 'pca_store_items';
-                    $results = $wpdb->get_results("SELECT id, name FROM $items ORDER BY name ASC");
-
-                    foreach ($results as $item) {
-                        echo "<option value='{$item->id}'>{$item->name}</option>";
-                    }
-                    ?>
                 </select>
             </td>
         </tr>

@@ -1,5 +1,28 @@
 jQuery(document).ready(function($){
 
+    function loadFilteredStockItems() {
+        let data = {
+            action: 'pca_store_get_filtered_items',
+            class_level: jQuery('#pca-stock-class').val(),
+            subject: jQuery('#pca-stock-subject').val()
+        };
+
+        jQuery.post(ajaxurl, data, function(response) {
+            if (!response.success) return;
+
+            let dropdown = jQuery('#pca-stock-item');
+            dropdown.empty();
+            dropdown.append('<option value="">Select Item</option>');
+
+            response.data.items.forEach(function(item) {
+                dropdown.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+        });
+    }
+
+    jQuery(document).on('change', '#pca-stock-class, #pca-stock-subject', loadFilteredStockItems);
+
+
     /* ---------------------------------------------------------
         Pack row toggle
     --------------------------------------------------------- */

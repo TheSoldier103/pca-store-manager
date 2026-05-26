@@ -9,6 +9,7 @@ class PCA_Store_Stock_Controller {
         add_action('wp_ajax_pca_store_return_stock', [__CLASS__, 'return_stock']);
     }
 
+
     /**
      * Core stock movement engine
      */
