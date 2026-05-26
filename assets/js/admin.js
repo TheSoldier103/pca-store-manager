@@ -744,11 +744,12 @@ jQuery(document).ready(function($){
 
 // ADD STOCK
 jQuery(document).on('click', '#pca-save-stock', function() {
+
     let data = {
         action: 'pca_store_add_stock',
+        campus_id: jQuery('#pca-stock-campus').val(),
         item_id: jQuery('#pca-stock-item').val(),
         qty: jQuery('#pca-stock-qty').val(),
-        supplier_id: jQuery('#pca-stock-supplier').val(),
         notes: jQuery('#pca-stock-notes').val()
     };
 
@@ -757,6 +758,7 @@ jQuery(document).on('click', '#pca-save-stock', function() {
         location.reload();
     });
 });
+
 
 // DAMAGE
 jQuery(document).on('click', '#pca-save-damage', function() {

@@ -11,16 +11,34 @@
             <th>Class</th>
             <th>Subject</th>
             <th>Price</th>
+            <th>Ughelli</th>
+            <th>Okuokoko</th>
             <th>Status</th>
             <th width="120">Actions</th>
         </tr>
     </thead>
+
     <tbody>
         <?php
         global $wpdb;
 
         $items_table = $wpdb->prefix . 'pca_store_items';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+
+        $ughelli_stock = $wpdb->get_var($wpdb->prepare("
+            SELECT stock FROM $stock_table
+            WHERE item_id = %d AND campus_id = 1
+        ", $book->id));
+
+        $okuokoko_stock = $wpdb->get_var($wpdb->prepare("
+            SELECT stock FROM $stock_table
+            WHERE item_id = %d AND campus_id = 2
+        ", $book->id));
+
+        $ughelli_stock = intval($ughelli_stock);
+        $okuokoko_stock = intval($okuokoko_stock);
+
 
         // Get Books department_id dynamically
         $books_dept_id = $wpdb->get_var("
@@ -44,6 +62,8 @@
                 echo '<td>' . esc_html($book->class_level) . '</td>';
                 echo '<td>' . esc_html($book->subject) . '</td>';
                 echo '<td>₦' . number_format($book->selling_price) . '</td>';
+                echo '<td>' . $ughelli_stock . '</td>';
+                echo '<td>' . $okuokoko_stock . '</td>';
                 echo '<td>' . esc_html($book->status) . '</td>';
                 echo '<td style="white-space: nowrap;">';
                 echo '<a href="#" class="pca-edit-item" data-id="' . $book->id . '">Edit</a> | ';

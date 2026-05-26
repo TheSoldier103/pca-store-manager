@@ -9,7 +9,7 @@
 if (!defined('ABSPATH')) exit;
 
 
-define('PCA_STORE_VERSION', '1.5.63');
+define('PCA_STORE_VERSION', '1.5.64');
 define('PCA_STORE_DB_VERSION', '1.5.23');
 define('PCA_STORE_MANAGER_PATH', plugin_dir_path(__FILE__));
 define('PCA_STORE_URL', plugin_dir_url(__FILE__));

@@ -5,12 +5,29 @@
     <table class="form-table">
 
         <tr>
+            <th><label>Campus</label></th>
+            <td>
+                <select id="pca-stock-campus" class="regular-text">
+                    <option value="">Select Campus</option>
+                    <?php
+                    global $wpdb;
+                    $campuses = $wpdb->prefix . 'pca_store_campuses';
+                    $rows = $wpdb->get_results("SELECT id, name FROM $campuses WHERE is_active = 1 ORDER BY name ASC");
+
+                    foreach ($rows as $c) {
+                        echo "<option value='{$c->id}'>{$c->name}</option>";
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
             <th><label>Select Item</label></th>
             <td>
                 <select id="pca-stock-item" class="regular-text">
                     <option value="">Select Item</option>
                     <?php
-                    global $wpdb;
                     $items = $wpdb->prefix . 'pca_store_items';
                     $results = $wpdb->get_results("SELECT id, name FROM $items ORDER BY name ASC");
 
@@ -25,23 +42,6 @@
         <tr>
             <th><label>Quantity</label></th>
             <td><input type="number" id="pca-stock-qty" class="regular-text"></td>
-        </tr>
-
-        <tr>
-            <th><label>Supplier</label></th>
-            <td>
-                <select id="pca-stock-supplier">
-                    <option value="">Select Supplier</option>
-                    <?php
-                    $suppliers = $wpdb->prefix . 'pca_store_suppliers';
-                    $rows = $wpdb->get_results("SELECT id, name FROM $suppliers ORDER BY name ASC");
-
-                    foreach ($rows as $s) {
-                        echo "<option value='{$s->id}'>{$s->name}</option>";
-                    }
-                    ?>
-                </select>
-            </td>
         </tr>
 
         <tr>
