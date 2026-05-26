@@ -26,20 +26,6 @@
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
         $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
-        $ughelli_stock = $wpdb->get_var($wpdb->prepare("
-            SELECT stock FROM $stock_table
-            WHERE item_id = %d AND campus_id = 1
-        ", $book->id));
-
-        $okuokoko_stock = $wpdb->get_var($wpdb->prepare("
-            SELECT stock FROM $stock_table
-            WHERE item_id = %d AND campus_id = 2
-        ", $book->id));
-
-        $ughelli_stock = intval($ughelli_stock);
-        $okuokoko_stock = intval($okuokoko_stock);
-
-
         // Get Books department_id dynamically
         $books_dept_id = $wpdb->get_var("
             SELECT id FROM $dept_table 
@@ -57,6 +43,17 @@
 
         if ($books) {
             foreach ($books as $book) {
+
+                $ughelli_stock = intval($wpdb->get_var($wpdb->prepare("
+                    SELECT stock FROM $stock_table
+                    WHERE item_id = %d AND campus_id = 1
+                ", $book->id)));
+
+                $okuokoko_stock = intval($wpdb->get_var($wpdb->prepare("
+                    SELECT stock FROM $stock_table
+                    WHERE item_id = %d AND campus_id = 2
+                ", $book->id)));
+
                 echo '<tr>';
                 echo '<td>' . esc_html($book->name) . '</td>';
                 echo '<td>' . esc_html($book->class_level) . '</td>';

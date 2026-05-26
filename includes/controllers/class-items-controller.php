@@ -11,46 +11,6 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
         add_action('wp_ajax_pca_store_delete_pack', [__CLASS__, 'delete_pack']);
         add_action('wp_ajax_pca_store_import_books', [__CLASS__, 'import_books']);
-
-
-    }
-
-    public static function add_stock() {
-        global $wpdb;
-
-        $stock_table = $wpdb->prefix . 'pca_item_stock';
-
-        $campus_id = intval($_POST['campus_id']);
-        $item_id   = intval($_POST['item_id']);
-        $qty       = intval($_POST['qty']);
-
-        if (!$campus_id || !$item_id || $qty <= 0) {
-            wp_send_json_error(['message' => 'Invalid stock data']);
-        }
-
-        // Check if stock row exists
-        $existing = $wpdb->get_var($wpdb->prepare("
-            SELECT id FROM $stock_table
-            WHERE item_id = %d AND campus_id = %d
-        ", $item_id, $campus_id));
-
-        if ($existing) {
-            // Update stock
-            $wpdb->query($wpdb->prepare("
-                UPDATE $stock_table
-                SET stock = stock + %d
-                WHERE id = %d
-            ", $qty, $existing));
-        } else {
-            // Insert new stock row
-            $wpdb->insert($stock_table, [
-                'item_id'   => $item_id,
-                'campus_id' => $campus_id,
-                'stock'     => $qty,
-            ]);
-        }
-
-        wp_send_json_success(['message' => 'Stock updated successfully']);
     }
 
 
