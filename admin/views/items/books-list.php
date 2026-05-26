@@ -11,7 +11,6 @@
             <th>Class</th>
             <th>Subject</th>
             <th>Price</th>
-            <th>Stock</th>
             <th>Status</th>
             <th width="120">Actions</th>
         </tr>
@@ -45,7 +44,6 @@
                 echo '<td>' . esc_html($book->class_level) . '</td>';
                 echo '<td>' . esc_html($book->subject) . '</td>';
                 echo '<td>₦' . number_format($book->selling_price) . '</td>';
-                echo '<td>' . intval($book->current_stock) . '</td>';
                 echo '<td>' . esc_html($book->status) . '</td>';
                 echo '<td style="white-space: nowrap;">';
                 echo '<a href="#" class="pca-edit-item" data-id="' . $book->id . '">Edit</a> | ';

@@ -70,8 +70,6 @@ class PCA_Store_Activator {
         // ---------------------------------------------------------
         $tables[] = "CREATE TABLE {$prefix}items (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            school_id BIGINT UNSIGNED NOT NULL,
-            campus_id BIGINT UNSIGNED NOT NULL,
             department_id BIGINT UNSIGNED NOT NULL,
             sku VARCHAR(50) NULL,
             name VARCHAR(255) NOT NULL,
@@ -84,7 +82,6 @@ class PCA_Store_Activator {
             supplier_id BIGINT UNSIGNED NULL,
             cost_price DECIMAL(12,2) DEFAULT 0.00,
             selling_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-            current_stock INT NOT NULL DEFAULT 0,
             reorder_level INT NOT NULL DEFAULT 0,
             status VARCHAR(30) DEFAULT 'active',
             notes TEXT NULL,
@@ -114,6 +111,22 @@ class PCA_Store_Activator {
             KEY pack_id (pack_id),
             KEY child_item_id (child_item_id)
         ) $charset;";
+
+        // ---------------------------------------------------------
+        // Item Stock
+        // ---------------------------------------------------------
+        $tables[] = "CREATE TABLE {$prefix}item_stock (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            item_id BIGINT UNSIGNED NOT NULL,
+            campus_id BIGINT UNSIGNED NOT NULL,
+            stock INT NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY item_id (item_id),
+            KEY campus_id (campus_id)
+        ) $charset;";
+
 
         // ---------------------------------------------------------
         // Suppliers

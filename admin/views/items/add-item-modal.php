@@ -107,7 +107,7 @@ $suppliers   = $wpdb->get_results("SELECT id, name FROM $suppliers_table WHERE i
 
     <p>Select a CSV file with the following columns:</p>
 
-    <pre>name,selling_price,class_level,subject,reorder_level</pre>
+    <pre>name,selling_price,class_level,subject,reorder_level,stock_ughelli,stock_okuokoko</pre>
 
     <input type="file" id="pca-books-csv-file" accept=".csv">
 

@@ -94,6 +94,12 @@ class PCA_Store_Items_Controller {
                 continue;
             }
 
+            $stock_ughelli  = intval($row['stock_ughelli'] ?? 0);
+            $stock_okuokoko = intval($row['stock_okuokoko'] ?? 0);
+
+            if ($stock_ughelli < 0) $stock_ughelli = 0;
+            if ($stock_okuokoko < 0) $stock_okuokoko = 0;
+
             // Duplicate check
             $exists = $wpdb->get_var($wpdb->prepare("
                 SELECT COUNT(*) FROM $items_table
@@ -115,6 +121,20 @@ class PCA_Store_Items_Controller {
                 'reorder_level' => intval($row['reorder_level'] ?? 0),
                 'status'        => 'active',
                 'created_at'    => current_time('mysql'),
+            ]);
+
+            // Insert Ughelli
+            $wpdb->insert($stock_table, [
+                'item_id'   => $item_id,
+                'campus_id' => 1,
+                'stock'     => $stock_ughelli,
+            ]);
+
+            // Insert Okuokoko
+            $wpdb->insert($stock_table, [
+                'item_id'   => $item_id,
+                'campus_id' => 2,
+                'stock'     => $stock_okuokoko,
             ]);
 
             $added++;
