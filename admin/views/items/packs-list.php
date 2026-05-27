@@ -122,8 +122,8 @@
                                             <tr>
                                                 <td><?php echo esc_html($child->name); ?></td>
                                                 <td><?php echo intval($child->quantity); ?></td>
-                                                <td><?php echo intval($child->virtual_ughelli); ?></td>
-                                                <td><?php echo intval($child->virtual_okuokoko); ?></td>
+                                                <td><?php echo intval($child->stock_u); ?></td>
+                                                <td><?php echo intval($child->stock_o); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
