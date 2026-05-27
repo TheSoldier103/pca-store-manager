@@ -37,6 +37,10 @@ switch ($active_tab) {
         break;
 
     case 'lowstock':
+        if ( ! current_user_can('pca_store_view_reports') ) {
+            wp_die( __('You do not have permission to view this page.'), 403 );
+        }
+        
         include __DIR__ . '/items/lowstock-list.php';
         break;
 }

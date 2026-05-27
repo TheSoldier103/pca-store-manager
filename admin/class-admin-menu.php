@@ -59,18 +59,6 @@ class PCA_Store_Admin_Menu {
             [__CLASS__, 'render_suppliers']
         );
 
-        // // Reports
-        // if (get_option('pca_roles_can_view_reports')) {
-        //     add_submenu_page(
-        //         'pca-store',
-        //         'Reports',
-        //         'Reports',
-        //         'manage_options',
-        //         'pca-store-reports',
-        //         [$this, 'render_reports_page']
-        //     );
-        // }
-
         // Reports
         add_submenu_page(
             'pca-store-dashboard',
@@ -90,27 +78,6 @@ class PCA_Store_Admin_Menu {
             'pca-store-audit-log',
             [__CLASS__, 'render_audit_log']
         );
-
-        // // Settings
-        // if (get_option('pca_roles_can_manage_settings')) {
-        //     add_submenu_page(
-        //         'pca-store',
-        //         'Settings',
-        //         'Settings',
-        //         'manage_options',
-        //         'pca-store-settings',
-        //         [$this, 'render_settings_page']
-        //     );
-        // }
-
-        // add_submenu_page(
-        //     'pca-store-dashboard',
-        //     'Settings',
-        //     'Settings',
-        //     'manage_options',
-        //     'pca-store-settings',
-        //     [__CLASS__, 'render_settings']
-        // );
 
         // Settings
         add_submenu_page(

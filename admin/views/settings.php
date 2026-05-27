@@ -6,7 +6,6 @@ $tabs = [
     'campuses'    => 'Campuses',
     'departments' => 'Departments',
     'receipt'     => 'Receipt Format',
-    // 'roles'       => 'Roles & Permissions',
     'advanced'    => 'Advanced'
 ];
 
@@ -29,10 +28,6 @@ switch ($active_tab) {
     case 'receipt':
         include __DIR__ . '/settings/receipt.php';
         break;
-
-    // case 'roles':
-    //     include __DIR__ . '/settings/roles.php';
-    //     break;
 
     case 'advanced':
         include __DIR__ . '/settings/advanced.php';

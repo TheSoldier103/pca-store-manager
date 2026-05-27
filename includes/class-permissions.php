@@ -21,7 +21,7 @@ class PCA_Store_Permissions {
 
     public static function add_caps() {
         $roles = [
-            'administrator' => self::$caps, // you can refine later
+            'administrator' => self::$caps,
         ];
 
         foreach ( $roles as $role_key => $caps ) {

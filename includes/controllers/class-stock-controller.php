@@ -33,7 +33,7 @@ class PCA_Store_Stock_Controller {
         } elseif ($movement_type === 'damage' || $movement_type === 'sale') {
             $new_stock = $current_stock - $qty;
         } elseif ($movement_type === 'correction') {
-            $new_stock = $qty; // qty = corrected stock
+            $new_stock = $qty;
         } else {
             return false;
         }
