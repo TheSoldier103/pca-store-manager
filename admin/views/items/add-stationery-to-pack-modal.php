@@ -1,4 +1,4 @@
-<div id="pca-add-stationery-pack-modal" class="pca-modal">
+<div id="pca-add-stationery-pack-modal" class="pca-modal" style="display:none;">
     <div class="pca-modal-content">
 
         <h2>Add Stationery to Pack</h2>

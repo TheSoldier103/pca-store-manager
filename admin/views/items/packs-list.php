@@ -9,7 +9,7 @@
             <th>Books</th>
             <th>Price</th>
             <th>Virtual Stock</th>
-            <th>Actions</th> <!-- Removed fixed width="120" -->
+            <th>Actions</th> 
         </tr>
     </thead>
     <tbody>
@@ -65,8 +65,8 @@
 
                 foreach ($children as $child) {
                     $qty     = max(1, intval($child->quantity));
-                    $stock_u = max(0, intval($child->stock_ughelli));  // FIX: was stock_u
-                    $stock_o = max(0, intval($child->stock_okuokoko)); // FIX: was stock_o
+                    $stock_u = max(0, intval($child->stock_ughelli)); 
+                    $stock_o = max(0, intval($child->stock_okuokoko));
 
                     $possible_u = floor($stock_u / $qty);
                     $possible_o = floor($stock_o / $qty);
@@ -121,7 +121,6 @@
                                             <tr>
                                                 <td><?php echo esc_html($child->name); ?></td>
                                                 <td><?php echo intval($child->quantity); ?></td>
-                                                <!-- FIX: corrected property names to match SQL aliases -->
                                                 <td><?php echo intval($child->stock_ughelli); ?></td>
                                                 <td><?php echo intval($child->stock_okuokoko); ?></td>
                                             </tr>
