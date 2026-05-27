@@ -19,6 +19,7 @@
         $items_table = $wpdb->prefix . 'pca_store_items';
         $packs_table = $wpdb->prefix . 'pca_store_item_packs';
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
         $books_dept_id = $wpdb->get_var("
             SELECT id FROM $dept_table 
@@ -42,7 +43,17 @@
 
                 // Child items with names
                 $children = $wpdb->get_results($wpdb->prepare("
-                    SELECT p.quantity, i.name, i.current_stock
+                    SELECT 
+                        p.quantity,
+                        i.name,
+                        (
+                            SELECT stock FROM $stock_table 
+                            WHERE item_id = i.id AND campus_id = 1
+                        ) AS stock_ughelli,
+                        (
+                            SELECT stock FROM $stock_table 
+                            WHERE item_id = i.id AND campus_id = 2
+                        ) AS stock_okuokoko
                     FROM $packs_table p
                     INNER JOIN $items_table i ON i.id = p.child_item_id
                     WHERE p.pack_id = %d
@@ -50,27 +61,25 @@
                 ", $pack->id));
 
                 // Virtual stock
-                $virtual_stock = null;
+                $virtual_ughelli = null;
+                $virtual_okuokoko = null;
 
                 foreach ($children as $child) {
 
-                    // Treat missing or negative stock as zero
-                    $stock = max(0, intval($child->current_stock));
-                    $qty   = max(1, intval($child->quantity));
+                    $qty = max(1, intval($child->quantity));
 
-                    $possible = floor($stock / $qty);
+                    $stock_u = max(0, intval($child->stock_ughelli));
+                    $stock_o = max(0, intval($child->stock_okuokoko));
 
-                    if ($virtual_stock === null) {
-                        $virtual_stock = $possible;
-                    } else {
-                        $virtual_stock = min($virtual_stock, $possible);
-                    }
+                    $possible_u = floor($stock_u / $qty);
+                    $possible_o = floor($stock_o / $qty);
+
+                    $virtual_ughelli = is_null($virtual_ughelli) ? $possible_u : min($virtual_ughelli, $possible_u);
+                    $virtual_okuokoko = is_null($virtual_okuokoko) ? $possible_o : min($virtual_okuokoko, $possible_o);
                 }
 
-                // If no children → virtual stock = 0
-                if ($virtual_stock === null) {
-                    $virtual_stock = 0;
-                }
+                $virtual_stock = min($virtual_ughelli, $virtual_okuokoko);
+
 
 
                 $row_id = 'pca-children-' . $pack->id;
@@ -90,6 +99,7 @@
                     <td><?php echo intval($virtual_stock); ?></td>
                     <td style="white-space:nowrap;">
                         <a href="#" class="pca-edit-pack" data-id="<?php echo $pack->id; ?>">Edit</a> |
+                        <a href="#" class="pca-add-stationery-to-pack" data-id="<?php echo $pack->id; ?>">Add Stationery</a> |
                         <a href="#" class="button-danger pca-delete-pack" data-id="<?php echo $pack->id; ?>">Delete</a>
                     </td>
                 </tr>

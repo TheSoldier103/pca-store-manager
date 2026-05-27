@@ -1,5 +1,64 @@
 jQuery(document).ready(function($){
 
+    $(document).on('click', '.pca-add-stationery-to-pack', function(e){
+        e.preventDefault();
+
+        let packId = $(this).data('id');
+
+        $('#pca-pack-stationery-pack-id').val(packId);
+
+        // Load stationery items via AJAX
+        $.post(ajaxurl, {
+            action: 'pca_store_get_stationery_items'
+        }, function(response){
+            if (!response.success) {
+                alert('Could not load stationery items');
+                return;
+            }
+
+            let list = $('#pca-pack-stationery-list');
+            list.empty();
+
+            response.data.items.forEach(function(item){
+                list.append(`
+                    <tr>
+                        <td>${item.name}</td>
+                        <td><input type="number" class="pca-stationery-qty" data-id="${item.id}" min="0" value="0"></td>
+                    </tr>
+                `);
+            });
+
+            $('#pca-add-stationery-pack-modal').show();
+        });
+    });
+
+    $(document).on('click', '#pca-save-stationery-to-pack', function(){
+
+        let packId = $('#pca-pack-stationery-pack-id').val();
+        let items = [];
+
+        $('.pca-stationery-qty').each(function(){
+            let qty = parseInt($(this).val());
+            if (qty > 0) {
+                items.push({
+                    id: $(this).data('id'),
+                    qty: qty
+                });
+            }
+        });
+
+        $.post(ajaxurl, {
+            action: 'pca_store_add_stationery_to_pack',
+            pack_id: packId,
+            items: items
+        }, function(response){
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+
+
     function loadFilteredStockItems() {
         let data = {
             action: 'pca_store_get_filtered_items',
