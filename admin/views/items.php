@@ -53,3 +53,4 @@ switch ($active_tab) {
 
 include __DIR__ . '/items/add-item-modal.php';
 include __DIR__ . '/items/add-pack-modal.php';
+include __DIR__ . '/items/add-stationery-to-pack-modal.php';
