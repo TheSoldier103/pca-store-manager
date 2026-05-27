@@ -1,23 +1,16 @@
 <?php
 $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'books';
 
-// Base tabs for all users
 $tabs = [
     'books'      => 'Books',
     'packs'      => 'Book Packs',
-    'stationery' => 'Stationery'
+    'stationery' => 'Stationery',
+    'lowstock'   => 'Low Stock'
 ];
 
 // Only users with report access can see Low Stock
 if ( current_user_can('pca_store_view_reports') ) {
     $tabs['lowstock'] = 'Low Stock';
-}
-
-// Validate active tab BEFORE rendering or switching
-$allowed_tabs = array_keys($tabs);
-
-if (!in_array($active_tab, $allowed_tabs)) {
-    $active_tab = 'books';
 }
 
 PCA_Store_Admin_Tabs::render_tabs($tabs, $active_tab);
@@ -40,6 +33,13 @@ switch ($active_tab) {
         include __DIR__ . '/items/lowstock-list.php';
         break;
 }
+
+$allowed_tabs = array_keys($tabs);
+
+if (!in_array($active_tab, $allowed_tabs)) {
+    $active_tab = 'books';
+}
+
 
 include __DIR__ . '/items/add-item-modal.php';
 include __DIR__ . '/items/add-pack-modal.php';
