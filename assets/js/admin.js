@@ -271,6 +271,42 @@ jQuery(document).ready(function($){
         toggleItemFields();
     });
 
+    $(document).on('click', '#pca-add-uniform-btn', function(e){
+        e.preventDefault();
+
+        resetItemModal();
+
+        // Preselect Uniforms department
+        $('#pca-item-department option').filter(function(){
+            return $(this).text().trim().toLowerCase() === 'uniforms';
+        }).prop('selected', true);
+
+        $('#pca-item-department').trigger('change');
+
+        toggleItemFields();
+
+        $('#pca-item-modal-title').text('Add New Uniform Item');
+        $('#pca-add-item-modal').show();
+    });
+
+    $(document).on('click', '#pca-add-uniform-pack-btn', function(e){
+        e.preventDefault();
+
+        resetPackModal();
+
+        // Preselect Uniforms department
+        $('#pca-pack-department option').filter(function(){
+            return $(this).text().trim().toLowerCase() === 'uniforms';
+        }).prop('selected', true);
+
+        $('#pca-pack-department').trigger('change');
+
+        $('#pca-pack-modal-title').text('Add New Uniform Pack');
+        $('#pca-add-pack-modal').show();
+    });
+
+
+
 
     /* ---------------------------------------------
        OPEN SINGLE ITEM MODAL (Books)

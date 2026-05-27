@@ -5,7 +5,9 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'books';
 $tabs = [
     'books'      => 'Books',
     'packs'      => 'Book Packs',
-    'stationery' => 'Stationery'
+    'stationery' => 'Stationery',
+    'uniforms'   => 'Uniforms',
+    'uniformpacks' => 'Uniform Packs'
 ];
 
 // Only users with report access can see Low Stock
@@ -34,6 +36,14 @@ switch ($active_tab) {
 
     case 'stationery':
         include __DIR__ . '/items/stationery-list.php';
+        break;
+
+    case 'uniforms':
+        include __DIR__ . '/items/uniforms-list.php';
+        break;
+
+    case 'uniformpacks':
+        include __DIR__ . '/items/uniformpacks-list.php';
         break;
 
     case 'lowstock':
