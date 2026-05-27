@@ -13,8 +13,36 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_import_books', [__CLASS__, 'import_books']);
         add_action('wp_ajax_pca_store_get_filtered_items', [__CLASS__, 'get_filtered_items']);
         add_action('wp_ajax_pca_store_add_stationery_to_pack', [__CLASS__, 'add_stationery_to_pack']);
+        add_action('wp_ajax_pca_store_get_stationery_items', [__CLASS__, 'get_stationery_items']);
 
+    }
 
+    public static function get_stationery_items() {
+        global $wpdb;
+
+        $table      = $wpdb->prefix . 'pca_store_items';
+        $dept_table = $wpdb->prefix . 'pca_store_departments';
+
+        $stationery_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table
+            WHERE LOWER(name) = 'stationery'
+            LIMIT 1
+        ");
+
+        $items = $wpdb->get_results($wpdb->prepare("
+            SELECT id, name, selling_price
+            FROM $table
+            WHERE department_id = %d
+            AND item_type = 'single'
+            AND status != 'deleted'
+            ORDER BY name ASC
+        ", $stationery_dept_id));
+
+        if ($items === false) {
+            wp_send_json_error(['message' => 'Database error']);
+        }
+
+        wp_send_json_success(['items' => $items]);
     }
 
     public static function add_stationery_to_pack() {
@@ -35,8 +63,6 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['message' => 'Stationery added to pack']);
     }
-
-
     
     public static function get_filtered_items() {
         global $wpdb;
@@ -67,7 +93,6 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['items' => $items]);
     }
-
 
     public static function get_pack() {
         global $wpdb;
@@ -203,8 +228,6 @@ class PCA_Store_Items_Controller {
         ]);
     }
 
-
-
     public static function delete_pack() {
         global $wpdb;
 
@@ -228,8 +251,6 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['message' => 'Pack deleted']);
     }
-
-
 
     public static function get_books_for_pack() {
         global $wpdb;
@@ -270,7 +291,6 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success(['books' => $books]);
     }
-
 
     public static function get_item() {
         global $wpdb;
