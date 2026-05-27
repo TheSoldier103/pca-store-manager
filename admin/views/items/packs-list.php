@@ -95,7 +95,6 @@
                     <td><?php echo intval($pack->book_count); ?></td>
                     <td>₦<?php echo number_format($pack->selling_price, 2); ?></td>
                     <td><?php echo intval($virtual_stock); ?></td>
-                    <!-- FIX: Removed white-space:nowrap so actions wrap naturally in the cell -->
                     <td>
                         <a href="#" class="pca-edit-pack" data-id="<?php echo $pack->id; ?>">Edit</a> |
                         <a href="#" class="pca-add-stationery-to-pack" data-id="<?php echo $pack->id; ?>">Add Stationery</a> |

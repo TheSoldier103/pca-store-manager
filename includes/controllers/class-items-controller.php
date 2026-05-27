@@ -45,23 +45,84 @@ class PCA_Store_Items_Controller {
         wp_send_json_success(['items' => $items]);
     }
 
+    // public static function add_stationery_to_pack() {
+    //     global $wpdb;
+
+    //     $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+
+    //     $pack_id = intval($_POST['pack_id']);
+    //     $items   = $_POST['items'];
+
+    //     foreach ($items as $item) {
+    //         $wpdb->insert($packs_table, [
+    //             'pack_id'       => $pack_id,
+    //             'child_item_id' => intval($item['id']),
+    //             'quantity'      => intval($item['qty'])
+    //         ]);
+    //     }
+
+    //     wp_send_json_success(['message' => 'Stationery added to pack']);
+    // }
+
     public static function add_stationery_to_pack() {
         global $wpdb;
 
         $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+        $items_table = $wpdb->prefix . 'pca_store_items';
 
         $pack_id = intval($_POST['pack_id']);
-        $items   = $_POST['items'];
+        $items   = $_POST['items'] ?? [];
+
+        $added   = 0;
+        $skipped = 0;
 
         foreach ($items as $item) {
+            $child_id = intval($item['id']);
+            $qty      = max(1, intval($item['qty']));
+
+            // FIX 1: Skip if this item is already in the pack
+            $exists = $wpdb->get_var($wpdb->prepare("
+                SELECT id FROM $packs_table
+                WHERE pack_id = %d AND child_item_id = %d
+            ", $pack_id, $child_id));
+
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+
             $wpdb->insert($packs_table, [
                 'pack_id'       => $pack_id,
-                'child_item_id' => intval($item['id']),
-                'quantity'      => intval($item['qty'])
+                'child_item_id' => $child_id,
+                'quantity'      => $qty,
             ]);
+
+            $added++;
         }
 
-        wp_send_json_success(['message' => 'Stationery added to pack']);
+        // FIX 2: Recalculate pack price from ALL children (books + stationery)
+        $new_price = $wpdb->get_var($wpdb->prepare("
+            SELECT SUM(i.selling_price * p.quantity)
+            FROM $packs_table p
+            INNER JOIN $items_table i ON i.id = p.child_item_id
+            WHERE p.pack_id = %d
+        ", $pack_id));
+
+        $wpdb->update(
+            $items_table,
+            ['selling_price' => floatval($new_price)],
+            ['id' => $pack_id]
+        );
+
+        $message = "$added item(s) added to pack.";
+        if ($skipped > 0) {
+            $message .= " $skipped duplicate(s) skipped.";
+        }
+
+        wp_send_json_success([
+            'message'   => $message,
+            'new_price' => floatval($new_price),
+        ]);
     }
     
     public static function get_filtered_items() {
