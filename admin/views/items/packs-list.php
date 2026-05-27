@@ -113,7 +113,8 @@
                                         <tr>
                                             <th>Book</th>
                                             <th>Qty in Pack</th>
-                                            <th>Current Stock</th>
+                                            <th>Ughelli Stock</th>
+                                            <th>Okuokoko Stock</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -121,7 +122,8 @@
                                             <tr>
                                                 <td><?php echo esc_html($child->name); ?></td>
                                                 <td><?php echo intval($child->quantity); ?></td>
-                                                <td><?php echo intval($child->current_stock); ?></td>
+                                                <td><?php echo intval($child->virtual_ughelli); ?></td>
+                                                <td><?php echo intval($child->virtual_okuokoko); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
