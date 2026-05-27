@@ -9,7 +9,7 @@
             <th>Books</th>
             <th>Price</th>
             <th>Virtual Stock</th>
-            <th width="120">Actions</th>
+            <th>Actions</th> <!-- Removed fixed width="120" -->
         </tr>
     </thead>
     <tbody>
@@ -41,7 +41,6 @@
         if ($pack_items):
             foreach ($pack_items as $pack):
 
-                // Child items with names
                 $children = $wpdb->get_results($wpdb->prepare("
                     SELECT 
                         p.quantity,
@@ -61,26 +60,25 @@
                 ", $pack->id));
 
                 // Virtual stock
-                $virtual_ughelli = null;
+                $virtual_ughelli  = null;
                 $virtual_okuokoko = null;
 
                 foreach ($children as $child) {
-
-                    $qty = max(1, intval($child->quantity));
-
-                    $stock_u = max(0, intval($child->stock_ughelli));
-                    $stock_o = max(0, intval($child->stock_okuokoko));
+                    $qty     = max(1, intval($child->quantity));
+                    $stock_u = max(0, intval($child->stock_ughelli));  // FIX: was stock_u
+                    $stock_o = max(0, intval($child->stock_okuokoko)); // FIX: was stock_o
 
                     $possible_u = floor($stock_u / $qty);
                     $possible_o = floor($stock_o / $qty);
 
-                    $virtual_ughelli = is_null($virtual_ughelli) ? $possible_u : min($virtual_ughelli, $possible_u);
+                    $virtual_ughelli  = is_null($virtual_ughelli)  ? $possible_u : min($virtual_ughelli,  $possible_u);
                     $virtual_okuokoko = is_null($virtual_okuokoko) ? $possible_o : min($virtual_okuokoko, $possible_o);
                 }
 
-                $virtual_stock = min($virtual_ughelli, $virtual_okuokoko);
-
-
+                // If pack has no children, show 0
+                $virtual_stock = (is_null($virtual_ughelli) || is_null($virtual_okuokoko))
+                    ? 0
+                    : min($virtual_ughelli, $virtual_okuokoko);
 
                 $row_id = 'pca-children-' . $pack->id;
                 ?>
@@ -97,7 +95,8 @@
                     <td><?php echo intval($pack->book_count); ?></td>
                     <td>₦<?php echo number_format($pack->selling_price, 2); ?></td>
                     <td><?php echo intval($virtual_stock); ?></td>
-                    <td style="white-space:nowrap;">
+                    <!-- FIX: Removed white-space:nowrap so actions wrap naturally in the cell -->
+                    <td>
                         <a href="#" class="pca-edit-pack" data-id="<?php echo $pack->id; ?>">Edit</a> |
                         <a href="#" class="pca-add-stationery-to-pack" data-id="<?php echo $pack->id; ?>">Add Stationery</a> |
                         <a href="#" class="button-danger pca-delete-pack" data-id="<?php echo $pack->id; ?>">Delete</a>
@@ -122,8 +121,9 @@
                                             <tr>
                                                 <td><?php echo esc_html($child->name); ?></td>
                                                 <td><?php echo intval($child->quantity); ?></td>
-                                                <td><?php echo intval($child->stock_u); ?></td>
-                                                <td><?php echo intval($child->stock_o); ?></td>
+                                                <!-- FIX: corrected property names to match SQL aliases -->
+                                                <td><?php echo intval($child->stock_ughelli); ?></td>
+                                                <td><?php echo intval($child->stock_okuokoko); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
