@@ -76,10 +76,12 @@
         ");
 
 
-       
-
         if ($rows) {
             foreach ($rows as $s) {
+                // Get cashier username
+                $user = get_userdata($s->sold_by);
+                $cashier = $user ? esc_html($user->display_name) : 'Unknown';
+
                 echo "<tr>
                         <td>{$s->sale_date}</td>
                         <td>{$s->receipt_no}</td>
@@ -89,8 +91,7 @@
                         <td>₦" . number_format($s->discount, 2) . "</td>
                         <td>₦" . number_format($s->balance, 2) . "</td>
                         <td>{$s->payment_method}</td>
-                        $user = get_userdata($row->sold_by);
-                        <td>echo echo esc_html($user->display_name);</td>
+                        <td>{$cashier}</td>
                       </tr>";
             }
         } else {
