@@ -43,6 +43,11 @@ class PCA_Store_Sales_Controller {
             WHERE item_id = %d AND campus_id = %d
         ", $item_id, $campus_id));
 
+        if ($available_stock === null) {
+            $available_stock = 0;
+        }
+
+
         if ($available_stock < $qty) {
             wp_send_json_error([
                 'message' => "Insufficient stock. Available: $available_stock"
