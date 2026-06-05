@@ -957,25 +957,6 @@ jQuery(document).on('click', '#pca-save-return', function() {
     });
 });
 
-jQuery(document).on('click', '#pca-record-sale-btn', function(){
-
-    let data = {
-        action: 'pca_store_record_sale',
-        item_id: jQuery('#pca-sale-item').val(),
-        qty: jQuery('#pca-sale-qty').val(),
-        price: jQuery('#pca-sale-price').val(),
-        discount: jQuery('#pca-sale-discount').val(),
-        receipt_no: jQuery('#pca-sale-receipt').val(),
-        payment_method: jQuery('#pca-sale-method').val(),
-        notes: jQuery('#pca-sale-notes').val(),
-        department: jQuery('#pca-sale-department').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response){
-        alert(response.data.message);
-        location.reload();
-    });
-});
 
 
 jQuery(function($){
