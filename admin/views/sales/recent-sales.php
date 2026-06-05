@@ -2,6 +2,7 @@
 
 <form method="get">
     <input type="hidden" name="page" value="pca-store-sales">
+    <input type="hidden" name="tab" value="recent">
 
     <?php if (!$fixed_campus): ?>
         <select name="campus_id">
