@@ -4,23 +4,53 @@
 
     <table class="form-table">
 
-        <tr>
-            <th><label>Campus</label></th>
-            <td>
-                <select id="pca-stock-campus" class="regular-text">
-                    <option value="">Select Campus</option>
-                    <?php
-                    global $wpdb;
-                    $campuses = $wpdb->prefix . 'pca_store_campuses';
-                    $rows = $wpdb->get_results("SELECT id, name FROM $campuses WHERE is_active = 1 ORDER BY name ASC");
+        <?php
+        $fixed_campus = PCA_Store_Helpers::get_user_campus();
+        ?>
 
-                    foreach ($rows as $c) {
-                        echo "<option value='{$c->id}'>{$c->name}</option>";
-                    }
-                    ?>
-                </select>
-            </td>
-        </tr>
+        <?php if ($fixed_campus): ?>
+
+            <!-- Campus is fixed for this user -->
+            <input type="hidden" id="pca-stock-campus" value="<?php echo $fixed_campus; ?>">
+
+            <tr>
+                <th><label>Campus</label></th>
+                <td>
+                    <strong>
+                        <?php
+                        global $wpdb;
+                        $campus_table = $wpdb->prefix . 'pca_store_campuses';
+                        $name = $wpdb->get_var($wpdb->prepare("SELECT name FROM $campus_table WHERE id = %d", $fixed_campus));
+                        echo esc_html($name);
+                        ?>
+                    </strong>
+                    <em>(auto‑assigned)</em>
+                </td>
+            </tr>
+
+        <?php else: ?>
+
+            <!-- Admin or unrestricted user → show dropdown -->
+            <tr>
+                <th><label>Campus</label></th>
+                <td>
+                    <select id="pca-stock-campus" class="regular-text">
+                        <option value="">Select Campus</option>
+                        <?php
+                        global $wpdb;
+                        $campuses = $wpdb->prefix . 'pca_store_campuses';
+                        $rows = $wpdb->get_results("SELECT id, name FROM $campuses WHERE is_active = 1 ORDER BY name ASC");
+
+                        foreach ($rows as $c) {
+                            echo "<option value='{$c->id}'>{$c->name}</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+
+        <?php endif; ?>
+
 
         <tr>
             <th><label>Class</label></th>
