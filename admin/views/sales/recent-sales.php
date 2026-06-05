@@ -76,7 +76,7 @@
         ");
 
 
-        $user_info = get_userdata($row->sold_by);
+       
 
         if ($rows) {
             foreach ($rows as $s) {
@@ -89,6 +89,7 @@
                         <td>₦" . number_format($s->discount, 2) . "</td>
                         <td>₦" . number_format($s->balance, 2) . "</td>
                         <td>{$s->payment_method}</td>
+                        $user = get_userdata($row->sold_by);
                         <td>echo esc_html($user_info->display_name);</td>
                       </tr>";
             }
