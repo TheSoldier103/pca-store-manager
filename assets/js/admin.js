@@ -9,8 +9,15 @@ jQuery(document).ready(function ($) {
         $('#pca-sale-total').val(total);
     }
 
+    // When item changes → update price → then update total
+    $('#pca-sale-item').on('change', function(){
+        let price = $('option:selected', this).data('price') || 0;
+        $('#pca-sale-price').val(price);
+        updateSaleTotal();
+    });
+
     // Trigger recalculation
-    $('#pca-sale-item').on('change', updateSaleTotal);
+    // $('#pca-sale-item').on('change', updateSaleTotal);
     $('#pca-sale-qty').on('input', updateSaleTotal);
     $('#pca-sale-discount').on('input', updateSaleTotal);
 
