@@ -13,6 +13,8 @@ class PCA_Store_Permissions {
         'pca_store_manage_schools',
         'pca_store_manage_campuses',
         'pca_store_manage_settings',
+        'pca_store_campus_ugh',
+        'pca_store_campus_oku',
     ];
 
     public static function init() {

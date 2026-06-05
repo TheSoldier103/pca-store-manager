@@ -68,7 +68,8 @@ class PCA_Store_Stock_Controller {
 
         $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
-        $campus_id = intval($_POST['campus_id']);
+        // $campus_id = intval($_POST['campus_id']);
+        $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
         $item_id   = intval($_POST['item_id']);
         $qty       = intval($_POST['qty']);
 

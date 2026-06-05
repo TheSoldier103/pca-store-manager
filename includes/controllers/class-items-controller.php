@@ -45,25 +45,6 @@ class PCA_Store_Items_Controller {
         wp_send_json_success(['items' => $items]);
     }
 
-    // public static function add_stationery_to_pack() {
-    //     global $wpdb;
-
-    //     $packs_table = $wpdb->prefix . 'pca_store_item_packs';
-
-    //     $pack_id = intval($_POST['pack_id']);
-    //     $items   = $_POST['items'];
-
-    //     foreach ($items as $item) {
-    //         $wpdb->insert($packs_table, [
-    //             'pack_id'       => $pack_id,
-    //             'child_item_id' => intval($item['id']),
-    //             'quantity'      => intval($item['qty'])
-    //         ]);
-    //     }
-
-    //     wp_send_json_success(['message' => 'Stationery added to pack']);
-    // }
-
     public static function add_stationery_to_pack() {
         global $wpdb;
 
