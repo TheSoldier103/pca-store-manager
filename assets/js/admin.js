@@ -1,5 +1,41 @@
 jQuery(document).ready(function($){
 
+    // Auto-fill price when selecting item
+    $('#pca-sale-item').on('change', function(){
+        let price = $('option:selected', this).data('price') || 0;
+        $('#pca-sale-price').val(price);
+    });
+
+    // Record sale
+    $('#pca-record-sale-btn').on('click', function(e){
+        e.preventDefault();
+
+        let data = {
+            action: 'pca_store_record_sale',
+            item_id: $('#pca-sale-item').val(),
+            qty: $('#pca-sale-qty').val(),
+            price: $('#pca-sale-price').val(),
+            discount: $('#pca-sale-discount').val() || 0,
+            receipt_no: $('#pca-sale-receipt').val(),
+            payment_method: $('#pca-sale-method').val(),
+            notes: $('#pca-sale-notes').val(),
+            department: $('#pca-sale-department').val(),
+            campus_id: $('#pca-sale-campus').val() // hidden for campus-bound roles
+        };
+
+        $.post(ajaxurl, data, function(response){
+
+            if (!response.success) {
+                alert(response.data.message);
+                return;
+            }
+
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+
     $(document).on('click', '.pca-add-stationery-to-pack', function(e){
         e.preventDefault();
 
@@ -955,47 +991,6 @@ jQuery(document).on('click', '#pca-save-return', function() {
         alert(response.data.message);
         location.reload();
     });
-});
-
-
-
-jQuery(function($){
-
-    // Auto-fill price when selecting item
-    $('#pca-sale-item').on('change', function(){
-        let price = $('option:selected', this).data('price');
-        $('#pca-sale-price').val(price);
-    });
-
-    // Record sale
-    $('#pca-record-sale-btn').on('click', function(e){
-        e.preventDefault();
-
-        let data = {
-            action: 'pca_store_record_sale',
-            item_id: $('#pca-sale-item').val(),
-            qty: $('#pca-sale-qty').val(),
-            price: $('#pca-sale-price').val(),
-            discount: $('#pca-sale-discount').val() || 0,
-            receipt_no: $('#pca-sale-receipt').val(),
-            payment_method: $('#pca-sale-method').val(),
-            notes: $('#pca-sale-notes').val(),
-            department: $('#pca-sale-department').val(),
-            campus_id: $('#pca-sale-campus').val() // IMPORTANT
-        };
-
-        $.post(ajaxurl, data, function(response){
-
-            if (!response.success) {
-                alert(response.data.message);
-                return;
-            }
-
-            alert(response.data.message);
-            location.reload();
-        });
-    });
-
 });
 
 
