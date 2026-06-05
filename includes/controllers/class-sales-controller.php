@@ -20,6 +20,7 @@ class PCA_Store_Sales_Controller {
         $payment_method = sanitize_text_field($_POST['payment_method']);
         $notes          = sanitize_text_field($_POST['notes']);
         $department     = sanitize_text_field($_POST['department']);
+        $campus_id     = sanitize_text_field($_POST['campus_id']);
 
         if (!$item_id || $qty <= 0) {
             wp_send_json_error(['message' => 'Invalid item or quantity']);
