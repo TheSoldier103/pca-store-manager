@@ -106,6 +106,12 @@
     </tr>
 
     <tr>
+        <th><label>Total</label></th>
+        <td><input type="number" id="pca-sale-total" readonly></td>
+    </tr>
+
+
+    <tr>
         <th><label>Receipt Number</label></th>
         <td><input type="text" id="pca-sale-receipt" class="regular-text"></td>
     </tr>

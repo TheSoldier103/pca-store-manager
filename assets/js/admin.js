@@ -1,5 +1,20 @@
 jQuery(document).ready(function ($) {
 
+    function updateSaleTotal() {
+        let price = parseFloat($('#pca-sale-price').val()) || 0;
+        let qty = parseInt($('#pca-sale-qty').val()) || 1;
+        let discount = parseFloat($('#pca-sale-discount').val()) || 0;
+
+        let total = (price * qty) - discount;
+        $('#pca-sale-total').val(total);
+    }
+
+    // Trigger recalculation
+    $('#pca-sale-item').on('change', updateSaleTotal);
+    $('#pca-sale-qty').on('input', updateSaleTotal);
+    $('#pca-sale-discount').on('input', updateSaleTotal);
+
+
     /* =============================================================
        SALES
     ============================================================= */
