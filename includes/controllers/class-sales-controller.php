@@ -32,6 +32,23 @@ class PCA_Store_Sales_Controller {
             $receipt_no = 'RCP-' . strtoupper(wp_generate_password(8, false));
         }
 
+        // Get available stock for this campus
+        $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
+
+        $stock_table = $wpdb->prefix . 'pca_store_stock';
+
+        $available_stock = $wpdb->get_var($wpdb->prepare("
+            SELECT quantity 
+            FROM $stock_table
+            WHERE item_id = %d AND campus_id = %d
+        ", $item_id, $campus_id));
+
+        if ($available_stock < $qty) {
+            wp_send_json_error([
+                'message' => "Insufficient stock. Available: $available_stock"
+            ]);
+        }
+
         // Insert sale
         $wpdb->insert($sales_table, [
             'receipt_no'     => $receipt_no,
