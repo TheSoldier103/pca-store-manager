@@ -4,6 +4,7 @@ class PCA_Store_Activator {
 
     public static function activate() {
         self::create_tables();
+        PCA_Store_Permissions::add_caps();
         update_option('pca_store_db_version', PCA_STORE_DB_VERSION);
     }
 
