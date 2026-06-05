@@ -8,6 +8,7 @@
             <th>Items</th>
             <th>Total</th>
             <th>Paid</th>
+            <th>Discount</th>
             <th>Balance</th>
             <th>Method</th>
             <th>Cashier</th>
@@ -33,6 +34,7 @@
                         <td>{$s->department}</td>
                         <td>₦" . number_format($s->total_amount, 2) . "</td>
                         <td>₦" . number_format($s->amount_paid, 2) . "</td>
+                        <td>₦" . number_format($s->discount, 2) . "</td>
                         <td>₦" . number_format($s->balance, 2) . "</td>
                         <td>{$s->payment_method}</td>
                         <td>{$s->sold_by}</td>
