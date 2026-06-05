@@ -35,7 +35,7 @@ class PCA_Store_Sales_Controller {
         // Get available stock for this campus
         $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
 
-        $stock_table = $wpdb->prefix . 'pca_store_stock';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
         $available_stock = $wpdb->get_var($wpdb->prepare("
             SELECT stock 
