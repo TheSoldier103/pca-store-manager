@@ -20,9 +20,14 @@ class PCA_Store_Helpers {
 
             $cap = 'pca_store_campus_' . $slug;
 
-            if (current_user_can($cap)) {
+            // if (current_user_can($cap)) {
+            //     return intval($campus->id);
+            // }
+
+            if (current_user_can($cap) && !current_user_can('administrator')) {
                 return intval($campus->id);
             }
+
         }
 
         return null; // Admin or unrestricted role
