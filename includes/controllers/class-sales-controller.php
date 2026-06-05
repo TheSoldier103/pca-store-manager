@@ -27,6 +27,10 @@ class PCA_Store_Sales_Controller {
 
         $line_total = ($price * $qty) - $discount;
 
+        if (empty($receipt_no)) {
+            $receipt_no = 'RCP-' . strtoupper(wp_generate_password(8, false));
+        }
+
         // Insert sale
         $wpdb->insert($sales_table, [
             'receipt_no'     => $receipt_no,
@@ -49,8 +53,7 @@ class PCA_Store_Sales_Controller {
             'item_id'    => $item_id,
             'quantity'   => $qty,
             'unit_price' => $price,
-            'discount'   => $discount,
-            'total'      => $line_total,
+            'total_price' => $line_total,
         ]);
 
         // Deduct stock
