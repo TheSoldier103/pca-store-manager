@@ -42,6 +42,7 @@ class PCA_Store_Sales_Controller {
             'payment_method' => $payment_method,
             'sold_by'        => get_current_user_id(),
             'notes'          => $notes,
+            'campus_id'      => $campus_id,
             'created_at'     => current_time('mysql'),
         ]);
 
