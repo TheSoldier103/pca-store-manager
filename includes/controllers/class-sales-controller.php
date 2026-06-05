@@ -38,7 +38,7 @@ class PCA_Store_Sales_Controller {
         $stock_table = $wpdb->prefix . 'pca_store_stock';
 
         $available_stock = $wpdb->get_var($wpdb->prepare("
-            SELECT quantity 
+            SELECT stock 
             FROM $stock_table
             WHERE item_id = %d AND campus_id = %d
         ", $item_id, $campus_id));

@@ -16,14 +16,21 @@ class PCA_Store_Stock_Controller {
     public static function apply_stock_movement($item_id, $qty, $movement_type, $reference_type, $reference_id, $notes = '') {
         global $wpdb;
 
-        $items_table = $wpdb->prefix . 'pca_store_items';
+        $stock_table    = $wpdb->prefix . 'pca_store_item_stock';
         $movement_table = $wpdb->prefix . 'pca_store_stock_movements';
 
-        // Get current stock
-        $current_stock = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT current_stock FROM $items_table WHERE id = %d",
-            $item_id
-        ));
+        // Determine campus
+        $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
+
+        // Get current stock for this campus
+        $current_stock = $wpdb->get_var($wpdb->prepare("
+            SELECT stock FROM $stock_table
+            WHERE item_id = %d AND campus_id = %d
+        ", $item_id, $campus_id));
+
+        if ($current_stock === null) {
+            $current_stock = 0;
+        }
 
         $stock_before = $current_stock;
 
@@ -38,14 +45,17 @@ class PCA_Store_Stock_Controller {
             return false;
         }
 
-        // Update stock
-        $wpdb->update($items_table, [
-            'current_stock' => $new_stock
-        ], ['id' => $item_id]);
+        // Update per-campus stock
+        $wpdb->update(
+            $stock_table,
+            ['stock' => $new_stock],
+            ['item_id' => $item_id, 'campus_id' => $campus_id]
+        );
 
         // Log movement
         $wpdb->insert($movement_table, [
             'item_id'        => $item_id,
+            'campus_id'      => $campus_id,
             'movement_type'  => $movement_type,
             'quantity'       => $qty,
             'stock_before'   => $stock_before,
@@ -59,6 +69,7 @@ class PCA_Store_Stock_Controller {
 
         return $new_stock;
     }
+
 
     /**
      * Add Stock
