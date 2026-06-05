@@ -17,7 +17,6 @@ jQuery(document).ready(function ($) {
     });
 
     // Trigger recalculation
-    // $('#pca-sale-item').on('change', updateSaleTotal);
     $('#pca-sale-qty').on('input', updateSaleTotal);
     $('#pca-sale-discount').on('input', updateSaleTotal);
 

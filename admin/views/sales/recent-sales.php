@@ -22,6 +22,8 @@
         <input type="hidden" name="campus_id" value="<?php echo $fixed_campus; ?>">
         <strong>
             <?php
+            global $wpdb; // ⭐ REQUIRED
+            $campus_table = $wpdb->prefix . 'pca_store_campuses';
             $name = $wpdb->get_var($wpdb->prepare("SELECT name FROM $campus_table WHERE id = %d", $fixed_campus));
             echo esc_html($name);
             ?>
