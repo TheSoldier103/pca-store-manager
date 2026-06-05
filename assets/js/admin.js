@@ -1,490 +1,266 @@
-jQuery(document).ready(function($){
+jQuery(document).ready(function ($) {
 
-    // Auto-fill price when selecting item
-    $('#pca-sale-item').on('change', function(){
-        let price = $('option:selected', this).data('price') || 0;
+    /* =============================================================
+       SALES
+    ============================================================= */
+
+    // Auto-fill price when selecting item (single handler — removed duplicate)
+    $(document).on('change', '#pca-sale-item', function () {
+        let price = $(this).find(':selected').data('price') || 0;
         $('#pca-sale-price').val(price);
     });
 
-    // Record sale
-    $('#pca-record-sale-btn').on('click', function(e){
-        e.preventDefault();
-
-        let data = {
-            action: 'pca_store_record_sale',
-            item_id: $('#pca-sale-item').val(),
-            qty: $('#pca-sale-qty').val(),
-            price: $('#pca-sale-price').val(),
-            discount: $('#pca-sale-discount').val() || 0,
-            receipt_no: $('#pca-sale-receipt').val(),
-            payment_method: $('#pca-sale-method').val(),
-            notes: $('#pca-sale-notes').val(),
-            department: $('#pca-sale-department').val(),
-            campus_id: $('#pca-sale-campus').val() // hidden for campus-bound roles
-        };
-
-        $.post(ajaxurl, data, function(response){
-
-            if (!response.success) {
-                alert(response.data.message);
-                return;
-            }
-
-            alert(response.data.message);
-            location.reload();
-        });
-    });
-
-
-    $(document).on('click', '.pca-add-stationery-to-pack', function(e){
-        e.preventDefault();
-
-        let packId = $(this).data('id');
-
-        $('#pca-pack-stationery-pack-id').val(packId);
-
-        // Load stationery items via AJAX
-        $.post(ajaxurl, {
-            action: 'pca_store_get_stationery_items'
-        }, function(response){
-            if (!response.success) {
-                alert('Could not load stationery items');
-                return;
-            }
-
-            let list = $('#pca-pack-stationery-list');
-            list.empty();
-
-            response.data.items.forEach(function(item){
-                list.append(`
-                    <tr>
-                        <td>${item.name}</td>
-                        <td><input type="number" class="pca-stationery-qty" data-id="${item.id}" min="0" value="0"></td>
-                    </tr>
-                `);
-            });
-
-            $('#pca-add-stationery-pack-modal').show();
-        });
-    });
-
-    $(document).on('click', '#pca-save-stationery-to-pack', function(){
-
-        let packId = $('#pca-pack-stationery-pack-id').val();
-        let items = [];
-
-        $('.pca-stationery-qty').each(function(){
-            let qty = parseInt($(this).val());
-            if (qty > 0) {
-                items.push({
-                    id: $(this).data('id'),
-                    qty: qty
-                });
-            }
-        });
-
-        $.post(ajaxurl, {
-            action: 'pca_store_add_stationery_to_pack',
-            pack_id: packId,
-            items: items
-        }, function(response){
-            alert(response.data.message);
-            location.reload();
-        });
-    });
-
-
+    // Filtered item dropdowns (sale form)
     function loadFilteredSaleItems() {
-        let data = {
-            action: 'pca_store_get_filtered_items',
-            class_level: jQuery('#pca-sale-class').val(),
-            subject: jQuery('#pca-sale-subject').val()
-        };
-
-        jQuery.post(ajaxurl, data, function(response) {
+        $.post(ajaxurl, {
+            action:      'pca_store_get_filtered_items',
+            class_level: $('#pca-sale-class').val(),
+            subject:     $('#pca-sale-subject').val()
+        }, function (response) {
             if (!response.success) return;
 
-            let dropdown = jQuery('#pca-sale-item');
-            dropdown.empty();
-            dropdown.append('<option value="">Select Book</option>');
+            let dropdown = $('#pca-sale-item');
+            dropdown.empty().append('<option value="">Select Book</option>');
 
-            response.data.items.forEach(function(item) {
+            response.data.items.forEach(function (item) {
                 dropdown.append(
-                    `<option value="${item.id}" data-price="${item.selling_price}">
-                        ${item.name}
-                    </option>`
+                    `<option value="${item.id}" data-price="${item.selling_price}">${item.name}</option>`
                 );
             });
         });
     }
 
-    jQuery(document).on('change', '#pca-sale-class, #pca-sale-subject', loadFilteredSaleItems);
+    $(document).on('change', '#pca-sale-class, #pca-sale-subject', loadFilteredSaleItems);
 
-    jQuery(document).on('change', '#pca-sale-item', function() {
-        let price = jQuery(this).find(':selected').data('price') || 0;
-        jQuery('#pca-sale-price').val(price);
+    // Record sale
+    $('#pca-record-sale-btn').on('click', function (e) {
+        e.preventDefault();
+
+        $.post(ajaxurl, {
+            action:         'pca_store_record_sale',
+            item_id:        $('#pca-sale-item').val(),
+            qty:            $('#pca-sale-qty').val(),
+            price:          $('#pca-sale-price').val(),
+            discount:       $('#pca-sale-discount').val() || 0,
+            receipt_no:     $('#pca-sale-receipt').val(),
+            payment_method: $('#pca-sale-method').val(),
+            notes:          $('#pca-sale-notes').val(),
+            department:     $('#pca-sale-department').val(),
+            campus_id:      $('#pca-sale-campus').val()
+        }, function (response) {
+            alert(response.data.message);
+            if (response.success) location.reload();
+        });
     });
 
 
+    /* =============================================================
+       STOCK (add / damage / correction / return)
+    ============================================================= */
 
+    // Filtered item dropdown (stock form)
     function loadFilteredStockItems() {
-        let data = {
-            action: 'pca_store_get_filtered_items',
-            class_level: jQuery('#pca-stock-class').val(),
-            subject: jQuery('#pca-stock-subject').val()
-        };
-
-        jQuery.post(ajaxurl, data, function(response) {
+        $.post(ajaxurl, {
+            action:      'pca_store_get_filtered_items',
+            class_level: $('#pca-stock-class').val(),
+            subject:     $('#pca-stock-subject').val()
+        }, function (response) {
             if (!response.success) return;
 
-            let dropdown = jQuery('#pca-stock-item');
-            dropdown.empty();
-            dropdown.append('<option value="">Select Item</option>');
+            let dropdown = $('#pca-stock-item');
+            dropdown.empty().append('<option value="">Select Item</option>');
 
-            response.data.items.forEach(function(item) {
+            response.data.items.forEach(function (item) {
                 dropdown.append(`<option value="${item.id}">${item.name}</option>`);
             });
         });
     }
 
-    jQuery(document).on('change', '#pca-stock-class, #pca-stock-subject', loadFilteredStockItems);
+    $(document).on('change', '#pca-stock-class, #pca-stock-subject', loadFilteredStockItems);
 
-
-    /* ---------------------------------------------------------
-        Pack row toggle
-    --------------------------------------------------------- */
-    $(document).on('click', '.pca-pack-toggle', function (e) {
-        e.preventDefault();
-
-        const $btn     = $(this);
-        const targetId = $btn.attr('aria-controls');
-        const $children = $('#' + targetId);
-        const isOpen   = $btn.hasClass('open');
-
-        $btn.toggleClass('open', !isOpen)
-            .attr('aria-expanded', String(!isOpen))
-            .text(isOpen ? '+' : '–');
-
-        $children.stop(true, true).slideToggle(180);
+    $('#pca-save-stock').on('click', function () {
+        $.post(ajaxurl, {
+            action:    'pca_store_add_stock',
+            campus_id: $('#pca-stock-campus').val(),
+            item_id:   $('#pca-stock-item').val(),
+            qty:       $('#pca-stock-qty').val(),
+            notes:     $('#pca-stock-notes').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
     });
 
-    $(document).on('click', '.pca-edit-item', function(e){
-        e.preventDefault();
+    $('#pca-save-damage').on('click', function () {
+        $.post(ajaxurl, {
+            action:  'pca_store_damage_stock',
+            item_id: $('#pca-damage-item').val(),
+            qty:     $('#pca-damage-qty').val(),
+            reason:  $('#pca-damage-reason').val(),
+            notes:   $('#pca-damage-notes').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
+    });
 
-        const id = $(this).data('id');
+    $('#pca-save-correction').on('click', function () {
+        $.post(ajaxurl, {
+            action:   'pca_store_correct_stock',
+            item_id:  $('#pca-correction-item').val(),
+            new_qty:  $('#pca-correction-new').val(),
+            notes:    $('#pca-correction-notes').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+    $('#pca-save-return').on('click', function () {
+        $.post(ajaxurl, {
+            action:  'pca_store_return_stock',
+            item_id: $('#pca-return-item').val(),
+            qty:     $('#pca-return-qty').val(),
+            reason:  $('#pca-return-reason').val(),
+            notes:   $('#pca-return-notes').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
+    });
+
+
+    /* =============================================================
+       ITEMS (single items — books, stationery, uniforms)
+    ============================================================= */
+
+    function toggleItemFields() {
+        const dept = $('#pca-item-department option:selected').text().trim().toLowerCase();
+        $('.pca-book-field').toggle(dept === 'books');
+        $('.pca-uniform-field').toggle(dept === 'uniforms');
+    }
+
+    function resetItemModal() {
+        $('#pca-item-id, #pca-item-name, #pca-item-price, #pca-item-reorder').val('');
+        $('#pca-item-class, #pca-item-subject').val('');
+        $('#pca-item-size, #pca-item-gender, #pca-item-color').val('');
+        $('#pca-item-department, #pca-item-supplier').val('');
+        $('#pca-item-type').val('single');
+        $('#pca-item-department').trigger('change');
+    }
+
+    // Load suppliers when department changes
+    $('#pca-item-department').on('change', function () {
+        const deptId = $(this).val();
+        $('#pca-item-supplier').html('<option value="">Loading...</option>');
 
         $.get(ajaxurl, {
-            action: 'pca_store_get_item',
-            id: id
-        }, function(response){
-
-            if (!response.success) {
-                alert(response.data.message);
-                return;
+            action:        'pca_get_suppliers_by_department',
+            department_id: deptId
+        }, function (response) {
+            let html = '<option value="">Select Supplier</option>';
+            if (response.success && response.data.suppliers.length > 0) {
+                response.data.suppliers.forEach(function (s) {
+                    html += `<option value="${s.id}">${s.name}</option>`;
+                });
             }
+            $('#pca-item-supplier').html(html);
+        });
+
+        toggleItemFields();
+    });
+
+    // Open item modal helpers
+    function openItemModal(deptName, title) {
+        resetItemModal();
+        $('#pca-item-department option').filter(function () {
+            return $(this).text().trim().toLowerCase() === deptName;
+        }).prop('selected', true);
+        $('#pca-item-department').trigger('change');
+        $('#pca-item-modal-title').text(title);
+        $('#pca-add-item-modal').show();
+    }
+
+    $(document).on('click', '#pca-add-book-btn',       () => openItemModal('books',      'Add New Book'));
+    $(document).on('click', '#pca-add-stationery-btn', () => openItemModal('stationery', 'Add New Stationery'));
+    $(document).on('click', '#pca-add-uniform-btn',    () => openItemModal('uniforms',   'Add New Uniform Item'));
+
+    // Edit item
+    $(document).on('click', '.pca-edit-item', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+
+        $.get(ajaxurl, { action: 'pca_store_get_item', id }, function (response) {
+            if (!response.success) { alert(response.data.message); return; }
 
             const item = response.data.item;
-
             resetItemModal();
 
             $('#pca-item-id').val(item.id);
             $('#pca-item-name').val(item.name);
             $('#pca-item-price').val(item.selling_price);
             $('#pca-item-reorder').val(item.reorder_level);
-
-            // Set department
-            $('#pca-item-department').val(item.department_id).trigger('change');
-
-            // Set supplier
-            setTimeout(() => {
-                $('#pca-item-supplier').val(item.supplier_id);
-            }, 300);
-
-            // Book fields
             $('#pca-item-class').val(item.class_level);
             $('#pca-item-subject').val(item.subject);
-
-            // Uniform fields
             $('#pca-item-size').val(item.size);
             $('#pca-item-gender').val(item.gender);
             $('#pca-item-color').val(item.color);
+
+            $('#pca-item-department').val(item.department_id).trigger('change');
+            setTimeout(() => $('#pca-item-supplier').val(item.supplier_id), 300);
 
             $('#pca-item-modal-title').text('Edit Item');
             $('#pca-add-item-modal').show();
         });
     });
 
-    $(document).on('click', '.pca-delete-item', function(e){
+    // Save item
+    $('#pca-save-item').on('click', function (e) {
         e.preventDefault();
 
-        if (!confirm('Are you sure you want to delete this item?')) {
-            return;
-        }
+        $.post(ajaxurl, {
+            action:        'pca_store_save_item',
+            item_type:     'single',
+            id:            $('#pca-item-id').val(),
+            name:          $('#pca-item-name').val(),
+            department_id: $('#pca-item-department').val(),
+            supplier_id:   $('#pca-item-supplier').val(),
+            selling_price: $('#pca-item-price').val(),
+            reorder_level: $('#pca-item-reorder').val(),
+            class_level:   $('#pca-item-class').val(),
+            subject:       $('#pca-item-subject').val(),
+            size:          $('#pca-item-size').val(),
+            gender:        $('#pca-item-gender').val(),
+            color:         $('#pca-item-color').val(),
+        }, function (response) {
+            alert(response.data.message);
+            if (response.success) location.reload();
+        });
+    });
 
-        const id = $(this).data('id');
+    // Delete item
+    $(document).on('click', '.pca-delete-item', function (e) {
+        e.preventDefault();
+        if (!confirm('Are you sure you want to delete this item?')) return;
 
         $.post(ajaxurl, {
             action: 'pca_store_delete_item',
-            id: id
-        }, function(response){
-            if (!response.success) {
-                alert(response.data.message);
-                return;
-            }
-
+            id:     $(this).data('id')
+        }, function (response) {
             alert(response.data.message);
-            location.reload();
+            if (response.success) location.reload();
         });
     });
 
-    $(document).on('click', '.pca-delete-pack', function(e){
-        e.preventDefault();
-
-        const packId = $(this).data('id');
-
-        if (!confirm('Are you sure you want to delete this pack?')) {
-            return;
-        }
-
-        $.post(ajaxurl, {
-            action: 'pca_store_delete_pack',
-            pack_id: packId
-        }, function(response){
-            if (response.success) {
-                alert('Pack deleted successfully');
-                location.reload();
-            } else {
-                alert('Error: ' + (response.data?.message || 'Could not delete pack.'));
-            }
-        }).fail(function(){
-            alert('Server error. Please try again.');
-        });
-    });
+    $('#pca-close-item-modal').on('click', () => $('#pca-add-item-modal').hide());
 
 
+    /* =============================================================
+       PACKS
+    ============================================================= */
 
-
-    // Open modal (new supplier)
-    $('#pca-add-supplier-btn').on('click', function(e){
-        e.preventDefault();
-        $('#pca-supplier-id').val('');
-        $('#pca-supplier-name').val('');
-        $('#pca-supplier-department').val('');
-        $('#pca-supplier-contact').val('');
-        $('#pca-supplier-phone').val('');
-        $('#pca-supplier-email').val('');
-        $('#pca-supplier-address').val('');
-        $('#pca-supplier-notes').val('');
-        $('#pca-supplier-status').val('1');
-        $('#pca-supplier-modal-title').text('Add Supplier');
-        $('#pca-add-supplier-modal').show();
-    });
-
-    // Close modal
-    $('#pca-close-supplier-modal').on('click', function(e){
-        e.preventDefault();
-        $('#pca-add-supplier-modal').hide();
-    });
-
-    // Edit supplier
-    $(document).on('click', '.pca-edit-supplier', function(e){
-        e.preventDefault();
-        const id = $(this).data('id');
-
-        $.get(ajaxurl, {
-            action: 'pca_get_supplier',
-            id: id
-        }, function(response){
-            if (!response || !response.success) {
-                alert(response && response.data && response.data.message ? response.data.message : 'Error loading supplier');
-                return;
-            }
-
-            const s = response.data.supplier;
-
-            $('#pca-supplier-id').val(s.id);
-            $('#pca-supplier-name').val(s.name);
-            $('#pca-supplier-department').val(s.department_id);
-            $('#pca-supplier-contact').val(s.contact_person);
-            $('#pca-supplier-phone').val(s.phone);
-            $('#pca-supplier-email').val(s.email);
-            $('#pca-supplier-address').val(s.address);
-            $('#pca-supplier-notes').val(s.notes);
-            $('#pca-supplier-status').val(s.is_active ? '1' : '0');
-            $('#pca-supplier-modal-title').text('Edit Supplier');
-            $('#pca-add-supplier-modal').show();
-        });
-    });
-
-    // Save supplier
-    $('#pca-save-supplier').on('click', function(e){
-        e.preventDefault();
-
-        const data = {
-            action: 'pca_save_supplier',
-            id: $('#pca-supplier-id').val(),
-            name: $('#pca-supplier-name').val(),
-            department_id: $('#pca-supplier-department').val(),
-            contact_person: $('#pca-supplier-contact').val(),
-            phone: $('#pca-supplier-phone').val(),
-            email: $('#pca-supplier-email').val(),
-            address: $('#pca-supplier-address').val(),
-            notes: $('#pca-supplier-notes').val(),
-            is_active: $('#pca-supplier-status').val()
-        };
-
-        $.post(ajaxurl, data, function(response){
-            if (!response || !response.success) {
-                alert(response && response.data && response.data.message ? response.data.message : 'Error saving supplier');
-                return;
-            }
-
-            alert(response.data.message || 'Supplier saved');
-            window.location.reload();
-        });
-    });
-
-    // Delete supplier
-    $(document).on('click', '.pca-delete-supplier', function(e){
-        e.preventDefault();
-
-        if (!confirm('Are you sure you want to delete this supplier?')) {
-            return;
-        }
-
-        const id = $(this).data('id');
-
-        $.post(ajaxurl, {
-            action: 'pca_delete_supplier',
-            id: id
-        }, function(response){
-            if (!response || !response.success) {
-                alert(response && response.data && response.data.message ? response.data.message : 'Error deleting supplier');
-                return;
-            }
-
-            alert(response.data.message || 'Supplier deleted');
-            window.location.reload();
-        });
-    });
-
-    /* ---------------------------------------------
-        LOAD SUPPLIERS WHEN DEPARTMENT CHANGES
-    --------------------------------------------- */
-    $('#pca-item-department').on('change', function(){
-
-        const deptId = $(this).val();
-
-        // Clear supplier dropdown
-        $('#pca-item-supplier').html('<option value="">Loading...</option>');
-
-        $.get(ajaxurl, {
-            action: 'pca_get_suppliers_by_department',
-            department_id: deptId
-        }, function(response){
-
-            let html = '<option value="">Select Supplier</option>';
-
-            if (response.success && response.data.suppliers.length > 0) {
-                response.data.suppliers.forEach(function(s){
-                    html += `<option value="${s.id}">${s.name}</option>`;
-                });
-            }
-
-            $('#pca-item-supplier').html(html);
-        });
-
-        // Also toggle fields
-        toggleItemFields();
-    });
-
-    $(document).on('click', '#pca-add-uniform-btn', function(e){
-        e.preventDefault();
-
-        resetItemModal();
-
-        // Preselect Uniforms department
-        $('#pca-item-department option').filter(function(){
-            return $(this).text().trim().toLowerCase() === 'uniforms';
-        }).prop('selected', true);
-
-        $('#pca-item-department').trigger('change');
-
-        toggleItemFields();
-
-        $('#pca-item-modal-title').text('Add New Uniform Item');
-        $('#pca-add-item-modal').show();
-    });
-
-    $(document).on('click', '#pca-add-uniform-pack-btn', function(e){
-        e.preventDefault();
-
-        resetPackModal();
-
-        // Preselect Uniforms department
-        $('#pca-pack-department option').filter(function(){
-            return $(this).text().trim().toLowerCase() === 'uniforms';
-        }).prop('selected', true);
-
-        $('#pca-pack-department').trigger('change');
-
-        $('#pca-pack-modal-title').text('Add New Uniform Pack');
-        $('#pca-add-pack-modal').show();
-    });
-
-
-
-
-    /* ---------------------------------------------
-       OPEN SINGLE ITEM MODAL (Books)
-    --------------------------------------------- */
-    $(document).on('click', '#pca-add-book-btn', function(e){
-        e.preventDefault();
-        resetItemModal();
-
-        // Preselect Books department
-        $('#pca-item-department option').filter(function(){
-            return $(this).text().trim().toLowerCase() === 'books';
-        }).prop('selected', true);
-
-        $('#pca-item-department').trigger('change');
-
-        toggleItemFields();
-
-        $('#pca-item-modal-title').text('Add New Book');
-        $('#pca-add-item-modal').show();
-    });
-
-    /* ---------------------------------------------
-       OPEN SINGLE ITEM MODAL (Stationery)
-    --------------------------------------------- */
-    $(document).on('click', '#pca-add-stationery-btn', function(e){
-        e.preventDefault();
-        resetItemModal();
-
-        // Preselect Stationery department
-        $('#pca-item-department option').filter(function(){
-            return $(this).text().trim().toLowerCase() === 'stationery';
-        }).prop('selected', true);
-
-        $('#pca-item-department').trigger('change');
-
-        toggleItemFields();
-
-        $('#pca-item-modal-title').text('Add New Stationery');
-        $('#pca-add-item-modal').show();
-    });
-
-
-    /* ---------------------------------------------------------
-        Persistent Selected Items
-    --------------------------------------------------------- */
     let selectedPackItems = {};
-    // Structure: { 12: { id:12, name:"Book", qty:1 }, ... }
 
-    /* ---------------------------------------------------------
-        Helpers
-    --------------------------------------------------------- */
     function resetPackModal() {
         selectedPackItems = {};
         $('#pca-pack-id').val('');
@@ -531,20 +307,12 @@ jQuery(document).ready(function($){
 
     function autoCalcPackPrice() {
         let total = 0;
-
         Object.values(selectedPackItems).forEach(item => {
-            const price = parseFloat(item.price || 0);
-            const qty   = parseInt(item.qty || 1);
-            total += price * qty;
+            total += parseFloat(item.price || 0) * parseInt(item.qty || 1);
         });
-
         $('#pca-pack-price').val(total);
     }
 
-
-    /* ---------------------------------------------------------
-        Load Filtered Books
-    --------------------------------------------------------- */
     function loadPackBooks() {
         const classLevel = $('#pca-pack-class-filter').val();
         const subject    = $('#pca-pack-subject-filter').val();
@@ -557,10 +325,10 @@ jQuery(document).ready(function($){
         $('#pca-pack-book-list').html('<p><em>Loading…</em></p>');
 
         $.get(ajaxurl, {
-            action: 'pca_store_get_books_for_pack',
-            class: classLevel,
-            subject: subject,
-        }, function(response) {
+            action:   'pca_store_get_books_for_pack',
+            class:    classLevel,
+            subject:  subject,
+        }, function (response) {
             if (!response.success) {
                 $('#pca-pack-book-list').html('<p>Failed to load books.</p>');
                 return;
@@ -575,22 +343,20 @@ jQuery(document).ready(function($){
 
             let html = `
                 <table class="widefat striped">
-                    <thead>
-                        <tr><th width="30">✓</th><th>Book</th></tr>
-                    </thead>
+                    <thead><tr><th width="30">✓</th><th>Book</th></tr></thead>
                     <tbody>
             `;
 
             books.forEach(book => {
                 const checked = selectedPackItems[book.id] ? 'checked' : '';
-                const meta = [book.class_level, book.subject].filter(Boolean).join(' – ');
+                const meta    = [book.class_level, book.subject].filter(Boolean).join(' – ');
                 html += `
                     <tr>
                         <td>
                             <input type="checkbox" class="pca-pack-select"
-                                data-id="${book.id}" 
-                                data-name="${book.name}" 
-                                data-price="${book.selling_price}" 
+                                data-id="${book.id}"
+                                data-name="${book.name}"
+                                data-price="${book.selling_price}"
                                 ${checked}>
                         </td>
                         <td>${book.name}${meta ? ' <small>(' + meta + ')</small>' : ''}</td>
@@ -603,32 +369,27 @@ jQuery(document).ready(function($){
         });
     }
 
-    /* ---------------------------------------------------------
-        Checkbox: Add / Remove
-    --------------------------------------------------------- */
-    $(document).on('change', '.pca-pack-select', function() {
-        const id   = $(this).data('id');
-        const name = $(this).data('name');
+    // Checkbox: add / remove book from pack
+    $(document).on('change', '.pca-pack-select', function () {
+        const id = $(this).data('id');
 
         if ($(this).is(':checked')) {
-            selectedPackItems[id] = { 
-                id, 
-                name, 
-                qty: 1,
+            selectedPackItems[id] = {
+                id,
+                name:  $(this).data('name'),
+                qty:   1,
                 price: parseFloat($(this).data('price'))
             };
         } else {
             delete selectedPackItems[id];
         }
+
         renderSelectedBooks();
         autoCalcPackPrice();
-
     });
 
-    /* ---------------------------------------------------------
-        Remove from Selected (sync checkbox)
-    --------------------------------------------------------- */
-    $(document).on('click', '.pca-remove-selected', function(e) {
+    // Remove from selected table (keep checkbox in sync)
+    $(document).on('click', '.pca-remove-selected', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         delete selectedPackItems[id];
@@ -636,72 +397,92 @@ jQuery(document).ready(function($){
         renderSelectedBooks();
     });
 
-    /* ---------------------------------------------------------
-        Update Quantity
-    --------------------------------------------------------- */
-    $(document).on('input', '.pca-selected-qty', function() {
+    // Quantity change
+    $(document).on('input', '.pca-selected-qty', function () {
         const id  = $(this).data('id');
         const qty = parseInt($(this).val(), 10);
         if (selectedPackItems[id] && qty > 0) {
             selectedPackItems[id].qty = qty;
             autoCalcPackPrice();
-
         }
     });
 
-    /* ---------------------------------------------------------
-        Filters
-    --------------------------------------------------------- */
     $(document).on('change', '#pca-pack-class-filter, #pca-pack-subject-filter', loadPackBooks);
 
-    /* ---------------------------------------------------------
-        Open Modal
-    --------------------------------------------------------- */
-    $(document).on('click', '#pca-add-pack-btn', function(e) {
+    // Open pack modal
+    $(document).on('click', '#pca-add-pack-btn', function (e) {
         e.preventDefault();
         resetPackModal();
         $('#pca-pack-modal-title').text('Add New Pack');
         $('#pca-add-pack-modal').show();
     });
 
-    /* ---------------------------------------------------------
-        Save Pack
-    --------------------------------------------------------- */
-    $(document).on('click', '#pca-save-pack', function(e) {
+    $(document).on('click', '#pca-add-uniform-pack-btn', function (e) {
+        e.preventDefault();
+        resetPackModal();
+        $('#pca-pack-department option').filter(function () {
+            return $(this).text().trim().toLowerCase() === 'uniforms';
+        }).prop('selected', true);
+        $('#pca-pack-department').trigger('change');
+        $('#pca-pack-modal-title').text('Add New Uniform Pack');
+        $('#pca-add-pack-modal').show();
+    });
+
+    // Edit pack
+    $(document).on('click', '.pca-edit-pack', function (e) {
+        e.preventDefault();
+        const packId = $(this).data('id');
+
+        selectedPackItems = {};
+        renderSelectedBooks();
+
+        $.get(ajaxurl, { action: 'pca_store_get_pack', pack_id: packId }, function (response) {
+            if (!response.success) { alert('Could not load pack'); return; }
+
+            const pack  = response.data.pack;
+            const items = response.data.items;
+
+            $('#pca-pack-id').val(pack.id);
+            $('#pca-pack-name').val(pack.name);
+            $('#pca-pack-class').val(pack.class_level);
+            $('#pca-pack-price').val(pack.selling_price);
+            $('#pca-pack-reorder').val(pack.reorder_level);
+
+            items.forEach(item => {
+                selectedPackItems[item.id] = { id: item.id, name: item.name, qty: item.qty };
+            });
+
+            renderSelectedBooks();
+            $('#pca-pack-modal-title').text('Edit Pack');
+            $('#pca-add-pack-modal').show();
+            loadPackBooks();
+        });
+    });
+
+    // Save pack
+    $(document).on('click', '#pca-save-pack', function (e) {
         e.preventDefault();
 
         const name  = $('#pca-pack-name').val().trim();
-        const deptId = $('#pca-pack-department-id').val();
-        const packId = $('#pca-pack-id').val();
-        const items  = Object.values(selectedPackItems);
+        const items = Object.values(selectedPackItems);
 
-        // Client-side validation
-        if (!name) {
-            alert('Please enter a pack name.');
-            $('#pca-pack-name').focus();
-            return;
-        }
-        if (items.length === 0) {
-            alert('Please select at least one book for this pack.');
-            return;
-        }
+        if (!name) { alert('Please enter a pack name.'); $('#pca-pack-name').focus(); return; }
+        if (!items.length) { alert('Please select at least one book for this pack.'); return; }
 
         const $btn = $(this).prop('disabled', true).text('Saving…');
 
         $.post(ajaxurl, {
             action:        'pca_store_save_item',
-            id:            packId,
+            id:            $('#pca-pack-id').val(),
             item_type:     'pack',
-            name:          name,
-            department_id: deptId,
+            name,
+            department_id: $('#pca-pack-department-id').val(),
             supplier_id:   0,
             selling_price: $('#pca-pack-price').val()   || 0,
             reorder_level: $('#pca-pack-reorder').val() || 0,
             class_level:   $('#pca-pack-class').val(),
-            pack_items:    items,   // array of { id, name, qty }
-            // pack_items: JSON.stringify(items),
-
-        }, function(response) {
+            pack_items:    items,
+        }, function (response) {
             if (response.success) {
                 $('#pca-add-pack-modal').hide();
                 resetPackModal();
@@ -710,93 +491,178 @@ jQuery(document).ready(function($){
             } else {
                 alert('Error: ' + (response.data?.message || 'Could not save pack.'));
             }
-        }).fail(function() {
+        }).fail(function () {
             alert('Server error. Please try again.');
-        }).always(function() {
+        }).always(function () {
             $btn.prop('disabled', false).text('Save Pack');
         });
     });
 
-    /* ---------------------------------------------------------
-        Close Modals
-    --------------------------------------------------------- */
-    $('#pca-close-item-modal').on('click', function() {
-        $('#pca-add-item-modal').hide();
-    });
-
-    $('#pca-close-pack-modal').on('click', function() {
-        $('#pca-add-pack-modal').hide();
-    });
-
-    $(document).on('click', '.pca-edit-pack', function(e){
+    // Delete pack
+    $(document).on('click', '.pca-delete-pack', function (e) {
         e.preventDefault();
+        if (!confirm('Are you sure you want to delete this pack?')) return;
 
-        const packId = $(this).data('id');
-
-        // Reset
-        selectedPackItems = {};
-        renderSelectedBooks();
-
-        $.get(ajaxurl, {
-            action: 'pca_store_get_pack',
-            pack_id: packId
-        }, function(response){
-
-            if (!response.success) {
-                alert('Could not load pack');
-                return;
+        $.post(ajaxurl, {
+            action:  'pca_store_delete_pack',
+            pack_id: $(this).data('id')
+        }, function (response) {
+            if (response.success) {
+                alert('Pack deleted successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + (response.data?.message || 'Could not delete pack.'));
             }
+        }).fail(() => alert('Server error. Please try again.'));
+    });
 
-            const pack = response.data.pack;
-            const items = response.data.items;
+    // Pack row toggle
+    $(document).on('click', '.pca-pack-toggle', function (e) {
+        e.preventDefault();
+        const $btn     = $(this);
+        const $children = $('#' + $btn.attr('aria-controls'));
+        const isOpen   = $btn.hasClass('open');
 
-            // Fill modal fields
-            $('#pca-pack-id').val(pack.id);
-            $('#pca-pack-name').val(pack.name);
-            $('#pca-pack-class').val(pack.class_level);
-            $('#pca-pack-price').val(pack.selling_price);
-            $('#pca-pack-reorder').val(pack.reorder_level);
+        $btn.toggleClass('open', !isOpen)
+            .attr('aria-expanded', String(!isOpen))
+            .text(isOpen ? '+' : '–');
 
-            // Load selected items into memory
-            items.forEach(item => {
-                selectedPackItems[item.id] = {
-                    id: item.id,
-                    name: item.name,
-                    qty: item.qty
-                };
+        $children.stop(true, true).slideToggle(180);
+    });
+
+    $('#pca-close-pack-modal').on('click', () => $('#pca-add-pack-modal').hide());
+
+
+    /* =============================================================
+       STATIONERY PACKS
+    ============================================================= */
+
+    $(document).on('click', '.pca-add-stationery-to-pack', function (e) {
+        e.preventDefault();
+        const packId = $(this).data('id');
+        $('#pca-pack-stationery-pack-id').val(packId);
+
+        $.post(ajaxurl, { action: 'pca_store_get_stationery_items' }, function (response) {
+            if (!response.success) { alert('Could not load stationery items'); return; }
+
+            const list = $('#pca-pack-stationery-list').empty();
+
+            response.data.items.forEach(function (item) {
+                list.append(`
+                    <tr>
+                        <td>${item.name}</td>
+                        <td><input type="number" class="pca-stationery-qty" data-id="${item.id}" min="0" value="0"></td>
+                    </tr>
+                `);
             });
 
-            // Render selected table
-            renderSelectedBooks();
+            $('#pca-add-stationery-pack-modal').show();
+        });
+    });
 
-            // Show modal
-            $('#pca-pack-modal-title').text('Edit Pack');
-            $('#pca-add-pack-modal').show();
+    $(document).on('click', '#pca-save-stationery-to-pack', function () {
+        const packId = $('#pca-pack-stationery-pack-id').val();
+        const items  = [];
 
-            // Load filtered books (checkboxes will auto-check)
-            loadPackBooks();
+        $('.pca-stationery-qty').each(function () {
+            const qty = parseInt($(this).val());
+            if (qty > 0) items.push({ id: $(this).data('id'), qty });
+        });
+
+        $.post(ajaxurl, {
+            action:  'pca_store_add_stationery_to_pack',
+            pack_id: packId,
+            items
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
         });
     });
 
 
-    $(document).on('click', '#pca-import-books-btn', function(e){
+    /* =============================================================
+       SUPPLIERS
+    ============================================================= */
+
+    function openSupplierModal(s = null) {
+        $('#pca-supplier-id').val(s?.id || '');
+        $('#pca-supplier-name').val(s?.name || '');
+        $('#pca-supplier-department').val(s?.department_id || '');
+        $('#pca-supplier-contact').val(s?.contact_person || '');
+        $('#pca-supplier-phone').val(s?.phone || '');
+        $('#pca-supplier-email').val(s?.email || '');
+        $('#pca-supplier-address').val(s?.address || '');
+        $('#pca-supplier-notes').val(s?.notes || '');
+        $('#pca-supplier-status').val(s ? (s.is_active ? '1' : '0') : '1');
+        $('#pca-supplier-modal-title').text(s ? 'Edit Supplier' : 'Add Supplier');
+        $('#pca-add-supplier-modal').show();
+    }
+
+    $('#pca-add-supplier-btn').on('click', e => { e.preventDefault(); openSupplierModal(); });
+
+    $('#pca-close-supplier-modal').on('click', e => { e.preventDefault(); $('#pca-add-supplier-modal').hide(); });
+
+    $(document).on('click', '.pca-edit-supplier', function (e) {
+        e.preventDefault();
+        $.get(ajaxurl, { action: 'pca_get_supplier', id: $(this).data('id') }, function (response) {
+            if (!response?.success) { alert(response?.data?.message || 'Error loading supplier'); return; }
+            openSupplierModal(response.data.supplier);
+        });
+    });
+
+    $('#pca-save-supplier').on('click', function (e) {
+        e.preventDefault();
+
+        $.post(ajaxurl, {
+            action:         'pca_save_supplier',
+            id:             $('#pca-supplier-id').val(),
+            name:           $('#pca-supplier-name').val(),
+            department_id:  $('#pca-supplier-department').val(),
+            contact_person: $('#pca-supplier-contact').val(),
+            phone:          $('#pca-supplier-phone').val(),
+            email:          $('#pca-supplier-email').val(),
+            address:        $('#pca-supplier-address').val(),
+            notes:          $('#pca-supplier-notes').val(),
+            is_active:      $('#pca-supplier-status').val()
+        }, function (response) {
+            if (!response?.success) { alert(response?.data?.message || 'Error saving supplier'); return; }
+            alert(response.data.message || 'Supplier saved');
+            window.location.reload();
+        });
+    });
+
+    $(document).on('click', '.pca-delete-supplier', function (e) {
+        e.preventDefault();
+        if (!confirm('Are you sure you want to delete this supplier?')) return;
+
+        $.post(ajaxurl, {
+            action: 'pca_delete_supplier',
+            id:     $(this).data('id')
+        }, function (response) {
+            if (!response?.success) { alert(response?.data?.message || 'Error deleting supplier'); return; }
+            alert(response.data.message || 'Supplier deleted');
+            window.location.reload();
+        });
+    });
+
+
+    /* =============================================================
+       CSV IMPORT
+    ============================================================= */
+
+    $(document).on('click', '#pca-import-books-btn', function (e) {
         e.preventDefault();
         $('#pca-import-books-result').html('');
         $('#pca-import-books-modal').show();
     });
 
-    $(document).on('click', '#pca-close-import-books', function(){
-        $('#pca-import-books-modal').hide();
-    });
+    $(document).on('click', '#pca-close-import-books', () => $('#pca-import-books-modal').hide());
 
-    $(document).on('click', '#pca-upload-books-csv', function(e){
+    $(document).on('click', '#pca-upload-books-csv', function (e) {
         e.preventDefault();
 
         const file = $('#pca-books-csv-file')[0].files[0];
-        if (!file) {
-            alert('Please select a CSV file.');
-            return;
-        }
+        if (!file) { alert('Please select a CSV file.'); return; }
 
         const formData = new FormData();
         formData.append('action', 'pca_store_import_books');
@@ -805,19 +671,18 @@ jQuery(document).ready(function($){
         $('#pca-import-books-result').html('<p><em>Importing… please wait.</em></p>');
 
         $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: formData,
+            url:         ajaxurl,
+            type:        'POST',
+            data:        formData,
             processData: false,
             contentType: false,
-            success: function(response){
+            success: function (response) {
                 if (!response.success) {
-                    $('#pca-import-books-result').html('<p style="color:red;">' + response.data.message + '</p>');
+                    $('#pca-import-books-result').html(`<p style="color:red;">${response.data.message}</p>`);
                     return;
                 }
 
                 const r = response.data;
-
                 $('#pca-import-books-result').html(`
                     <p><strong>Import Complete</strong></p>
                     <p>Added: ${r.added}</p>
@@ -825,313 +690,106 @@ jQuery(document).ready(function($){
                     <p>Errors: ${r.errors}</p>
                 `);
 
-                if (r.added > 0) {
-                    setTimeout(() => location.reload(), 1500);
-                }
+                if (r.added > 0) setTimeout(() => location.reload(), 1500);
             }
         });
     });
 
 
-    
-    /* ---------------------------------------------
-       TOGGLE FIELDS WHEN DEPARTMENT CHANGES
-    --------------------------------------------- */
-    $('#pca-item-department').on('change', function(){
-        toggleItemFields();
-    });
+    /* =============================================================
+       SETTINGS
+    ============================================================= */
 
-    function toggleItemFields() {
-        const selectedName = $('#pca-item-department option:selected').text().trim().toLowerCase();
-
-        // Hide all conditional fields first
-        $('.pca-book-field').hide();
-        $('.pca-uniform-field').hide();
-
-        if (selectedName === 'books') {
-            $('.pca-book-field').show();
-        }
-
-        if (selectedName === 'uniforms') {
-            $('.pca-uniform-field').show();
-        }
-    }
-
-    /* ---------------------------------------------
-       RESET SINGLE ITEM MODAL
-    --------------------------------------------- */
-    function resetItemModal() {
-        $('#pca-item-id').val('');
-        $('#pca-item-name').val('');
-        $('#pca-item-department').val('');
-        $('#pca-item-supplier').val('');
-        $('#pca-item-price').val('');
-        $('#pca-item-reorder').val('');
-        $('#pca-item-class').val('');
-        $('#pca-item-subject').val('');
-        $('#pca-item-size').val('');
-        $('#pca-item-gender').val('');
-        $('#pca-item-color').val('');
-        $('#pca-item-type').val('single');
-        $('#pca-item-department').trigger('change');
-    }
-
-    /* ---------------------------------------------
-       RESET PACK MODAL
-    --------------------------------------------- */
-    function resetPackModal() {
-        $('#pca-pack-id').val('');
-        $('#pca-pack-name').val('');
-        $('#pca-pack-class').val('');
-        $('#pca-pack-price').val('');
-        $('#pca-pack-reorder').val('');
-
-        // Reset all qty fields to 1
-        $('.pca-pack-qty').val(1);
-    }
-
-    /* ---------------------------------------------
-       SAVE SINGLE ITEM
-    --------------------------------------------- */
-    $('#pca-save-item').on('click', function(e){
-        e.preventDefault();
-
-        const data = {
-            action: 'pca_store_save_item',
-            item_type: 'single',
-            id: $('#pca-item-id').val(),
-            name: $('#pca-item-name').val(),
-            department_id: $('#pca-item-department').val(),
-            supplier_id: $('#pca-item-supplier').val(),
-            selling_price: $('#pca-item-price').val(),
-            reorder_level: $('#pca-item-reorder').val(),
-            class_level: $('#pca-item-class').val(),
-            subject: $('#pca-item-subject').val(),
-            size: $('#pca-item-size').val(),
-            gender: $('#pca-item-gender').val(),
-            color: $('#pca-item-color').val(),
-        };
-
-        $.post(ajaxurl, data, function(response){
-            if (!response.success) {
-                alert(response.data.message);
-                return; // STOP HERE
-            }
-
-            alert(response.data.message);
-            location.reload();
-        });
-
-    });
-
-
-});
-
-
-// ADD STOCK
-jQuery(document).on('click', '#pca-save-stock', function() {
-
-    let data = {
-        action: 'pca_store_add_stock',
-        campus_id: jQuery('#pca-stock-campus').val(),
-        item_id: jQuery('#pca-stock-item').val(),
-        qty: jQuery('#pca-stock-qty').val(),
-        notes: jQuery('#pca-stock-notes').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response) {
-        alert(response.data.message);
-        location.reload();
-    });
-});
-
-
-// DAMAGE
-jQuery(document).on('click', '#pca-save-damage', function() {
-    let data = {
-        action: 'pca_store_damage_stock',
-        item_id: jQuery('#pca-damage-item').val(),
-        qty: jQuery('#pca-damage-qty').val(),
-        reason: jQuery('#pca-damage-reason').val(),
-        notes: jQuery('#pca-damage-notes').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response) {
-        alert(response.data.message);
-        location.reload();
-    });
-});
-
-// CORRECTION
-jQuery(document).on('click', '#pca-save-correction', function() {
-    let data = {
-        action: 'pca_store_correct_stock',
-        item_id: jQuery('#pca-correction-item').val(),
-        new_qty: jQuery('#pca-correction-new').val(),
-        notes: jQuery('#pca-correction-notes').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response) {
-        alert(response.data.message);
-        location.reload();
-    });
-});
-
-// RETURNS
-jQuery(document).on('click', '#pca-save-return', function() {
-    let data = {
-        action: 'pca_store_return_stock',
-        item_id: jQuery('#pca-return-item').val(),
-        qty: jQuery('#pca-return-qty').val(),
-        reason: jQuery('#pca-return-reason').val(),
-        notes: jQuery('#pca-return-notes').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response) {
-        alert(response.data.message);
-        location.reload();
-    });
-});
-
-
-
-function pcaLoadReport(url, target) {
-    jQuery.get(url, function(response){
-        if (response.success) {
-            jQuery(target).html(JSON.stringify(response.data, null, 2));
-        }
-    });
-}
-
-jQuery(function($){
-
-    $('#pca-save-campus').on('click', function(){
-
-        let data = {
-            action: 'pca_settings_save_campus',
-            name: $('#pca-campus-name').val(),
+    $('#pca-save-campus').on('click', function () {
+        $.post(ajaxurl, {
+            action:    'pca_settings_save_campus',
+            name:      $('#pca-campus-name').val(),
             school_id: $('#pca-campus-school').val(),
-            status: $('#pca-campus-status').val()
-        };
-
-        $.post(ajaxurl, data, function(response){
+            status:    $('#pca-campus-status').val()
+        }, function (response) {
             alert(response.data.message);
             location.reload();
         });
     });
 
-    $(document).on('click', '.pca-delete-campus', function(e){
+    $(document).on('click', '.pca-delete-campus', function (e) {
         e.preventDefault();
-
         if (!confirm('Delete this campus?')) return;
-
-        let id = $(this).data('id');
 
         $.post(ajaxurl, {
             action: 'pca_settings_delete_campus',
-            id: id
-        }, function(response){
+            id:     $(this).data('id')
+        }, function (response) {
             alert(response.data.message);
             location.reload();
         });
     });
 
-});
-
-// SAVE SCHOOL
-jQuery(document).on('click', '#pca-save-school', function(){
-    let data = {
-        action: 'pca_settings_save_school',
-        name: jQuery('#pca-school-name').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response){  // <-- was pcaStore.ajaxurl
-        alert(response.data.message);
-        location.reload();
+    $('#pca-save-school').on('click', function () {
+        $.post(ajaxurl, {
+            action: 'pca_settings_save_school',
+            name:   $('#pca-school-name').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
     });
-});
 
-// DELETE SCHOOL
-jQuery(document).on('click', '.pca-delete-school', function(e){
-    e.preventDefault();
-    if (!confirm('Delete this school?')) return;
+    $(document).on('click', '.pca-delete-school', function (e) {
+        e.preventDefault();
+        if (!confirm('Delete this school?')) return;
 
-    let id = jQuery(this).data('id');
-
-    jQuery.post(ajaxurl, {                          // <-- was pcaStore.ajaxurl
-        action: 'pca_settings_delete_school',
-        id: id
-    }, function(response){
-        alert(response.data.message);
-        location.reload();
+        $.post(ajaxurl, {
+            action: 'pca_settings_delete_school',
+            id:     $(this).data('id')
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
     });
-});
 
-
-// SAVE DEPARTMENT
-jQuery(document).on('click', '#pca-save-department', function(){
-
-    let data = {
-        action: 'pca_settings_save_department',
-        name: jQuery('#pca-dept-name').val(),
-        code: jQuery('#pca-dept-code').val()
-    };
-
-    jQuery.post(ajaxurl, data, function(response){
-        alert(response.data.message);
-        location.reload();
+    $('#pca-save-department').on('click', function () {
+        $.post(ajaxurl, {
+            action: 'pca_settings_save_department',
+            name:   $('#pca-dept-name').val(),
+            code:   $('#pca-dept-code').val()
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
     });
-});
 
-// DELETE DEPARTMENT
-jQuery(document).on('click', '.pca-delete-department', function(e){
-    e.preventDefault();
+    $(document).on('click', '.pca-delete-department', function (e) {
+        e.preventDefault();
+        if (!confirm('Delete this department?')) return;
 
-    if (!confirm('Delete this department?')) return;
-
-    let id = jQuery(this).data('id');
-
-    jQuery.post(ajaxurl, {
-        action: 'pca_settings_delete_department',
-        id: id
-    }, function(response){
-        alert(response.data.message);
-        location.reload();
+        $.post(ajaxurl, {
+            action: 'pca_settings_delete_department',
+            id:     $(this).data('id')
+        }, function (response) {
+            alert(response.data.message);
+            location.reload();
+        });
     });
-});
 
-jQuery(function($){
-
-    $('#pca-save-roles').on('click', function(){
-
-        let data = {
-            action: 'pca_settings_save_roles',
-            can_edit_stock: $('#pca-role-edit-stock').is(':checked') ? 1 : 0,
-            can_view_reports: $('#pca-role-view-reports').is(':checked') ? 1 : 0,
+    $('#pca-save-roles').on('click', function () {
+        $.post(ajaxurl, {
+            action:              'pca_settings_save_roles',
+            can_edit_stock:      $('#pca-role-edit-stock').is(':checked')      ? 1 : 0,
+            can_view_reports:    $('#pca-role-view-reports').is(':checked')    ? 1 : 0,
             can_manage_settings: $('#pca-role-manage-settings').is(':checked') ? 1 : 0
-        };
-
-        $.post(ajaxurl, data, function(response){
+        }, function (response) {
             alert(response.data.message);
         });
     });
 
-});
-
-jQuery(function($){
-
-    $('#pca-save-advanced').on('click', function(){
-
-        let data = {
-            action: 'pca_settings_save_advanced',
+    $('#pca-save-advanced').on('click', function () {
+        $.post(ajaxurl, {
+            action:     'pca_settings_save_advanced',
             debug_mode: $('#pca-advanced-debug').is(':checked') ? 1 : 0
-        };
-
-        $.post(ajaxurl, data, function(response){
+        }, function (response) {
             alert(response.data.message);
         });
     });
 
 });
-
-
