@@ -2,29 +2,91 @@
 
 <table class="form-table">
 
+    <?php $fixed_campus = PCA_Store_Helpers::get_user_campus(); ?>
+
+    <?php if ($fixed_campus): ?>
+
+        <input type="hidden" id="pca-sale-campus" value="<?php echo $fixed_campus; ?>">
+
+        <tr>
+            <th><label>Campus</label></th>
+            <td>
+                <strong>
+                    <?php
+                    global $wpdb;
+                    $campus_table = $wpdb->prefix . 'pca_store_campuses';
+                    $name = $wpdb->get_var($wpdb->prepare("SELECT name FROM $campus_table WHERE id = %d", $fixed_campus));
+                    echo esc_html($name);
+                    ?>
+                </strong>
+                <em>(auto‑assigned)</em>
+            </td>
+        </tr>
+
+    <?php else: ?>
+
+        <tr>
+            <th><label>Campus</label></th>
+            <td>
+                <select id="pca-sale-campus" class="regular-text">
+                    <option value="">Select Campus</option>
+                    <?php
+                    global $wpdb;
+                    $campuses = $wpdb->prefix . 'pca_store_campuses';
+                    $rows = $wpdb->get_results("SELECT id, name FROM $campuses WHERE is_active = 1 ORDER BY name ASC");
+
+                    foreach ($rows as $c) {
+                        echo "<option value='{$c->id}'>{$c->name}</option>";
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
+
+    <?php endif; ?>
+
+    <tr>
+        <th><label>Class</label></th>
+        <td>
+            <select id="pca-sale-class" class="regular-text">
+                <option value="">All Classes</option>
+                <?php
+                global $wpdb;
+                $items_table = $wpdb->prefix . 'pca_store_items';
+                $classes = $wpdb->get_col("SELECT DISTINCT class_level FROM $items_table WHERE class_level IS NOT NULL AND class_level != '' ORDER BY class_level ASC");
+
+                foreach ($classes as $c) {
+                    echo "<option value='{$c}'>{$c}</option>";
+                }
+                ?>
+            </select>
+        </td>
+    </tr>
+
+    <tr>
+        <th><label>Subject</label></th>
+        <td>
+            <select id="pca-sale-subject" class="regular-text">
+                <option value="">All Subjects</option>
+                <?php
+                $subjects = $wpdb->get_col("SELECT DISTINCT subject FROM $items_table WHERE subject IS NOT NULL AND subject != '' ORDER BY subject ASC");
+
+                foreach ($subjects as $s) {
+                    echo "<option value='{$s}'>{$s}</option>";
+                }
+                ?>
+            </select>
+        </td>
+    </tr>
+
+
     <tr>
         <th><label>Select Book</label></th>
         <td>
             <select id="pca-sale-item" class="regular-text">
                 <option value="">Select Book</option>
-                <?php
-                global $wpdb;
-                $items = $wpdb->prefix . 'pca_store_items';
-
-                $books = $wpdb->get_results("
-                    SELECT id, name, selling_price, current_stock
-                    FROM $items
-                    WHERE department='books' AND item_type='single' AND status='active'
-                    ORDER BY name ASC
-                ");
-
-                foreach ($books as $b) {
-                    echo "<option value='{$b->id}' data-price='{$b->selling_price}' data-stock='{$b->current_stock}'>
-                            {$b->name} (Stock: {$b->current_stock})
-                          </option>";
-                }
-                ?>
             </select>
+
         </td>
     </tr>
 

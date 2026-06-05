@@ -58,6 +58,38 @@ jQuery(document).ready(function($){
     });
 
 
+    function loadFilteredSaleItems() {
+        let data = {
+            action: 'pca_store_get_filtered_items',
+            class_level: jQuery('#pca-sale-class').val(),
+            subject: jQuery('#pca-sale-subject').val()
+        };
+
+        jQuery.post(ajaxurl, data, function(response) {
+            if (!response.success) return;
+
+            let dropdown = jQuery('#pca-sale-item');
+            dropdown.empty();
+            dropdown.append('<option value="">Select Book</option>');
+
+            response.data.items.forEach(function(item) {
+                dropdown.append(
+                    `<option value="${item.id}" data-price="${item.selling_price}">
+                        ${item.name}
+                    </option>`
+                );
+            });
+        });
+    }
+
+    jQuery(document).on('change', '#pca-sale-class, #pca-sale-subject', loadFilteredSaleItems);
+
+    jQuery(document).on('change', '#pca-sale-item', function() {
+        let price = jQuery(this).find(':selected').data('price') || 0;
+        jQuery('#pca-sale-price').val(price);
+    });
+
+
 
     function loadFilteredStockItems() {
         let data = {
