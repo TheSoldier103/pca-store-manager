@@ -968,7 +968,8 @@ jQuery(function($){
     });
 
     // Record sale
-    $('#pca-record-sale-btn').on('click', function(){
+    $('#pca-record-sale-btn').on('click', function(e){
+        e.preventDefault();
 
         let data = {
             action: 'pca_store_record_sale',
@@ -979,16 +980,24 @@ jQuery(function($){
             receipt_no: $('#pca-sale-receipt').val(),
             payment_method: $('#pca-sale-method').val(),
             notes: $('#pca-sale-notes').val(),
-            department: $('#pca-sale-department').val()
+            department: $('#pca-sale-department').val(),
+            campus_id: $('#pca-sale-campus').val() // IMPORTANT
         };
 
         $.post(ajaxurl, data, function(response){
+
+            if (!response.success) {
+                alert(response.data.message);
+                return;
+            }
+
             alert(response.data.message);
             location.reload();
         });
     });
 
 });
+
 
 
 function pcaLoadReport(url, target) {
