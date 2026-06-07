@@ -9,6 +9,7 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
         add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
         add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
+        add_action('wp_ajax_pca_store_get_book_packs', [__CLASS__, 'get_book_packs']);
         add_action('wp_ajax_pca_store_delete_pack', [__CLASS__, 'delete_pack']);
         add_action('wp_ajax_pca_store_import_books', [__CLASS__, 'import_books']);
         add_action('wp_ajax_pca_store_get_filtered_items', [__CLASS__, 'get_filtered_items']);
@@ -16,6 +17,33 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_stationery_items', [__CLASS__, 'get_stationery_items']);
 
     }
+
+    add_action('wp_ajax_pca_store_get_book_packs', [__CLASS__, 'get_book_packs']);
+
+    public static function get_book_packs() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+
+        $books_dept_id = $wpdb->get_var("
+            SELECT id FROM $dept_table
+            WHERE LOWER(name) = 'books'
+            LIMIT 1
+        ");
+
+        $packs = $wpdb->get_results($wpdb->prepare("
+            SELECT id, name, selling_price
+            FROM $items_table
+            WHERE department_id = %d
+            AND item_type = 'pack'
+            AND status = 'active'
+            ORDER BY name ASC
+        ", $books_dept_id));
+
+        wp_send_json_success(['items' => $packs]);
+    }
+
 
     public static function get_stationery_items() {
         global $wpdb;
