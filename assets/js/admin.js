@@ -253,7 +253,9 @@ jQuery(document).ready(function ($) {
         $.post(ajaxurl, {
             action:      'pca_store_get_filtered_items',
             class_level: $('#pca-stock-class').val(),
-            subject:     $('#pca-stock-subject').val()
+            subject:     $('#pca-stock-subject').val(),
+            department: 'books', 
+            campus_id: $('#pca-stock-campus').val() 
         }, function (response) {
             if (!response.success) return;
 

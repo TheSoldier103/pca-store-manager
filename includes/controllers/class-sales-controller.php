@@ -36,13 +36,6 @@ class PCA_Store_Sales_Controller {
             ]);
         }
 
-        // Deduct stock
-        // $wpdb->query($wpdb->prepare(
-        //     "UPDATE $stock_table SET stock = stock - %d
-        //     WHERE item_id = %d AND campus_id = %d",
-        //     $owed->qty_owed, $owed->item_id, $owed->campus_id
-        // ));
-
         // Log movement
         PCA_Store_Stock_Controller::apply_stock_movement(
             $owed->item_id,
@@ -144,14 +137,6 @@ class PCA_Store_Sales_Controller {
         // 5. DEDUCT AVAILABLE STOCK + APPLY STOCK MOVEMENT
         // ---------------------------------------------------------
         if ($qty_to_deduct > 0) {
-
-            // Deduct stock
-            // $wpdb->query($wpdb->prepare(
-            //     "UPDATE $stock_table 
-            //     SET stock = stock - %d 
-            //     WHERE item_id = %d AND campus_id = %d",
-            //     $qty_to_deduct, $item_id, $campus_id
-            // ));
 
             // Log stock movement
             PCA_Store_Stock_Controller::apply_stock_movement(
