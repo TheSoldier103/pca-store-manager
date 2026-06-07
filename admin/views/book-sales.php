@@ -5,7 +5,8 @@ $tabs = [
     'books'      => 'Books Sale',
     'packs'      => 'Book Packs Sale',
     'stationery' => 'Stationery Sale',
-    'recent'     => 'Recent Sales'
+    'recent'     => 'Recent Sales',
+    'owed-items' => 'Owed Items'
 ];
 
 PCA_Store_Admin_Tabs::render_tabs($tabs, $active_tab);
@@ -22,6 +23,10 @@ switch ($active_tab) {
 
     case 'stationery':
         include __DIR__ . '/book-sales/stationery-sale.php';
+        break;
+    
+    case 'owed-items':
+        include __DIR__ . '/book-sales/owed-items.php';
         break;
 
     case 'recent':
