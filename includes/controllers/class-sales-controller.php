@@ -37,21 +37,23 @@ class PCA_Store_Sales_Controller {
         }
 
         // Deduct stock
-        $wpdb->query($wpdb->prepare(
-            "UPDATE $stock_table SET stock = stock - %d
-            WHERE item_id = %d AND campus_id = %d",
-            $owed->qty_owed, $owed->item_id, $owed->campus_id
-        ));
+        // $wpdb->query($wpdb->prepare(
+        //     "UPDATE $stock_table SET stock = stock - %d
+        //     WHERE item_id = %d AND campus_id = %d",
+        //     $owed->qty_owed, $owed->item_id, $owed->campus_id
+        // ));
 
         // Log movement
         PCA_Store_Stock_Controller::apply_stock_movement(
             $owed->item_id,
             $owed->qty_owed,
+            $owed->campus_id,
             'fulfill_owed',
             'owed_fulfillment',
             $owed->sale_id,
             'Fulfilled owed items for receipt ' . $owed->receipt_no
         );
+
 
         // Mark fulfilled
         $wpdb->update($owed_table, [
@@ -144,17 +146,18 @@ class PCA_Store_Sales_Controller {
         if ($qty_to_deduct > 0) {
 
             // Deduct stock
-            $wpdb->query($wpdb->prepare(
-                "UPDATE $stock_table 
-                SET stock = stock - %d 
-                WHERE item_id = %d AND campus_id = %d",
-                $qty_to_deduct, $item_id, $campus_id
-            ));
+            // $wpdb->query($wpdb->prepare(
+            //     "UPDATE $stock_table 
+            //     SET stock = stock - %d 
+            //     WHERE item_id = %d AND campus_id = %d",
+            //     $qty_to_deduct, $item_id, $campus_id
+            // ));
 
             // Log stock movement
             PCA_Store_Stock_Controller::apply_stock_movement(
                 $item_id,
                 $qty_to_deduct,
+                $campus_id,
                 'sale',
                 'sale',
                 $sale_id,
