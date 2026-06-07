@@ -4,6 +4,23 @@ jQuery(document).ready(function ($) {
        SALES
     ============================================================= */
 
+    $(document).on('change', '.pca-fulfill-owed', function () {
+        let id = $(this).data('id');
+
+        if (!confirm("Mark this owed item as fulfilled?")) {
+            $(this).prop('checked', false);
+            return;
+        }
+
+        $.post(ajaxurl, {
+            action: 'pca_store_fulfill_single_owed_item',
+            id: id
+        }, function (response) {
+            alert(response.data.message);
+            if (response.success) location.reload();
+        });
+    });
+
 
     function loadItemStock(item_id, campus_id) {
         return $.post(ajaxurl, {

@@ -4,7 +4,52 @@ class PCA_Store_Sales_Controller {
 
     public static function init() {
         add_action('wp_ajax_pca_store_record_sale', [__CLASS__, 'record_sale']);
+        add_action('wp_ajax_pca_store_fulfill_single_owed_item', [__CLASS__, 'fulfill_single_owed_item']);
     }
+
+
+    public static function fulfill_single_owed_item() {
+        global $wpdb;
+
+        $id = intval($_POST['id']);
+        $owed_table  = $wpdb->prefix . 'pca_store_owed_items';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+
+        // Get owed item
+        $owed = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $owed_table WHERE id = %d
+        ", $id));
+
+        if (!$owed) {
+            wp_send_json_error(['message' => 'Owed item not found']);
+        }
+
+        // Deduct stock
+        $wpdb->query($wpdb->prepare(
+            "UPDATE $stock_table SET stock = stock - %d
+            WHERE item_id = %d AND campus_id = %d",
+            $owed->qty_owed, $owed->item_id, $owed->campus_id
+        ));
+
+        // Log movement
+        PCA_Store_Stock_Controller::apply_stock_movement(
+            $owed->item_id,
+            $owed->qty_owed,
+            'fulfill_owed',
+            'owed_fulfillment',
+            $owed->sale_id,
+            'Fulfilled owed items for receipt ' . $owed->receipt_no
+        );
+
+        // Mark fulfilled
+        $wpdb->update($owed_table, [
+            'status' => 'fulfilled',
+            'date_fulfilled' => current_time('mysql')
+        ], ['id' => $id]);
+
+        wp_send_json_success(['message' => 'Owed item fulfilled']);
+    });
+
 
     public static function record_sale() {
         global $wpdb;

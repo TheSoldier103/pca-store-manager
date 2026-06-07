@@ -5,8 +5,9 @@ $tabs = [
     'books'      => 'Books Sale',
     'packs'      => 'Book Packs Sale',
     'stationery' => 'Stationery Sale',
-    'recent'     => 'Recent Sales',
-    'owed-items' => 'Owed Items'
+    'owed-items' => 'Owed Items',
+    'recent'     => 'Recent Sales'
+
 ];
 
 PCA_Store_Admin_Tabs::render_tabs($tabs, $active_tab);
