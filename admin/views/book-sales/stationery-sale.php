@@ -62,36 +62,6 @@
         <td>
             <select id="pca-sale-item" class="regular-text">
                 <option value="">Select Item</option>
-
-                <?php
-                global $wpdb;
-
-                $items_table = $wpdb->prefix . 'pca_store_items';
-                $stock_table = $wpdb->prefix . 'pca_store_item_stock';
-
-                // Determine campus
-                $campus_id = $fixed_campus ?: intval($_GET['campus_id'] ?? 0);
-
-                // Fetch stationery items with correct per‑campus stock
-                $stationery = $wpdb->get_results($wpdb->prepare("
-                    SELECT i.id, i.name, i.selling_price,
-                           COALESCE(s.stock, 0) AS stock
-                    FROM $items_table i
-                    LEFT JOIN $stock_table s 
-                        ON s.item_id = i.id AND s.campus_id = %d
-                    WHERE i.department = 'stationery'
-                      AND i.status = 'active'
-                    ORDER BY i.name ASC
-                ", $campus_id));
-
-                foreach ($stationery as $s) {
-                    echo "<option value='{$s->id}' 
-                                 data-price='{$s->selling_price}' 
-                                 data-stock='{$s->stock}'>
-                            {$s->name} (Stock: {$s->stock})
-                          </option>";
-                }
-                ?>
             </select>
         </td>
     </tr>

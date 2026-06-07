@@ -1,5 +1,30 @@
 jQuery(document).ready(function ($) {
 
+    function pca_load_stationery_items() {
+
+        let campus_id = $('#pca-sale-campus').val();
+
+        $.post(ajaxurl, {
+            action: 'pca_store_get_stationery_items',
+            campus_id: campus_id
+        }, function(response) {
+
+            let $select = $('#pca-sale-item');
+            $select.html('<option value="">Select Item</option>');
+
+            if (!response.success || !response.data.items) return;
+
+            response.data.items.forEach(function(item) {
+                $select.append(
+                    `<option value="${item.id}" data-price="${item.selling_price}">
+                        ${item.name}
+                    </option>`
+                );
+            });
+        });
+    }
+
+
     function updateSaleTotal() {
         let price = parseFloat($('#pca-sale-price').val()) || 0;
         let qty = parseInt($('#pca-sale-qty').val()) || 1;
