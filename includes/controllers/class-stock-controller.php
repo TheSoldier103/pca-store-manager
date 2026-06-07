@@ -38,7 +38,7 @@ class PCA_Store_Stock_Controller {
     /**
      * Core stock movement engine
      */
-    public static function apply_stock_movement($item_id, $qty, $campus_id, $movement_type, $reference_type, $reference_id, $notes = '') {
+    public static function apply_stock_movement($item_id, $qty, $campus_id, $movement_type, $reference_type, $reference_id, $notes = ''){
         global $wpdb;
 
         $stock_table    = $wpdb->prefix . 'pca_store_item_stock';
@@ -46,6 +46,8 @@ class PCA_Store_Stock_Controller {
 
         // Determine campus
         // $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
+        $campus_id = intval($campus_id);
+
 
         // Get current stock for this campus
         $current_stock = $wpdb->get_var($wpdb->prepare("
