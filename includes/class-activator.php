@@ -173,6 +173,7 @@ class PCA_Store_Activator {
             total_amount DECIMAL(12,2) DEFAULT 0.00,
             amount_paid DECIMAL(12,2) DEFAULT 0.00,
             balance DECIMAL(12,2) DEFAULT 0.00,
+            has_owed_items TINYINT(1) NOT NULL DEFAULT 0,
             status VARCHAR(30) DEFAULT 'completed',
             notes TEXT NULL,
             sold_by BIGINT UNSIGNED NOT NULL,
@@ -190,6 +191,29 @@ class PCA_Store_Activator {
         ) $charset;";
 
         // ---------------------------------------------------------
+        // Sales - Owed Items
+        // ---------------------------------------------------------
+        $tables[] = "CREATE TABLE {$prefix}owed_items (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            sale_id BIGINT UNSIGNED NOT NULL,
+            receipt_no VARCHAR(100) NOT NULL,
+            item_id BIGINT UNSIGNED NOT NULL,
+            item_name VARCHAR(255) NOT NULL,
+            qty_owed INT NOT NULL DEFAULT 0,
+            campus_id BIGINT UNSIGNED NOT NULL,
+            status ENUM('pending','fulfilled') NOT NULL DEFAULT 'pending',
+            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            date_fulfilled TIMESTAMP NULL,
+            PRIMARY KEY (id),
+            KEY sale_id (sale_id),
+            KEY receipt_no (receipt_no),
+            KEY item_id (item_id),
+            KEY campus_id (campus_id),
+            KEY status (status)
+        ) $charset;";
+
+
+        // ---------------------------------------------------------
         // Sale Items
         // ---------------------------------------------------------
         $tables[] = "CREATE TABLE {$prefix}sale_items (
@@ -205,6 +229,8 @@ class PCA_Store_Activator {
             KEY sale_id (sale_id),
             KEY item_id (item_id)
         ) $charset;";
+
+        
 
         // ---------------------------------------------------------
         // Stock Movements

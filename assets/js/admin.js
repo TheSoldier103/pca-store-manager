@@ -1,5 +1,23 @@
 jQuery(document).ready(function ($) {
 
+    /* =============================================================
+       SALES
+    ============================================================= */
+
+
+    function loadItemStock(item_id, campus_id) {
+        return $.post(ajaxurl, {
+            action: 'pca_store_get_item_stock',
+            item_id: item_id,
+            campus_id: campus_id
+        });
+    }
+
+    loadItemStock(item_id, campus_id).done(function(response) {
+        let stock = response.data.stock;
+    });
+
+
     let department = $('#pca-sale-department').val();
 
     if (department === 'books' && $('#pca-sale-item option:first').text() === 'Select Pack') {
@@ -45,7 +63,7 @@ jQuery(document).ready(function ($) {
         });
     }
 
-
+    // Load stationery items
     function loadStationeryItems() {
 
         let campus_id = $('#pca-sale-campus').val();
@@ -92,10 +110,6 @@ jQuery(document).ready(function ($) {
     $('#pca-sale-discount').on('input', updateSaleTotal);
 
 
-    /* =============================================================
-       SALES
-    ============================================================= */
-
     // Auto-fill price when selecting item (single handler — removed duplicate)
     $(document).on('change', '#pca-sale-item', function () {
         let price = $(this).find(':selected').data('price') || 0;
@@ -125,25 +139,95 @@ jQuery(document).ready(function ($) {
     $(document).on('change', '#pca-sale-class, #pca-sale-subject', loadFilteredSaleItems);
 
     // Record sale
+    // $('#pca-record-sale-btn').on('click', function (e) {
+    //     e.preventDefault();
+
+    //     $.post(ajaxurl, {
+    //         action:         'pca_store_record_sale',
+    //         item_id:        $('#pca-sale-item').val(),
+    //         qty:            $('#pca-sale-qty').val(),
+    //         price:          $('#pca-sale-price').val(),
+    //         discount:       $('#pca-sale-discount').val() || 0,
+    //         receipt_no:     $('#pca-sale-receipt').val(),
+    //         payment_method: $('#pca-sale-method').val(),
+    //         notes:          $('#pca-sale-notes').val(),
+    //         department:     $('#pca-sale-department').val(),
+    //         campus_id:      $('#pca-sale-campus').val()
+    //     }, function (response) {
+    //         alert(response.data.message);
+    //         if (response.success) location.reload();
+    //     });
+    // });
+
+    // Record sale with owed items
     $('#pca-record-sale-btn').on('click', function (e) {
         e.preventDefault();
 
-        $.post(ajaxurl, {
-            action:         'pca_store_record_sale',
-            item_id:        $('#pca-sale-item').val(),
-            qty:            $('#pca-sale-qty').val(),
-            price:          $('#pca-sale-price').val(),
-            discount:       $('#pca-sale-discount').val() || 0,
-            receipt_no:     $('#pca-sale-receipt').val(),
-            payment_method: $('#pca-sale-method').val(),
-            notes:          $('#pca-sale-notes').val(),
-            department:     $('#pca-sale-department').val(),
-            campus_id:      $('#pca-sale-campus').val()
-        }, function (response) {
-            alert(response.data.message);
-            if (response.success) location.reload();
+        let item_id   = $('#pca-sale-item').val();
+        let qty       = parseInt($('#pca-sale-qty').val());
+        let campus_id = $('#pca-sale-campus').val();
+
+        if (!item_id || !qty || !campus_id) {
+            alert("Please select item, quantity, and campus.");
+            return;
+        }
+
+        // STEP 1 — Load stock
+        loadItemStock(item_id, campus_id).done(function(response) {
+
+            if (!response.success) {
+                alert("Could not load stock.");
+                return;
+            }
+
+            let available = parseInt(response.data.stock);
+            let owed = qty > available ? (qty - available) : 0;
+
+            // STEP 2 — If owed items exist, require confirmation
+            if (owed > 0) {
+
+                // If checkbox not already shown, insert it
+                if ($('#pca-owed-confirm').length === 0) {
+                    $('#pca-record-sale-btn').before(`
+                        <div id="pca-owed-warning" style="margin:10px 0; padding:10px; border:1px solid #cc0000; background:#ffeeee;">
+                            Only ${available} available. ${owed} will be owed.<br>
+                            <label>
+                                <input type="checkbox" id="pca-owed-confirm"> 
+                                I confirm this sale should proceed with owed items.
+                            </label>
+                        </div>
+                    `);
+                }
+
+                // Block sale until confirmed
+                if (!$('#pca-owed-confirm').is(':checked')) {
+                    alert("Please confirm that you want to proceed with owed items.");
+                    return;
+                }
+            }
+
+            // STEP 3 — Submit sale with owed info
+            $.post(ajaxurl, {
+                action:         'pca_store_record_sale',
+                item_id:        item_id,
+                qty:            qty,
+                price:          $('#pca-sale-price').val(),
+                discount:       $('#pca-sale-discount').val() || 0,
+                receipt_no:     $('#pca-sale-receipt').val(),
+                payment_method: $('#pca-sale-method').val(),
+                notes:          $('#pca-sale-notes').val(),
+                department:     $('#pca-sale-department').val(),
+                campus_id:      campus_id,
+                has_owed_items: owed > 0 ? 1 : 0,
+                qty_owed:       owed
+            }, function (response) {
+                alert(response.data.message);
+                if (response.success) location.reload();
+            });
+
         });
     });
+
 
 
     /* =============================================================

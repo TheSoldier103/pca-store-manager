@@ -7,6 +7,31 @@ class PCA_Store_Stock_Controller {
         add_action('wp_ajax_pca_store_damage_stock', [__CLASS__, 'damage_stock']);
         add_action('wp_ajax_pca_store_correct_stock', [__CLASS__, 'correct_stock']);
         add_action('wp_ajax_pca_store_return_stock', [__CLASS__, 'return_stock']);
+        add_action('wp_ajax_pca_store_get_item_stock', [__CLASS__, 'pca_store_get_item_stock']);
+    }
+
+
+    function pca_store_get_item_stock() {
+        global $wpdb;
+
+        $item_id   = intval($_POST['item_id'] ?? 0);
+        $campus_id = intval($_POST['campus_id'] ?? 0);
+
+        if ($item_id <= 0 || $campus_id <= 0) {
+            wp_send_json_error(['message' => 'Invalid parameters']);
+        }
+
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+
+        $stock = $wpdb->get_var($wpdb->prepare(
+            "SELECT stock FROM $stock_table WHERE item_id = %d AND campus_id = %d",
+            $item_id,
+            $campus_id
+        ));
+
+        wp_send_json_success([
+            'stock' => intval($stock)
+        ]);
     }
 
 
