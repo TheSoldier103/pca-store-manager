@@ -1,5 +1,36 @@
 jQuery(document).ready(function ($) {
 
+    function loadPackItems() {
+
+        let campus_id = $('#pca-sale-campus').val();
+
+        $.post(ajaxurl, {
+            action: 'pca_store_get_book_packs',
+            campus_id: campus_id
+        }, function(response) {
+
+            let dropdown = $('#pca-sale-item');
+            dropdown.empty().append('<option value="">Select Pack</option>');
+
+            if (!response.success || !response.data.items) return;
+
+            response.data.items.forEach(function(item) {
+                dropdown.append(
+                    `<option value="${item.id}" data-price="${item.selling_price}">
+                        ${item.name}
+                    </option>`
+                );
+            });
+        });
+    }
+
+    $(document).on('change', '#pca-sale-campus', loadPackItems);
+
+    if ($('#pca-sale-campus').val()) {
+        loadPackItems();
+    }
+
+
     function loadStationeryItems() {
 
         let campus_id = $('#pca-sale-campus').val();

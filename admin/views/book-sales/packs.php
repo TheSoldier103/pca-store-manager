@@ -2,28 +2,63 @@
 
 <table class="form-table">
 
+    <?php $fixed_campus = PCA_Store_Helpers::get_user_campus(); ?>
+
+    <?php if ($fixed_campus): ?>
+
+        <input type="hidden" id="pca-sale-campus" value="<?php echo $fixed_campus; ?>">
+
+        <tr>
+            <th><label>Campus</label></th>
+            <td>
+                <strong>
+                    <?php
+                    global $wpdb;
+                    $campus_table = $wpdb->prefix . 'pca_store_campuses';
+                    $name = $wpdb->get_var($wpdb->prepare(
+                        "SELECT name FROM $campus_table WHERE id = %d",
+                        $fixed_campus
+                    ));
+                    echo esc_html($name);
+                    ?>
+                </strong>
+                <em>(auto‑assigned)</em>
+            </td>
+        </tr>
+
+    <?php else: ?>
+
+        <tr>
+            <th><label>Campus</label></th>
+            <td>
+                <select id="pca-sale-campus" class="regular-text">
+                    <option value="">Select Campus</option>
+                    <?php
+                    global $wpdb;
+                    $campuses = $wpdb->prefix . 'pca_store_campuses';
+                    $rows = $wpdb->get_results("
+                        SELECT id, name 
+                        FROM $campuses 
+                        WHERE is_active = 1 
+                        ORDER BY name ASC
+                    ");
+
+                    foreach ($rows as $c) {
+                        echo "<option value='{$c->id}'>{$c->name}</option>";
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
+
+    <?php endif; ?>
+
+
     <tr>
         <th><label>Select Pack</label></th>
         <td>
-            <select id="pca-sale-item">
+            <select id="pca-sale-item" class="regular-text">
                 <option value="">Select Pack</option>
-                <?php
-                global $wpdb;
-                $items = $wpdb->prefix . 'pca_store_items';
-
-                $packs = $wpdb->get_results("
-                    SELECT id, name, selling_price
-                    FROM $items
-                    WHERE department='books' AND item_type='pack' AND status='active'
-                    ORDER BY name ASC
-                ");
-
-                foreach ($packs as $p) {
-                    echo "<option value='{$p->id}' data-price='{$p->selling_price}'>
-                            {$p->name}
-                          </option>";
-                }
-                ?>
             </select>
         </td>
     </tr>
@@ -36,6 +71,16 @@
     <tr>
         <th><label>Price</label></th>
         <td><input type="number" id="pca-sale-price" readonly></td>
+    </tr>
+
+    <tr>
+        <th><label>Discount (optional)</label></th>
+        <td><input type="number" id="pca-sale-discount" value="0"></td>
+    </tr>
+
+    <tr>
+        <th><label>Total</label></th>
+        <td><input type="number" id="pca-sale-total" readonly></td>
     </tr>
 
     <tr>
