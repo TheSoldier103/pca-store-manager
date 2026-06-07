@@ -48,8 +48,9 @@ class PCA_Store_Sales_Controller {
         ], ['id' => $id]);
 
         wp_send_json_success(['message' => 'Owed item fulfilled']);
-    });
+    }
 
+    
 
     public static function record_sale() {
         global $wpdb;
