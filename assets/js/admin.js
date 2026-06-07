@@ -1,5 +1,26 @@
 jQuery(document).ready(function ($) {
 
+    let department = $('#pca-sale-department').val();
+
+    if (department === 'books' && $('#pca-sale-item option:first').text() === 'Select Pack') {
+
+        $(document).on('change', '#pca-sale-campus', loadPackItems);
+
+        if ($('#pca-sale-campus').val()) {
+            loadPackItems();
+        }
+    }
+
+    if (department === 'stationery') {
+
+        $(document).on('change', '#pca-sale-campus', loadStationeryItems);
+
+        if ($('#pca-sale-campus').val()) {
+            loadStationeryItems();
+        }
+    }
+
+
     function loadPackItems() {
 
         let campus_id = $('#pca-sale-campus').val();
@@ -22,12 +43,6 @@ jQuery(document).ready(function ($) {
                 );
             });
         });
-    }
-
-    $(document).on('change', '#pca-sale-campus', loadPackItems);
-
-    if ($('#pca-sale-campus').val()) {
-        loadPackItems();
     }
 
 
@@ -53,12 +68,6 @@ jQuery(document).ready(function ($) {
                 );
             });
         });
-    }
-
-    $(document).on('change', '#pca-sale-campus', loadStationeryItems);
-
-    if ($('#pca-sale-campus').val()) {
-        loadStationeryItems();
     }
 
 
