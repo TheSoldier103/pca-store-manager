@@ -24,6 +24,18 @@ class PCA_Store_Sales_Controller {
             wp_send_json_error(['message' => 'Owed item not found']);
         }
 
+        // Check stock availability
+        $available_stock = intval($wpdb->get_var($wpdb->prepare(
+            "SELECT stock FROM $stock_table WHERE item_id = %d AND campus_id = %d",
+            $owed->item_id, $owed->campus_id
+        )));
+
+        if ($available_stock < $owed->qty_owed) {
+            wp_send_json_error([
+                'message' => "Cannot fulfill. Only $available_stock available."
+            ]);
+        }
+
         // Deduct stock
         $wpdb->query($wpdb->prepare(
             "UPDATE $stock_table SET stock = stock - %d
@@ -50,7 +62,6 @@ class PCA_Store_Sales_Controller {
         wp_send_json_success(['message' => 'Owed item fulfilled']);
     }
 
-    
 
     public static function record_sale() {
         global $wpdb;
