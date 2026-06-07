@@ -1,4 +1,4 @@
-<h2 class="title">Add Stock</h2>
+<h2 class="title">Add Book Stock</h2>
 
 <div class="pca-stock-form">
 
