@@ -133,15 +133,60 @@ class PCA_Store_Items_Controller {
     }
 
     
+    // public static function get_filtered_items() {
+    //     global $wpdb;
+
+    //     $items_table = $wpdb->prefix . 'pca_store_items';
+
+    //     $class   = sanitize_text_field($_POST['class_level'] ?? '');
+    //     $subject = sanitize_text_field($_POST['subject'] ?? '');
+
+    //     $where = ["item_type = 'single'", "status != 'deleted'"];
+
+    //     if ($class !== '') {
+    //         $where[] = $wpdb->prepare("class_level = %s", $class);
+    //     }
+
+    //     if ($subject !== '') {
+    //         $where[] = $wpdb->prepare("subject = %s", $subject);
+    //     }
+
+    //     $where_sql = implode(' AND ', $where);
+
+    //     $items = $wpdb->get_results("
+    //         SELECT id, name, selling_price
+    //         FROM $items_table
+    //         WHERE $where_sql
+    //         ORDER BY name ASC
+    //     ");
+
+    //     wp_send_json_success(['items' => $items]);
+    // }
+
+
     public static function get_filtered_items() {
         global $wpdb;
 
         $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
 
-        $class   = sanitize_text_field($_POST['class_level'] ?? '');
-        $subject = sanitize_text_field($_POST['subject'] ?? '');
+        $class      = sanitize_text_field($_POST['class_level'] ?? '');
+        $subject    = sanitize_text_field($_POST['subject'] ?? '');
+        $department = sanitize_text_field($_POST['department'] ?? '');
+        $campus_id  = intval($_POST['campus_id'] ?? 0);
 
-        $where = ["item_type = 'single'", "status != 'deleted'"];
+        // Resolve department_id
+        $department_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $dept_table WHERE LOWER(name) = %s LIMIT 1",
+            strtolower($department)
+        ));
+
+        // Base filters
+        $where = [
+            "item_type = 'single'",
+            "status != 'deleted'",
+            $wpdb->prepare("department_id = %d", $department_id)
+        ];
 
         if ($class !== '') {
             $where[] = $wpdb->prepare("class_level = %s", $class);

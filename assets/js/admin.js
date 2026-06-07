@@ -117,11 +117,32 @@ jQuery(document).ready(function ($) {
     });
 
     // Filtered item dropdowns (sale form)
+    // function loadFilteredSaleItems() {
+    //     $.post(ajaxurl, {
+    //         action:      'pca_store_get_filtered_items',
+    //         class_level: $('#pca-sale-class').val(),
+    //         subject:     $('#pca-sale-subject').val()
+    //     }, function (response) {
+    //         if (!response.success) return;
+
+    //         let dropdown = $('#pca-sale-item');
+    //         dropdown.empty().append('<option value="">Select Book</option>');
+
+    //         response.data.items.forEach(function (item) {
+    //             dropdown.append(
+    //                 `<option value="${item.id}" data-price="${item.selling_price}">${item.name}</option>`
+    //             );
+    //         });
+    //     });
+    // }
+
     function loadFilteredSaleItems() {
         $.post(ajaxurl, {
             action:      'pca_store_get_filtered_items',
             class_level: $('#pca-sale-class').val(),
-            subject:     $('#pca-sale-subject').val()
+            subject:     $('#pca-sale-subject').val(),
+            department:  $('#pca-sale-department').val(),   // NEW
+            campus_id:   $('#pca-sale-campus').val()        // NEW
         }, function (response) {
             if (!response.success) return;
 
@@ -130,11 +151,14 @@ jQuery(document).ready(function ($) {
 
             response.data.items.forEach(function (item) {
                 dropdown.append(
-                    `<option value="${item.id}" data-price="${item.selling_price}">${item.name}</option>`
+                    `<option value="${item.id}" data-price="${item.selling_price}">
+                        ${item.name}
+                    </option>`
                 );
             });
         });
     }
+
 
     $(document).on('change', '#pca-sale-class, #pca-sale-subject', loadFilteredSaleItems);
 
