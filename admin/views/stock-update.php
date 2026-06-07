@@ -2,7 +2,9 @@
 $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'add-books';
 
 $tabs = [
-    'add-books'       => 'Add Book Stock',
+    'add-books' => 'Add Book Stock',
+    'add-stationery' => 'Add Stationery Stock',
+    'add-uniforms' => 'Add Uniform Stock',
     'damage'    => 'Damage / Loss',
     'correction'=> 'Correction',
     'returns'   => 'Returns',
