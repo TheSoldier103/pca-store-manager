@@ -11,7 +11,7 @@ class PCA_Store_Stock_Controller {
     }
 
 
-    function pca_store_get_item_stock() {
+    public static function pca_store_get_item_stock() {
         global $wpdb;
 
         $item_id   = intval($_POST['item_id'] ?? 0);
