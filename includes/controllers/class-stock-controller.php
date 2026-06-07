@@ -110,6 +110,15 @@ class PCA_Store_Stock_Controller {
             ]);
         }
 
+        PCA_Store_Stock_Controller::apply_stock_movement(
+            $item_id,
+            $qty,
+            'add',
+            'stock_update',
+            0,
+            'Manual stock addition'
+        );
+
         wp_send_json_success(['message' => 'Stock updated successfully']);
     }
 
