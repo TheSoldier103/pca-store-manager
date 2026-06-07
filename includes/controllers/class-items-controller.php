@@ -18,8 +18,6 @@ class PCA_Store_Items_Controller {
 
     }
 
-    add_action('wp_ajax_pca_store_get_book_packs', [__CLASS__, 'get_book_packs']);
-
     public static function get_book_packs() {
         global $wpdb;
 
