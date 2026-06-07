@@ -13,9 +13,9 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    loadItemStock(item_id, campus_id).done(function(response) {
-        let stock = response.data.stock;
-    });
+    // loadItemStock(item_id, campus_id).done(function(response) {
+    //     let stock = response.data.stock;
+    // });
 
 
     let department = $('#pca-sale-department').val();
