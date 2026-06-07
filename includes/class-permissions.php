@@ -4,7 +4,8 @@ class PCA_Store_Permissions {
 
     protected static $caps = [
         'pca_store_view_dashboard',
-        'pca_store_record_sales',
+        'pca_store_book_sales',
+        'pca_store_uniform_sales',
         'pca_store_manage_items',
         'pca_store_manage_stock',
         'pca_store_manage_suppliers',

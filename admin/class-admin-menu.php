@@ -22,12 +22,23 @@ class PCA_Store_Admin_Menu {
         // Record Sale
         add_submenu_page(
             'pca-store-dashboard',
-            'Record Sale',
-            'Record Sale',
-            'pca_store_record_sales',
-            'pca-store-sales',
-            [__CLASS__, 'render_sales_form']
+            'Book Sales',
+            'Book Sales',
+            'pca_store_book_sales',
+            'pca-store-book-sales',
+            [__CLASS__, 'render_book_sales_form']
         );
+
+        // Record Sale
+        add_submenu_page(
+            'pca-store-dashboard',
+            'Uniform Sales',
+            'Uniform Sales',
+            'pca_store_uniform_sales',
+            'pca-store-uniform-sales',
+            [__CLASS__, 'render_uniform_sales_form']
+        );
+
 
         // Stock Update
         add_submenu_page(
@@ -96,8 +107,12 @@ class PCA_Store_Admin_Menu {
         include PCA_STORE_MANAGER_PATH . 'admin/views/dashboard.php';
     }
 
-    public static function render_sales_form() {
-        include PCA_STORE_MANAGER_PATH . 'admin/views/record-sale.php';
+    public static function render_book_sales_form() {
+        include PCA_STORE_MANAGER_PATH . 'admin/views/book-sales.php';
+    }
+
+    public static function render_uniform_sales_form() {
+        include PCA_STORE_MANAGER_PATH . 'admin/views/uniform-sales.php';
     }
 
     public static function render_stock_update() {

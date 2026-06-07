@@ -13,18 +13,18 @@ PCA_Store_Admin_Tabs::render_tabs($tabs, $active_tab);
 switch ($active_tab) {
 
     case 'books':
-        include __DIR__ . '/sales/books-sale.php';
+        include __DIR__ . '/book-sales/books.php';
         break;
 
     case 'packs':
-        include __DIR__ . '/sales/packs-sale.php';
+        include __DIR__ . '/book-sales/packs.php';
         break;
 
     case 'stationery':
-        include __DIR__ . '/sales/stationery-sale.php';
+        include __DIR__ . '/book-sales/stationery-sale.php';
         break;
 
     case 'recent':
-        include __DIR__ . '/sales/recent-sales.php';
+        include __DIR__ . '/book-sales/recent-sales.php';
         break;
 }
