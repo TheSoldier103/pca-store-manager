@@ -31,7 +31,7 @@ switch ($active_tab) {
         break;
 
     case 'packs':
-        include __DIR__ . '/items/packs-list.php';
+        include __DIR__ . '/items/book-packs-list.php';
         break;
 
     case 'stationery':
@@ -43,7 +43,7 @@ switch ($active_tab) {
         break;
 
     case 'uniformpacks':
-        include __DIR__ . '/items/uniformpacks-list.php';
+        include __DIR__ . '/items/uniform-packs-list.php';
         break;
 
     case 'lowstock':

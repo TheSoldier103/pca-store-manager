@@ -1,6 +1,6 @@
 jQuery(document).ready(function ($) {
 
-    function pca_load_stationery_items() {
+    function loadStationeryItems() {
 
         let campus_id = $('#pca-sale-campus').val();
 
@@ -9,19 +9,25 @@ jQuery(document).ready(function ($) {
             campus_id: campus_id
         }, function(response) {
 
-            let $select = $('#pca-sale-item');
-            $select.html('<option value="">Select Item</option>');
+            let dropdown = $('#pca-sale-item');
+            dropdown.empty().append('<option value="">Select Item</option>');
 
             if (!response.success || !response.data.items) return;
 
             response.data.items.forEach(function(item) {
-                $select.append(
+                dropdown.append(
                     `<option value="${item.id}" data-price="${item.selling_price}">
                         ${item.name}
                     </option>`
                 );
             });
         });
+    }
+
+    $(document).on('change', '#pca-sale-campus', loadStationeryItems);
+
+    if ($('#pca-sale-campus').val()) {
+        loadStationeryItems();
     }
 
 
