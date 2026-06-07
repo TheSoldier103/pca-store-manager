@@ -477,7 +477,8 @@ class PCA_Store_Items_Controller {
             }
 
             $selling_price = $total_price;
-}
+
+        }
 
 
         // --- Duplicate check (exclude self when editing) ---
@@ -585,12 +586,12 @@ class PCA_Store_Items_Controller {
 
         $pack_id = intval($_GET['pack_id']);
 
-        $rows = $wpdb->get_results("
+        $rows = $wpdb->get_results($wpdb->prepare("
             SELECT p.child_item_id, p.quantity, i.name, i.selling_price
             FROM $packs_table p
             LEFT JOIN $items_table i ON i.id = p.child_item_id
-            WHERE p.pack_id = $pack_id
-        ");
+            WHERE p.pack_id = %d
+        ", $pack_id));
 
         wp_send_json_success($rows);
     }

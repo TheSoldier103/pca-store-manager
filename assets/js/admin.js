@@ -13,10 +13,6 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    // loadItemStock(item_id, campus_id).done(function(response) {
-    //     let stock = response.data.stock;
-    // });
-
 
     let department = $('#pca-sale-department').val();
 
@@ -117,25 +113,6 @@ jQuery(document).ready(function ($) {
     });
 
     // Filtered item dropdowns (sale form)
-    // function loadFilteredSaleItems() {
-    //     $.post(ajaxurl, {
-    //         action:      'pca_store_get_filtered_items',
-    //         class_level: $('#pca-sale-class').val(),
-    //         subject:     $('#pca-sale-subject').val()
-    //     }, function (response) {
-    //         if (!response.success) return;
-
-    //         let dropdown = $('#pca-sale-item');
-    //         dropdown.empty().append('<option value="">Select Book</option>');
-
-    //         response.data.items.forEach(function (item) {
-    //             dropdown.append(
-    //                 `<option value="${item.id}" data-price="${item.selling_price}">${item.name}</option>`
-    //             );
-    //         });
-    //     });
-    // }
-
     function loadFilteredSaleItems() {
         $.post(ajaxurl, {
             action:      'pca_store_get_filtered_items',
@@ -184,53 +161,123 @@ jQuery(document).ready(function ($) {
     // });
 
     // Record sale with owed items
+    // $('#pca-record-sale-btn').on('click', function (e) {
+    //     e.preventDefault();
+
+    //     let item_id   = $('#pca-sale-item').val();
+    //     let qty       = parseInt($('#pca-sale-qty').val());
+    //     let campus_id = $('#pca-sale-campus').val();
+
+    //     if (!item_id || !qty || !campus_id) {
+    //         alert("Please select item, quantity, and campus.");
+    //         return;
+    //     }
+
+    //     // STEP 1 — Load stock
+    //     loadItemStock(item_id, campus_id).done(function(response) {
+
+    //         if (!response.success) {
+    //             alert("Could not load stock.");
+    //             return;
+    //         }
+
+    //         let available = parseInt(response.data.stock);
+    //         let owed = qty > available ? (qty - available) : 0;
+
+    //         // STEP 2 — If owed items exist, require confirmation
+    //         if (owed > 0) {
+
+    //             // If checkbox not already shown, insert it
+    //             if ($('#pca-owed-confirm').length === 0) {
+    //                 $('#pca-record-sale-btn').before(`
+    //                     <div id="pca-owed-warning" style="margin:10px 0; padding:10px; border:1px solid #cc0000; background:#ffeeee;">
+    //                         Only ${available} available. ${owed} will be owed.<br>
+    //                         <label>
+    //                             <input type="checkbox" id="pca-owed-confirm"> 
+    //                             I confirm this sale should proceed with owed items.
+    //                         </label>
+    //                     </div>
+    //                 `);
+    //             }
+
+    //             // Block sale until confirmed
+    //             if (!$('#pca-owed-confirm').is(':checked')) {
+    //                 alert("Please confirm that you want to proceed with owed items.");
+    //                 return;
+    //             }
+    //         }
+
+    //         // STEP 3 — Submit sale with owed info
+    //         $.post(ajaxurl, {
+    //             action:         'pca_store_record_sale',
+    //             item_id:        item_id,
+    //             qty:            qty,
+    //             price:          $('#pca-sale-price').val(),
+    //             discount:       $('#pca-sale-discount').val() || 0,
+    //             receipt_no:     $('#pca-sale-receipt').val(),
+    //             payment_method: $('#pca-sale-method').val(),
+    //             notes:          $('#pca-sale-notes').val(),
+    //             department:     $('#pca-sale-department').val(),
+    //             campus_id:      campus_id,
+    //             has_owed_items: owed > 0 ? 1 : 0,
+    //             qty_owed:       owed
+    //         }, function (response) {
+    //             alert(response.data.message);
+    //             if (response.success) location.reload();
+    //         });
+
+    //     });
+    // });
     $('#pca-record-sale-btn').on('click', function (e) {
         e.preventDefault();
 
-        let item_id   = $('#pca-sale-item').val();
-        let qty       = parseInt($('#pca-sale-qty').val());
-        let campus_id = $('#pca-sale-campus').val();
+        const item_id   = $('#pca-sale-item').val();
+        const qty       = parseInt($('#pca-sale-qty').val());
+        const campus_id = $('#pca-sale-campus').val();
 
         if (!item_id || !qty || !campus_id) {
             alert("Please select item, quantity, and campus.");
             return;
         }
 
-        // STEP 1 — Load stock
-        loadItemStock(item_id, campus_id).done(function(response) {
+        loadItemStock(item_id, campus_id).done(handleStockResponse);
 
+        function handleStockResponse(response) {
             if (!response.success) {
                 alert("Could not load stock.");
                 return;
             }
 
-            let available = parseInt(response.data.stock);
-            let owed = qty > available ? (qty - available) : 0;
+            const available = parseInt(response.data.stock);
+            const owed      = qty > available ? (qty - available) : 0;
 
-            // STEP 2 — If owed items exist, require confirmation
-            if (owed > 0) {
+            if (owed > 0 && !confirmOwedSale(available, owed)) return;
 
-                // If checkbox not already shown, insert it
-                if ($('#pca-owed-confirm').length === 0) {
-                    $('#pca-record-sale-btn').before(`
-                        <div id="pca-owed-warning" style="margin:10px 0; padding:10px; border:1px solid #cc0000; background:#ffeeee;">
-                            Only ${available} available. ${owed} will be owed.<br>
-                            <label>
-                                <input type="checkbox" id="pca-owed-confirm"> 
-                                I confirm this sale should proceed with owed items.
-                            </label>
-                        </div>
-                    `);
-                }
+            submitSale(owed);
+        }
 
-                // Block sale until confirmed
-                if (!$('#pca-owed-confirm').is(':checked')) {
-                    alert("Please confirm that you want to proceed with owed items.");
-                    return;
-                }
+        function confirmOwedSale(available, owed) {
+            if ($('#pca-owed-confirm').length === 0) {
+                $('#pca-record-sale-btn').before(`
+                    <div id="pca-owed-warning" style="margin:10px 0; padding:10px; border:1px solid #cc0000; background:#ffeeee;">
+                        Only ${available} available. ${owed} will be owed.<br>
+                        <label>
+                            <input type="checkbox" id="pca-owed-confirm">
+                            I confirm this sale should proceed with owed items.
+                        </label>
+                    </div>
+                `);
             }
 
-            // STEP 3 — Submit sale with owed info
+            if (!$('#pca-owed-confirm').is(':checked')) {
+                alert("Please confirm that you want to proceed with owed items.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitSale(owed) {
             $.post(ajaxurl, {
                 action:         'pca_store_record_sale',
                 item_id:        item_id,
@@ -243,13 +290,12 @@ jQuery(document).ready(function ($) {
                 department:     $('#pca-sale-department').val(),
                 campus_id:      campus_id,
                 has_owed_items: owed > 0 ? 1 : 0,
-                qty_owed:       owed
+                qty_owed:       owed,
             }, function (response) {
                 alert(response.data.message);
                 if (response.success) location.reload();
             });
-
-        });
+        }
     });
 
 
