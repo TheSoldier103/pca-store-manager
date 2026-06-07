@@ -118,6 +118,10 @@ class PCA_Store_Sales_Controller {
             wp_send_json_error(['message' => 'Invalid item or quantity']);
         }
 
+        if (empty($receipt_no)) {
+            $receipt_no = 'RCP-' . strtoupper(wp_generate_password(8, false));
+        }
+
         // ---------------------------------------------------------
         // 1. GET CURRENT STOCK
         // ---------------------------------------------------------
@@ -138,20 +142,18 @@ class PCA_Store_Sales_Controller {
         $total_amount = ($price * $qty_requested) - $discount;
 
         $wpdb->insert($sales_table, [
-            'school_id'      => 1, // adjust if needed
-            'campus_id'      => $campus_id,
-            'department_id'  => 0, // optional
             'receipt_no'     => $receipt_no,
-            'payment_method' => $payment_method,
-            'subtotal'       => $price * $qty_requested,
-            'discount'       => $discount,
+            'sale_date'      => current_time('mysql'),
+            'department'     => $department,
             'total_amount'   => $total_amount,
             'amount_paid'    => $total_amount,
             'balance'        => 0,
-            'has_owed_items' => $qty_owed > 0 ? 1 : 0,
-            'notes'          => $notes,
+            'payment_method' => $payment_method,
             'sold_by'        => get_current_user_id(),
-            'created_at'     => current_time('mysql')
+            'notes'          => $notes,
+            'campus_id'      => $campus_id,
+            'has_owed_items' => $qty_owed > 0 ? 1 : 0,
+            'created_at'     => current_time('mysql'),
         ]);
 
         $sale_id = $wpdb->insert_id;
@@ -162,7 +164,7 @@ class PCA_Store_Sales_Controller {
         $wpdb->insert($sale_items_table, [
             'sale_id'     => $sale_id,
             'item_id'     => $item_id,
-            'item_name'   => get_the_title($item_id) ?: '',
+            'item_name'   => $wpdb->get_var("SELECT name FROM {$wpdb->prefix}pca_store_items WHERE id = $item_id"),
             'quantity'    => $qty_requested,
             'unit_price'  => $price,
             'total_price' => $total_amount,
@@ -170,21 +172,34 @@ class PCA_Store_Sales_Controller {
         ]);
 
         // ---------------------------------------------------------
-        // 5. DEDUCT AVAILABLE STOCK
+        // 5. DEDUCT AVAILABLE STOCK + APPLY STOCK MOVEMENT
         // ---------------------------------------------------------
         if ($qty_to_deduct > 0) {
+
+            // Deduct stock
             $wpdb->query($wpdb->prepare(
                 "UPDATE $stock_table 
                 SET stock = stock - %d 
                 WHERE item_id = %d AND campus_id = %d",
                 $qty_to_deduct, $item_id, $campus_id
             ));
+
+            // Log stock movement
+            PCA_Store_Stock_Controller::apply_stock_movement(
+                $item_id,
+                $qty_to_deduct,
+                'sale',
+                'sale',
+                $sale_id,
+                'Receipt ' . $receipt_no
+            );
         }
 
         // ---------------------------------------------------------
         // 6. INSERT OWED ITEMS (IF ANY)
         // ---------------------------------------------------------
         if ($qty_owed > 0) {
+
             $item_name = $wpdb->get_var($wpdb->prepare(
                 "SELECT name FROM {$wpdb->prefix}pca_store_items WHERE id = %d",
                 $item_id
@@ -208,8 +223,10 @@ class PCA_Store_Sales_Controller {
         wp_send_json_success([
             'message' => $qty_owed > 0
                 ? "Sale recorded. Owed items: $qty_owed"
-                : "Sale recorded successfully"
+                : "Sale recorded successfully",
+            'sale_id' => $sale_id
         ]);
     }
+
 
 }
