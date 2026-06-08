@@ -110,6 +110,7 @@
 </table>
 
 <input type="hidden" id="pca-sale-department" value="stationery">
+<input type="hidden" id="pca-sale-type" value="single">
 
 <p>
     <button class="button button-primary" id="pca-record-sale-btn">Record Sale</button>
