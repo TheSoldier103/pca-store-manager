@@ -171,7 +171,14 @@ jQuery(document).ready(function ($) {
             return;
         }
 
+        if ($('#pca-sale-type').val() === 'pack') {
+            // Skip stock check entirely
+            submitSale(0);
+            return;
+        }
+
         loadItemStock(item_id, campus_id).done(handleStockResponse);
+
 
         function handleStockResponse(response) {
             if (!response.success) {
