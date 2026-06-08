@@ -1,6 +1,6 @@
 <h1>PCA Store Dashboard</h1>
 
-<style>
+<!-- <style>
     .pca-kpi-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -27,7 +27,7 @@
     .pca-section {
         margin-top: 40px;
     }
-</style>
+</style> -->
 
 <!-- BOOKS KPI CARDS -->
 <h2>📘 Books Overview</h2>
