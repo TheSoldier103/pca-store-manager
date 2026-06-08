@@ -2,42 +2,43 @@
 global $wpdb;
 
 /* ============================================================
-   DEPARTMENT ID LOOKUP
-============================================================ */
-
-$dept_books = $wpdb->get_var("
-    SELECT id FROM {$wpdb->prefix}pca_store_departments
-    WHERE code = 'BK' AND is_active = 1
-");
-
-$dept_stationery = $wpdb->get_var("
-    SELECT id FROM {$wpdb->prefix}pca_store_departments
-    WHERE code = 'ST' AND is_active = 1
-");
-
-/* ============================================================
-   CAMPUS FILTER
+   CAMPUS FILTER BUILDER
 ============================================================ */
 
 $fixed_campus = PCA_Store_Helpers::get_user_campus();
 $selected_campus = $fixed_campus ?: intval($_GET['campus'] ?? 0);
 
-$campus_filter = $selected_campus ? "AND campus_id = $selected_campus" : "";
+// Returns a qualified AND clause for the given table alias
+function pca_campus_filter(int $campus_id, string $alias): string {
+    return $campus_id ? "AND {$alias}.campus_id = {$campus_id}" : "";
+}
 
 /* ============================================================
    KPI QUERIES — BOOKS
 ============================================================ */
 
 // 1. Today's Book Sales (₦)
+//    Single table — sales owns campus_id
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department = 'books'
+    WHERE department_id = $dept_books
     AND DATE(sale_date) = CURDATE()
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'pca_store_sales') . "
+") ?: 0;
+// Note: no alias on a single-table query — use the table name, or add an alias:
+
+// Cleaner with alias:
+$kpi_today_sales = $wpdb->get_var("
+    SELECT SUM(s.total_amount)
+    FROM {$wpdb->prefix}pca_store_sales s
+    WHERE s.department_id = $dept_books
+    AND DATE(s.sale_date) = CURDATE()
+    " . pca_campus_filter($selected_campus, 's') . "
 ") ?: 0;
 
 // 2. Books Sold Today (qty)
+//    campus_id is on sales (s), not items
 $kpi_books_sold = $wpdb->get_var("
     SELECT SUM(si.quantity)
     FROM {$wpdb->prefix}pca_store_sale_items si
@@ -45,45 +46,48 @@ $kpi_books_sold = $wpdb->get_var("
     INNER JOIN {$wpdb->prefix}pca_store_sales s ON s.id = si.sale_id
     WHERE i.department_id = $dept_books
     AND DATE(s.sale_date) = CURDATE()
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 's') . "
 ") ?: 0;
 
 // 3. Packs Sold Today
 $kpi_packs_sold = $wpdb->get_var("
-    SELECT SUM(pack_qty)
-    FROM {$wpdb->prefix}pca_store_sales
-    WHERE sale_type = 'pack'
-    AND DATE(sale_date) = CURDATE()
-    $campus_filter
+    SELECT SUM(s.pack_qty)
+    FROM {$wpdb->prefix}pca_store_sales s
+    WHERE s.sale_type = 'pack'
+    AND DATE(s.sale_date) = CURDATE()
+    " . pca_campus_filter($selected_campus, 's') . "
 ") ?: 0;
 
 // 4. Low Stock (Books)
+//    campus_id is on item_stock (st), not items
 $kpi_low_stock = $wpdb->get_var("
     SELECT COUNT(*)
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
     WHERE i.department_id = $dept_books
     AND st.stock <= i.reorder_level
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'st') . "
 ") ?: 0;
 
 // 5. Total Book Stock Value
+//    campus_id is on item_stock (st)
 $kpi_stock_value = $wpdb->get_var("
     SELECT SUM(st.stock * i.selling_price)
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
     WHERE i.department_id = $dept_books
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'st') . "
 ") ?: 0;
 
 // 6. Total Owed (Books)
+//    campus_id is on owed_items (oi)
 $kpi_owed_books = $wpdb->get_var("
     SELECT SUM(oi.qty_owed)
     FROM {$wpdb->prefix}pca_store_owed_items oi
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = oi.item_id
     WHERE i.department_id = $dept_books
     AND oi.status = 'pending'
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'oi') . "
 ") ?: 0;
 
 /* ============================================================
@@ -98,7 +102,7 @@ $kpi_stationery_sold = $wpdb->get_var("
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = si.item_id
     WHERE i.department_id = $dept_stationery
     AND DATE(s.sale_date) = CURDATE()
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 's') . "
 ") ?: 0;
 
 // Low Stock (Stationery)
@@ -108,7 +112,7 @@ $kpi_stationery_low = $wpdb->get_var("
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
     WHERE i.department_id = $dept_stationery
     AND st.stock <= i.reorder_level
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'st') . "
 ") ?: 0;
 
 /* ============================================================
@@ -116,13 +120,13 @@ $kpi_stationery_low = $wpdb->get_var("
 ============================================================ */
 
 $recent_sales = $wpdb->get_results("
-    SELECT s.*, 
+    SELECT s.*,
         (SELECT GROUP_CONCAT(item_name SEPARATOR ', ')
-         FROM {$wpdb->prefix}pca_store_sale_items 
+         FROM {$wpdb->prefix}pca_store_sale_items
          WHERE sale_id = s.id) AS items
     FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department IN ('books', 'stationery')
-    $campus_filter
+    WHERE s.department_id IN ($dept_books, $dept_stationery)
+    " . pca_campus_filter($selected_campus, 's') . "
     ORDER BY s.sale_date DESC
     LIMIT 10
 ");
@@ -137,7 +141,7 @@ $low_stock_books = $wpdb->get_results("
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
     WHERE i.department_id = $dept_books
     AND st.stock <= i.reorder_level
-    $campus_filter
+    " . pca_campus_filter($selected_campus, 'st') . "
     ORDER BY st.stock ASC
 ");
 
