@@ -108,7 +108,6 @@ class PCA_Store_Stock_Controller {
 
         $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
-        // $campus_id = intval($_POST['campus_id']);
         $campus_id = PCA_Store_Helpers::get_user_campus() ?: intval($_POST['campus_id']);
         $item_id   = intval($_POST['item_id']);
         $qty       = intval($_POST['qty']);
@@ -117,28 +116,22 @@ class PCA_Store_Stock_Controller {
             wp_send_json_error(['message' => 'Invalid stock data']);
         }
 
-        // Check if stock row exists
+        // Ensure stock row exists
         $existing = $wpdb->get_var($wpdb->prepare("
             SELECT id FROM $stock_table
             WHERE item_id = %d AND campus_id = %d
         ", $item_id, $campus_id));
 
-        if ($existing) {
-            // Update stock
-            $wpdb->query($wpdb->prepare("
-                UPDATE $stock_table
-                SET stock = stock + %d
-                WHERE id = %d
-            ", $qty, $existing));
-        } else {
-            // Insert new stock row
+        if (!$existing) {
+            // Create stock row with 0 so movement engine can update it
             $wpdb->insert($stock_table, [
                 'item_id'   => $item_id,
                 'campus_id' => $campus_id,
-                'stock'     => $qty,
+                'stock'     => 0
             ]);
         }
 
+        // Apply movement (this updates stock + logs movement)
         PCA_Store_Stock_Controller::apply_stock_movement(
             $item_id,
             $qty,
@@ -149,9 +142,9 @@ class PCA_Store_Stock_Controller {
             'Manual stock addition'
         );
 
-
         wp_send_json_success(['message' => 'Stock updated successfully']);
     }
+
 
     /**
      * Damage / Loss
