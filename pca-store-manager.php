@@ -2,14 +2,14 @@
 /**
  * Plugin Name: PCA Store Manager
  * Description: Multi-campus bookshop and uniform manager for PCA.
- * Version: 1.6.15
+ * Version: 1.6.16
  * Author: PCA
  */
 
 if (!defined('ABSPATH')) exit;
 
 
-define('PCA_STORE_VERSION', '1.6.15');
+define('PCA_STORE_VERSION', '1.6.16');
 define('PCA_STORE_DB_VERSION', '1.6.1');
 define('PCA_STORE_MANAGER_PATH', plugin_dir_path(__FILE__));
 define('PCA_STORE_URL', plugin_dir_url(__FILE__));
