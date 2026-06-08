@@ -2,6 +2,21 @@
 global $wpdb;
 
 /* ============================================================
+   DEPARTMENT ID LOOKUP
+============================================================ */
+
+$dept_books = $wpdb->get_var("
+    SELECT id FROM {$wpdb->prefix}pca_store_departments
+    WHERE code = 'BK' AND is_active = 1
+");
+
+$dept_stationery = $wpdb->get_var("
+    SELECT id FROM {$wpdb->prefix}pca_store_departments
+    WHERE code = 'ST' AND is_active = 1
+");
+
+
+/* ============================================================
    CAMPUS FILTER BUILDER
 ============================================================ */
 
