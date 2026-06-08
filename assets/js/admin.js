@@ -172,13 +172,72 @@ jQuery(document).ready(function ($) {
         }
 
         if ($('#pca-sale-type').val() === 'pack') {
-            // Skip stock check entirely
-            submitSale(0);
+            // Check pack stock first, then confirm if needed
+            $.post(ajaxurl, {
+                action:    'pca_store_check_pack_stock',
+                pack_id:   item_id,
+                qty:       qty,
+                campus_id: campus_id,
+            }, function (response) {
+                if (!response.success) {
+                    alert("Could not check pack stock.");
+                    return;
+                }
+
+                const owedItems = response.data.owed_items;
+
+                if (owedItems.length > 0) {
+                    // Show confirmation warning — same style as single items
+                    if ($('#pca-owed-confirm').length === 0) {
+                        const list = owedItems
+                            .map(i => `• ${i.name}: ${i.available} available, ${i.owed} will be owed`)
+                            .join('<br>');
+
+                        $('#pca-record-sale-btn').before(`
+                            <div id="pca-owed-warning" style="
+                                display: flex;
+                                align-items: flex-start;
+                                gap: 10px;
+                                margin: 10px 0;
+                                padding: 12px 14px;
+                                border-left: 4px solid #cc0000;
+                                background: #fff5f5;
+                                border-radius: 4px;
+                                font-size: 13px;
+                                color: #333;
+                            ">
+                                <span style="font-size:18px; line-height:1;">⚠️</span>
+                                <div>
+                                    <strong>Stock shortage in this pack:</strong><br>
+                                    <div style="margin-top:4px; line-height:1.8;">${list}</div>
+                                    <label style="display:inline-flex; align-items:center; gap:6px; margin-top:8px; cursor:pointer;">
+                                        <input type="checkbox" id="pca-owed-confirm">
+                                        I confirm this sale should proceed with owed items.
+                                    </label>
+                                </div>
+                            </div>
+                        `);
+                    }
+
+                    if (!$('#pca-owed-confirm').is(':checked')) {
+                        alert("Please confirm that you want to proceed with owed items.");
+                        return;
+                    }
+
+                    // Confirmed — submit
+                    submitSale();
+
+                } else {
+                    // No shortages — submit straight away
+                    submitSale();
+                }
+            });
+
             return;
         }
 
+        // Single item flow — unchanged
         loadItemStock(item_id, campus_id).done(handleStockResponse);
-
 
         function handleStockResponse(response) {
             if (!response.success) {
@@ -229,7 +288,7 @@ jQuery(document).ready(function ($) {
             return true;
         }
 
-        function submitSale(owed) {
+        function submitSale(owed = 0) {
             $.post(ajaxurl, {
                 action: $('#pca-sale-type').val() === 'pack'
                     ? 'pca_store_record_pack_sale'
@@ -252,40 +311,8 @@ jQuery(document).ready(function ($) {
                     return;
                 }
 
-                if (response.data.owed_items && response.data.owed_items.length > 0) {
-                    // Remove any previous warning
-                    $('#pca-owed-warning').remove();
-
-                    const list = response.data.owed_items
-                        .map(i => `• ${i.name}: <strong>${i.qty}</strong>`)
-                        .join('<br>');
-
-                    $('#pca-record-sale-btn').before(`
-                        <div id="pca-owed-warning" style="
-                            display: flex;
-                            align-items: flex-start;
-                            gap: 10px;
-                            margin: 10px 0;
-                            padding: 12px 14px;
-                            border-left: 4px solid #cc0000;
-                            background: #fff5f5;
-                            border-radius: 4px;
-                            font-size: 13px;
-                            color: #333;
-                        ">
-                            <span style="font-size:18px; line-height:1;">⚠️</span>
-                            <div>
-                                <strong>Pack sale recorded — some items are owed:</strong><br>
-                                <div style="margin-top:6px; line-height:1.8;">${list}</div>
-                            </div>
-                        </div>
-                    `);
-                } else {
-                    alert(response.data.message);
-                }
-
-                // Delay reload so user can read the warning
-                setTimeout(() => location.reload(), 4000);
+                alert(response.data.message);
+                location.reload();
             });
         }
     });

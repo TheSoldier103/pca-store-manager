@@ -6,9 +6,49 @@ class PCA_Store_Sales_Controller {
         add_action('wp_ajax_pca_store_record_sale', [__CLASS__, 'record_sale']);
         add_action('wp_ajax_pca_store_fulfill_single_owed_item', [__CLASS__, 'fulfill_single_owed_item']);
         add_action('wp_ajax_pca_store_record_pack_sale', [__CLASS__, 'record_pack_sale']);
+        add_action('wp_ajax_pca_store_check_pack_stock', [__CLASS__, 'check_pack_stock']);
         
     }
 
+    public static function check_pack_stock() {
+        global $wpdb;
+
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+        $pack_id     = intval($_POST['pack_id']);
+        $qty_packs   = intval($_POST['qty']);
+        $campus_id   = intval($_POST['campus_id']);
+
+        $pack_items = PCA_Store_Items_Controller::fetch_pack_items($pack_id);
+
+        if (!$pack_items) {
+            wp_send_json_error(['message' => 'Pack has no items']);
+        }
+
+        $owed_items = [];
+
+        foreach ($pack_items as $child) {
+            $required_qty = $child->quantity * $qty_packs;
+
+            $available = intval($wpdb->get_var($wpdb->prepare(
+                "SELECT stock FROM $stock_table WHERE item_id = %d AND campus_id = %d",
+                $child->child_item_id, $campus_id
+            )));
+
+            $owed = max(0, $required_qty - $available);
+
+            if ($owed > 0) {
+                $owed_items[] = [
+                    'name'      => $child->name,
+                    'available' => $available,
+                    'required'  => $required_qty,
+                    'owed'      => $owed,
+                ];
+            }
+        }
+
+        wp_send_json_success(['owed_items' => $owed_items]);
+    }
+    
 
     public static function fulfill_single_owed_item() {
         global $wpdb;
