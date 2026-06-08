@@ -64,6 +64,8 @@ class PCA_Store_Stock_Controller {
         // Apply movement
         if ($movement_type === 'add' || $movement_type === 'return') {
             $new_stock = $current_stock + $qty;
+        } elseif ($movement_type === 'fulfill_owed') {
+            $new_stock = $current_stock - $qty;
         } elseif ($movement_type === 'damage' || $movement_type === 'sale') {
             $new_stock = $current_stock - $qty;
         } elseif ($movement_type === 'correction') {
@@ -140,11 +142,13 @@ class PCA_Store_Stock_Controller {
         PCA_Store_Stock_Controller::apply_stock_movement(
             $item_id,
             $qty,
+            $campus_id,
             'add',
             'stock_update',
             0,
             'Manual stock addition'
         );
+
 
         wp_send_json_success(['message' => 'Stock updated successfully']);
     }
