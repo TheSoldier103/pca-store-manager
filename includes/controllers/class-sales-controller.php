@@ -193,7 +193,7 @@ class PCA_Store_Sales_Controller {
         $stock_table      = $wpdb->prefix . 'pca_store_item_stock';
         $owed_table       = $wpdb->prefix . 'pca_store_owed_items';
 
-        $pack_id        = intval($_POST['item_id']); // pack id
+        $pack_id        = intval($_POST['item_id']);
         $qty_packs      = intval($_POST['qty']);
         $price          = floatval($_POST['price']);
         $discount       = floatval($_POST['discount']);
@@ -210,16 +210,15 @@ class PCA_Store_Sales_Controller {
             $receipt_no = 'RCP-' . strtoupper(wp_generate_password(8, false));
         }
 
-        // Load pack children
         $pack_items = PCA_Store_Items_Controller::fetch_pack_items($pack_id);
 
         if (!$pack_items) {
             wp_send_json_error(['message' => 'Pack has no items']);
         }
 
-        $has_owed = false;
+        $has_owed  = false;
+        $owed_list = []; // ✅ initialized here, before the foreach
 
-        // Insert sale header
         $total_amount = ($price * $qty_packs) - $discount;
 
         $wpdb->insert($sales_table, [
@@ -239,51 +238,27 @@ class PCA_Store_Sales_Controller {
 
         $sale_id = $wpdb->insert_id;
 
-
-        // Add this before the foreach:
-        $owed_list = [];
-
-        // Inside the foreach, after calculating $owed, update the existing insert:
-        if ($owed > 0) {
-            $has_owed = true;
-            $owed_list[] = [           // ← add this line
-                'name' => $child->name,
-                'qty'  => $owed
-            ];
-
-            $wpdb->insert($owed_table, [
-                'sale_id'     => $sale_id,
-                'receipt_no'  => $receipt_no,
-                'item_id'     => $child_id,
-                'item_name'   => $child->name,
-                'qty_owed'    => $owed,
-                'campus_id'   => $campus_id,
-                'status'      => 'pending',
-                'date_created'=> current_time('mysql')
-            ]);
-        }
-
-
-        // Process each child item
         foreach ($pack_items as $child) {
 
-            $child_id = $child->child_item_id;
+            $child_id     = $child->child_item_id;
             $required_qty = $child->quantity * $qty_packs;
 
-            // Get stock
             $available = intval($wpdb->get_var($wpdb->prepare(
                 "SELECT stock FROM $stock_table WHERE item_id = %d AND campus_id = %d",
                 $child_id, $campus_id
             )));
 
             $deduct = min($required_qty, $available);
-            $owed   = max(0, $required_qty - $available);
+            $owed   = max(0, $required_qty - $available); // ✅ $owed defined here
 
             if ($owed > 0) {
-                $has_owed = true;
+                $has_owed    = true;
+                $owed_list[] = [             // ✅ now inside foreach, after $owed is set
+                    'name' => $child->name,
+                    'qty'  => $owed,
+                ];
             }
 
-            // Insert sale item
             $wpdb->insert($sale_items_table, [
                 'sale_id'     => $sale_id,
                 'item_id'     => $child_id,
@@ -291,10 +266,9 @@ class PCA_Store_Sales_Controller {
                 'quantity'    => $required_qty,
                 'unit_price'  => 0,
                 'total_price' => 0,
-                'created_at'  => current_time('mysql')
+                'created_at'  => current_time('mysql'),
             ]);
 
-            // Deduct stock
             if ($deduct > 0) {
                 PCA_Store_Stock_Controller::apply_stock_movement(
                     $child_id,
@@ -307,43 +281,31 @@ class PCA_Store_Sales_Controller {
                 );
             }
 
-            // Insert owed
             if ($owed > 0) {
                 $wpdb->insert($owed_table, [
-                    'sale_id'     => $sale_id,
-                    'receipt_no'  => $receipt_no,
-                    'item_id'     => $child_id,
-                    'item_name'   => $child->name,
-                    'qty_owed'    => $owed,
-                    'campus_id'   => $campus_id,
-                    'status'      => 'pending',
-                    'date_created'=> current_time('mysql')
+                    'sale_id'      => $sale_id,
+                    'receipt_no'   => $receipt_no,
+                    'item_id'      => $child_id,
+                    'item_name'    => $child->name,
+                    'qty_owed'     => $owed,
+                    'campus_id'    => $campus_id,
+                    'status'       => 'pending',
+                    'date_created' => current_time('mysql'),
                 ]);
             }
         }
 
-        // Update sale header if owed exists
         if ($has_owed) {
-            $wpdb->update($sales_table, [
-                'has_owed_items' => 1
-            ], ['id' => $sale_id]);
+            $wpdb->update($sales_table, ['has_owed_items' => 1], ['id' => $sale_id]);
         }
 
-
-        if ($has_owed) {
-            wp_send_json_success([
-                'message' => "Pack sale recorded. Some items are owed.",
-                'sale_id' => $sale_id,
-                'owed_items' => $owed_list
-            ]);
-        } else {
-            wp_send_json_success([
-                'message' => "Pack sale recorded successfully",
-                'sale_id' => $sale_id,
-                'owed_items' => []
-            ]);
-        }
-
+        wp_send_json_success([
+            'message'    => $has_owed
+                ? "Pack sale recorded. Some items are owed."
+                : "Pack sale recorded successfully",
+            'sale_id'    => $sale_id,
+            'owed_items' => $owed_list,
+        ]);
     }
 
 
