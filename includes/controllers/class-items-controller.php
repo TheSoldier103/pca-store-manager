@@ -6,6 +6,7 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_save_item', [__CLASS__, 'save_item']);
         add_action('wp_ajax_pca_store_delete_item', [__CLASS__, 'delete_item']);
         add_action('wp_ajax_pca_store_get_pack_items', [__CLASS__, 'get_pack_items']);
+        add_action('wp_ajax_pca_store_fetch_pack_items', [__CLASS__, 'fetch_pack_items']);
         add_action('wp_ajax_pca_store_get_item', [__CLASS__, 'get_item']);
         add_action('wp_ajax_pca_store_get_books_for_pack', [__CLASS__, 'get_books_for_pack']);
         add_action('wp_ajax_pca_store_get_pack', [__CLASS__, 'get_pack']);
@@ -595,4 +596,23 @@ class PCA_Store_Items_Controller {
 
         wp_send_json_success($rows);
     }
+
+    public static function fetch_pack_items($pack_id) {
+        global $wpdb;
+
+        $packs_table = $wpdb->prefix . 'pca_store_item_packs';
+        $items_table = $wpdb->prefix . 'pca_store_items';
+
+        return $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                p.child_item_id, 
+                p.quantity, 
+                i.name, 
+                i.selling_price
+            FROM $packs_table p
+            LEFT JOIN $items_table i ON i.id = p.child_item_id
+            WHERE p.pack_id = %d
+        ", $pack_id));
+    }
+
 }
