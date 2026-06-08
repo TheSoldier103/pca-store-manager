@@ -44,13 +44,13 @@ $kpi_today_sales = $wpdb->get_var("
 // Note: no alias on a single-table query — use the table name, or add an alias:
 
 // Cleaner with alias:
-$kpi_today_sales = $wpdb->get_var("
-    SELECT SUM(s.total_amount)
-    FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department_id = $dept_books
-    AND DATE(s.sale_date) = CURDATE()
-    " . pca_campus_filter($selected_campus, 's') . "
-") ?: 0;
+// $kpi_today_sales = $wpdb->get_var("
+//     SELECT SUM(s.total_amount)
+//     FROM {$wpdb->prefix}pca_store_sales s
+//     WHERE s.department_id = $dept_books
+//     AND DATE(s.sale_date) = CURDATE()
+//     " . pca_campus_filter($selected_campus, 's') . "
+// ") ?: 0;
 
 // 2. Books Sold Today (qty)
 //    campus_id is on sales (s), not items
