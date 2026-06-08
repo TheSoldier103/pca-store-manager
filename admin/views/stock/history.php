@@ -30,6 +30,9 @@
 
         if ($rows) {
             foreach ($rows as $m) {
+                $user = get_userdata($s->sold_by);
+                $username = $user ? esc_html($user->display_name) : 'Unknown';
+                
                 echo "<tr>
                         <td>{$m->created_at}</td>
                         <td>{$m->item_name}</td>
@@ -38,7 +41,7 @@
                         <td>{$m->stock_before}</td>
                         <td>{$m->stock_after}</td>
                         <td>{$m->reference_type} #{$m->reference_id}</td>
-                        <td>{$m->created_by}</td>
+                        <td>{$username}</td>
                       </tr>";
             }
         } else {
