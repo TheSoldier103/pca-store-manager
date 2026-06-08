@@ -2,6 +2,20 @@
 global $wpdb;
 
 /* ============================================================
+   DEPARTMENT ID LOOKUP
+============================================================ */
+
+$dept_books = $wpdb->get_var("
+    SELECT id FROM {$wpdb->prefix}pca_store_departments
+    WHERE code = 'BK' AND is_active = 1
+");
+
+$dept_stationery = $wpdb->get_var("
+    SELECT id FROM {$wpdb->prefix}pca_store_departments
+    WHERE code = 'ST' AND is_active = 1
+");
+
+/* ============================================================
    CAMPUS FILTER
 ============================================================ */
 
@@ -18,7 +32,7 @@ $campus_filter = $selected_campus ? "AND campus_id = $selected_campus" : "";
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department_id = 2
+    WHERE department_id = $dept_books
     AND DATE(sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
@@ -29,11 +43,10 @@ $kpi_books_sold = $wpdb->get_var("
     FROM {$wpdb->prefix}pca_store_sale_items si
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = si.item_id
     INNER JOIN {$wpdb->prefix}pca_store_sales s ON s.id = si.sale_id
-    WHERE i.department = 'books'
+    WHERE i.department_id = $dept_books
     AND DATE(s.sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
-
 
 // 3. Packs Sold Today
 $kpi_packs_sold = $wpdb->get_var("
@@ -49,7 +62,7 @@ $kpi_low_stock = $wpdb->get_var("
     SELECT COUNT(*)
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
-    WHERE i.department = 'books'
+    WHERE i.department_id = $dept_books
     AND st.stock <= i.reorder_level
     $campus_filter
 ") ?: 0;
@@ -59,7 +72,7 @@ $kpi_stock_value = $wpdb->get_var("
     SELECT SUM(st.stock * i.selling_price)
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
-    WHERE i.department = 'books'
+    WHERE i.department_id = $dept_books
     $campus_filter
 ") ?: 0;
 
@@ -68,7 +81,7 @@ $kpi_owed_books = $wpdb->get_var("
     SELECT SUM(oi.qty_owed)
     FROM {$wpdb->prefix}pca_store_owed_items oi
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = oi.item_id
-    WHERE i.department = 'books'
+    WHERE i.department_id = $dept_books
     AND oi.status = 'pending'
     $campus_filter
 ") ?: 0;
@@ -83,7 +96,7 @@ $kpi_stationery_sold = $wpdb->get_var("
     FROM {$wpdb->prefix}pca_store_sale_items si
     INNER JOIN {$wpdb->prefix}pca_store_sales s ON s.id = si.sale_id
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = si.item_id
-    WHERE i.department = 'stationery'
+    WHERE i.department_id = $dept_stationery
     AND DATE(s.sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
@@ -93,7 +106,7 @@ $kpi_stationery_low = $wpdb->get_var("
     SELECT COUNT(*)
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
-    WHERE i.department = 'stationery'
+    WHERE i.department_id = $dept_stationery
     AND st.stock <= i.reorder_level
     $campus_filter
 ") ?: 0;
@@ -103,12 +116,12 @@ $kpi_stationery_low = $wpdb->get_var("
 ============================================================ */
 
 $recent_sales = $wpdb->get_results("
-    SELECT s.*, 
+    SELECT s.*,
         (SELECT GROUP_CONCAT(item_name SEPARATOR ', ')
-         FROM {$wpdb->prefix}pca_store_sale_items 
+         FROM {$wpdb->prefix}pca_store_sale_items
          WHERE sale_id = s.id) AS items
     FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department IN ('books', 'stationery')
+    WHERE s.department_id IN ($dept_books, $dept_stationery)
     $campus_filter
     ORDER BY s.sale_date DESC
     LIMIT 10
@@ -122,7 +135,7 @@ $low_stock_books = $wpdb->get_results("
     SELECT i.name, st.stock, i.reorder_level
     FROM {$wpdb->prefix}pca_store_item_stock st
     INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
-    WHERE i.department = 'books'
+    WHERE i.department_id = $dept_books
     AND st.stock <= i.reorder_level
     $campus_filter
     ORDER BY st.stock ASC
