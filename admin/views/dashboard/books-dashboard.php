@@ -249,7 +249,13 @@ $low_stock_books = $wpdb->get_results("
                     <tr>
                         <td><?php echo esc_html($s->sale_date); ?></td>
                         <td><?php echo esc_html($s->receipt_no); ?></td>
-                        <td><?php echo esc_html($s->items); ?></td>
+                        <td>
+                            <?php if ($s->sale_type === 'pack'): ?>
+                                <?php echo esc_html($s->pack_name); ?>
+                            <?php else: ?>
+                                <?php echo esc_html($s->items); ?>
+                            <?php endif; ?>
+                        </td>
                         <td>₦<?php echo number_format($s->total_amount, 2); ?></td>
                         <td><?php echo esc_html(get_userdata($s->sold_by)->display_name); ?></td>
                     </tr>
