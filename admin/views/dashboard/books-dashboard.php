@@ -32,7 +32,7 @@ $campus_filter = $selected_campus ? "AND campus_id = $selected_campus" : "";
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department_id = $dept_books
+    WHERE department = 'books'
     AND DATE(sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
@@ -116,12 +116,12 @@ $kpi_stationery_low = $wpdb->get_var("
 ============================================================ */
 
 $recent_sales = $wpdb->get_results("
-    SELECT s.*,
+    SELECT s.*, 
         (SELECT GROUP_CONCAT(item_name SEPARATOR ', ')
-         FROM {$wpdb->prefix}pca_store_sale_items
+         FROM {$wpdb->prefix}pca_store_sale_items 
          WHERE sale_id = s.id) AS items
     FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department_id IN ($dept_books, $dept_stationery)
+    WHERE s.department IN ('books', 'stationery')
     $campus_filter
     ORDER BY s.sale_date DESC
     LIMIT 10
