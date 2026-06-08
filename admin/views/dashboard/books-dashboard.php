@@ -37,7 +37,7 @@ function pca_campus_filter(int $campus_id, string $alias): string {
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department_id = $dept_books
+    WHERE department = 'books'
     AND DATE(sale_date) = CURDATE()
     " . pca_campus_filter($selected_campus, 'pca_store_sales') . "
 ") ?: 0;
@@ -140,7 +140,7 @@ $recent_sales = $wpdb->get_results("
          FROM {$wpdb->prefix}pca_store_sale_items
          WHERE sale_id = s.id) AS items
     FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department_id IN ($dept_books, $dept_stationery)
+    WHERE s.department IN ('books', 'stationery')
     " . pca_campus_filter($selected_campus, 's') . "
     ORDER BY s.sale_date DESC
     LIMIT 10
