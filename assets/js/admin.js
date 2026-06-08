@@ -246,28 +246,34 @@ jQuery(document).ready(function ($) {
                 campus_id:      campus_id,
                 has_owed_items: owed > 0 ? 1 : 0,
                 qty_owed:       owed,
-            }, function (response) {
-                if (!response.success) {
-                    alert(response.data.message);
-                    return;
+            }, 
+                function (response) {
+
+                    if (!response.success) {
+                        alert(response.data.message);
+                        return;
+                    }
+
+                    // If there are owed items, show them
+                    if (response.data.owed_items && response.data.owed_items.length > 0) {
+                        let list = response.data.owed_items
+                            .map(i => `${i.name}: ${i.qty}`)
+                            .join("\n");
+
+                        alert(
+                            "Pack sale recorded.\n\nOwed items:\n" +
+                            list
+                        );
+                    } else {
+                        alert(response.data.message);
+                    }
+
+                    location.reload();
                 }
 
-                // If there are owed items, show them
-                if (response.data.owed_items && response.data.owed_items.length > 0) {
-                    let list = response.data.owed_items
-                        .map(i => `${i.name}: ${i.qty}`)
-                        .join("\n");
-
-                    alert(
-                        "Pack sale recorded.\n\nOwed items:\n" +
-                        list
-                    );
-                } else {
-                    alert(response.data.message);
-                }
-
-                location.reload();
-            });
+        );
+        }
+    });
 
 
 
