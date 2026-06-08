@@ -212,7 +212,7 @@ class PCA_Store_Sales_Controller {
 
         // Load pack children
         // $pack_items = PCA_Store_Helpers::get_pack_items($pack_id);
-        $pack_items = PCA_Store_Items_Controller::get_pack_items($pack_id);
+        $pack_items = PCA_Store_Items_Controller::fetch_pack_items($pack_id);
 
         if (!$pack_items) {
             wp_send_json_error(['message' => 'Pack has no items']);
