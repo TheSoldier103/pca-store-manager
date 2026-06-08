@@ -27,12 +27,13 @@ $kpi_today_sales = $wpdb->get_var("
 $kpi_books_sold = $wpdb->get_var("
     SELECT SUM(si.quantity)
     FROM {$wpdb->prefix}pca_store_sale_items si
+    INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = si.item_id
     INNER JOIN {$wpdb->prefix}pca_store_sales s ON s.id = si.sale_id
-    WHERE s.department = 'books'
-    AND si.unit_price > 0
+    WHERE i.department = 'books'
     AND DATE(s.sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
+
 
 // 3. Packs Sold Today
 $kpi_packs_sold = $wpdb->get_var("
