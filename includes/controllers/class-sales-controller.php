@@ -239,6 +239,7 @@ class PCA_Store_Sales_Controller {
 
         $sale_id = $wpdb->insert_id;
 
+
         // Add this before the foreach:
         $owed_list = [];
 
@@ -250,7 +251,16 @@ class PCA_Store_Sales_Controller {
                 'qty'  => $owed
             ];
 
-            $wpdb->insert($owed_table, [ ... ]); // already exists, no change
+            $wpdb->insert($owed_table, [
+                'sale_id'     => $sale_id,
+                'receipt_no'  => $receipt_no,
+                'item_id'     => $child_id,
+                'item_name'   => $child->name,
+                'qty_owed'    => $owed,
+                'campus_id'   => $campus_id,
+                'status'      => 'pending',
+                'date_created'=> current_time('mysql')
+            ]);
         }
 
 
