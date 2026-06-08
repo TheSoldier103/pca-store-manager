@@ -1,4 +1,5 @@
 jQuery(document).ready(function ($) {
+    
 
     /* =============================================================
        SALES
@@ -223,7 +224,10 @@ jQuery(document).ready(function ($) {
 
         function submitSale(owed) {
             $.post(ajaxurl, {
-                action:         'pca_store_record_sale',
+                // action:         'pca_store_record_sale',
+                action: $('#pca-sale-type').val() === 'pack'
+                    ? 'pca_store_record_pack_sale'
+                    : 'pca_store_record_sale',
                 item_id:        item_id,
                 qty:            qty,
                 price:          $('#pca-sale-price').val(),
