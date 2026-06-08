@@ -244,6 +244,11 @@ class PCA_Store_Sales_Controller {
         $notes          = sanitize_text_field($_POST['notes']);
         $campus_id      = intval($_POST['campus_id']);
 
+        $pack_name = $wpdb->get_var($wpdb->prepare(
+            "SELECT name FROM {$wpdb->prefix}pca_store_items WHERE id = %d",
+            $pack_id
+        ));
+
         if (!$pack_id || $qty_packs <= 0) {
             wp_send_json_error(['message' => 'Invalid pack or quantity']);
         }

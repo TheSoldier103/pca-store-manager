@@ -18,7 +18,7 @@ $campus_filter = $selected_campus ? "AND campus_id = $selected_campus" : "";
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department = 'books'
+    WHERE department_id = 2
     AND DATE(sale_date) = CURDATE()
     $campus_filter
 ") ?: 0;
