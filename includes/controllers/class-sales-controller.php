@@ -48,7 +48,7 @@ class PCA_Store_Sales_Controller {
 
         wp_send_json_success(['owed_items' => $owed_items]);
     }
-    
+
 
     public static function fulfill_single_owed_item() {
         global $wpdb;
@@ -155,6 +155,7 @@ class PCA_Store_Sales_Controller {
             'payment_method' => $payment_method,
             'sold_by'        => get_current_user_id(),
             'notes'          => $notes,
+            'sale_type'      => 'single',
             'campus_id'      => $campus_id,
             'has_owed_items' => $qty_owed > 0 ? 1 : 0,
             'created_at'     => current_time('mysql'),
@@ -271,6 +272,7 @@ class PCA_Store_Sales_Controller {
             'payment_method' => $payment_method,
             'sold_by'        => get_current_user_id(),
             'notes'          => $notes,
+            'sale_type'      => 'pack',
             'campus_id'      => $campus_id,
             'has_owed_items' => 0,
             'created_at'     => current_time('mysql'),

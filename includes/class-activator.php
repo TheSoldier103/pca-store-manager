@@ -174,6 +174,7 @@ class PCA_Store_Activator {
             amount_paid DECIMAL(12,2) DEFAULT 0.00,
             balance DECIMAL(12,2) DEFAULT 0.00,
             has_owed_items TINYINT(1) NOT NULL DEFAULT 0,
+            sale_type VARCHAR(20) DEFAULT 'single',
             status VARCHAR(30) DEFAULT 'completed',
             notes TEXT NULL,
             sold_by BIGINT UNSIGNED NOT NULL,
