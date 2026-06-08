@@ -211,7 +211,6 @@ class PCA_Store_Sales_Controller {
         }
 
         // Load pack children
-        // $pack_items = PCA_Store_Helpers::get_pack_items($pack_id);
         $pack_items = PCA_Store_Items_Controller::fetch_pack_items($pack_id);
 
         if (!$pack_items) {
@@ -239,6 +238,26 @@ class PCA_Store_Sales_Controller {
         ]);
 
         $sale_id = $wpdb->insert_id;
+
+        if ($owed > 0) {
+
+            $owed_list[] = [
+                'name' => $child->name,
+                'qty'  => $owed
+            ];
+
+            $wpdb->insert($owed_table, [
+                'sale_id'     => $sale_id,
+                'receipt_no'  => $receipt_no,
+                'item_id'     => $child_id,
+                'item_name'   => $child->name,
+                'qty_owed'    => $owed,
+                'campus_id'   => $campus_id,
+                'status'      => 'pending',
+                'date_created'=> current_time('mysql')
+            ]);
+        }
+
 
         // Process each child item
         foreach ($pack_items as $child) {
@@ -305,12 +324,21 @@ class PCA_Store_Sales_Controller {
             ], ['id' => $sale_id]);
         }
 
-        wp_send_json_success([
-            'message' => $has_owed
-                ? "Pack sale recorded. Some items are owed."
-                : "Pack sale recorded successfully",
-            'sale_id' => $sale_id
-        ]);
+
+        if ($has_owed) {
+            wp_send_json_success([
+                'message' => "Pack sale recorded. Some items are owed.",
+                'sale_id' => $sale_id,
+                'owed_items' => $owed_list
+            ]);
+        } else {
+            wp_send_json_success([
+                'message' => "Pack sale recorded successfully",
+                'sale_id' => $sale_id,
+                'owed_items' => []
+            ]);
+        }
+
     }
 
 

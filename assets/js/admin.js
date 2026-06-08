@@ -247,11 +247,27 @@ jQuery(document).ready(function ($) {
                 has_owed_items: owed > 0 ? 1 : 0,
                 qty_owed:       owed,
             }, function (response) {
-                alert(response.data.message);
-                if (response.success) location.reload();
+                if (!response.success) {
+                    alert(response.data.message);
+                    return;
+                }
+
+                // If there are owed items, show them
+                if (response.data.owed_items && response.data.owed_items.length > 0) {
+                    let list = response.data.owed_items
+                        .map(i => `${i.name}: ${i.qty}`)
+                        .join("\n");
+
+                    alert(
+                        "Pack sale recorded.\n\nOwed items:\n" +
+                        list
+                    );
+                } else {
+                    alert(response.data.message);
+                }
+
+                location.reload();
             });
-        }
-    });
 
 
 
