@@ -30,7 +30,7 @@
 
         if ($rows) {
             foreach ($rows as $m) {
-                $user = get_userdata($m->sold_by);
+                $user = get_userdata($m->created_by);
                 $username = $user ? esc_html($user->display_name) : 'Unknown';
                 
                 echo "<tr>
