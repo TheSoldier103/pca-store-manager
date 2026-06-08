@@ -231,7 +231,6 @@ jQuery(document).ready(function ($) {
 
         function submitSale(owed) {
             $.post(ajaxurl, {
-                // action:         'pca_store_record_sale',
                 action: $('#pca-sale-type').val() === 'pack'
                     ? 'pca_store_record_pack_sale'
                     : 'pca_store_record_sale',
@@ -246,32 +245,48 @@ jQuery(document).ready(function ($) {
                 campus_id:      campus_id,
                 has_owed_items: owed > 0 ? 1 : 0,
                 qty_owed:       owed,
-            }, 
-                function (response) {
-
-                    if (!response.success) {
-                        alert(response.data.message);
-                        return;
-                    }
-
-                    // If there are owed items, show them
-                    if (response.data.owed_items && response.data.owed_items.length > 0) {
-                        let list = response.data.owed_items
-                            .map(i => `${i.name}: ${i.qty}`)
-                            .join("\n");
-
-                        alert(
-                            "Pack sale recorded.\n\nOwed items:\n" +
-                            list
-                        );
-                    } else {
-                        alert(response.data.message);
-                    }
-
-                    location.reload();
+            },
+            function (response) {
+                if (!response.success) {
+                    alert(response.data.message);
+                    return;
                 }
 
-        );
+                if (response.data.owed_items && response.data.owed_items.length > 0) {
+                    // Remove any previous warning
+                    $('#pca-owed-warning').remove();
+
+                    const list = response.data.owed_items
+                        .map(i => `• ${i.name}: <strong>${i.qty}</strong>`)
+                        .join('<br>');
+
+                    $('#pca-record-sale-btn').before(`
+                        <div id="pca-owed-warning" style="
+                            display: flex;
+                            align-items: flex-start;
+                            gap: 10px;
+                            margin: 10px 0;
+                            padding: 12px 14px;
+                            border-left: 4px solid #cc0000;
+                            background: #fff5f5;
+                            border-radius: 4px;
+                            font-size: 13px;
+                            color: #333;
+                        ">
+                            <span style="font-size:18px; line-height:1;">⚠️</span>
+                            <div>
+                                <strong>Pack sale recorded — some items are owed:</strong><br>
+                                <div style="margin-top:6px; line-height:1.8;">${list}</div>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    alert(response.data.message);
+                }
+
+                // Delay reload so user can read the warning
+                setTimeout(() => location.reload(), 4000);
+            });
         }
     });
 
