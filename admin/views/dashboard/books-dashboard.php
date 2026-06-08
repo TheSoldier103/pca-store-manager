@@ -38,11 +38,19 @@ $kpi_books_sold = $wpdb->get_var("
 $kpi_packs_sold = $wpdb->get_var("
     SELECT COUNT(*)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department = 'books'
-    AND notes LIKE '%pack%'
+    WHERE sale_type = 'pack'
     AND DATE(sale_date) = CURDATE()
     $campus_filter
+
 ") ?: 0;
+
+
+    // SELECT COUNT(*)
+    // FROM {$wpdb->prefix}pca_store_sales
+    // WHERE department = 'books'
+    // AND notes LIKE '%pack%'
+    // AND DATE(sale_date) = CURDATE()
+    // $campus_filter
 
 // 4. Low Stock (Books)
 $kpi_low_stock = $wpdb->get_var("
