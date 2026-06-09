@@ -2,8 +2,8 @@
 $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'students_summary_reports';
 
 $tabs = [
-    'students_summary_reports' => 'Students Summary',
-    'daily_payments'           => 'Daily Payments',
+    
+    'daily_sales'           => 'Daily Payments',
     'debtors_reports'          => 'Debtors',
     'prospectus_report'        => 'Prospectus Fees',
     'stock_reports'            => 'Stock Reports',
