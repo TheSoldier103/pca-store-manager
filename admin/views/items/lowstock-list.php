@@ -120,7 +120,7 @@
 
                 echo "<tr>
                         <td>{$item->name}</td>
-                        <td>{$item->department}</td>
+                        <td>{$item->department_id}</td>
                         <td>{$item->item_type}</td>
                         <td>{$item->class_level}</td>
                         <td>{$display_stock}</td>
