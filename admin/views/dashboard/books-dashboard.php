@@ -233,6 +233,11 @@ $low_stock_books = $wpdb->get_results("
 <div class="pca-kpi-grid">
 
     <div class="pca-kpi-card">
+        <h3>Today's Stationery Sales</h3>
+        <div class="value">₦<?php echo number_format($kpi_today_sales, 2); ?></div>
+    </div>
+
+    <div class="pca-kpi-card">
         <h3>Stationery Sold Today</h3>
         <div class="value"><?php echo $kpi_stationery_sold; ?></div>
     </div>
