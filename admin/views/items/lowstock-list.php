@@ -1,7 +1,17 @@
+<?php
+global $wpdb;
+
+// Department lookup
+$departments = $wpdb->get_results("
+    SELECT id, name FROM {$wpdb->prefix}pca_store_departments 
+    WHERE is_active = 1 ORDER BY name ASC
+");
+$dept_map = array_column($departments, 'name', 'id'); // [id => name]
+?>
+
 <h2 class="title">Low Stock Items</h2>
 
 <div class="pca-filters">
-
     <form method="get">
         <input type="hidden" name="page" value="pca-store-items">
         <input type="hidden" name="tab" value="lowstock">
@@ -10,10 +20,7 @@
         <select name="campus">
             <option value="">All Campuses</option>
             <?php
-            global $wpdb;
-            $campus_table = $wpdb->prefix . 'pca_store_campuses';
-            $campuses = $wpdb->get_results("SELECT id, name FROM $campus_table ORDER BY name ASC");
-
+            $campuses = $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}pca_store_campuses ORDER BY name ASC");
             foreach ($campuses as $c) {
                 $selected = (isset($_GET['campus']) && $_GET['campus'] == $c->id) ? 'selected' : '';
                 echo "<option value='{$c->id}' $selected>{$c->name}</option>";
@@ -22,22 +29,24 @@
         </select>
 
         <label>Department:</label>
-        <select name="department">
+        <select name="department_id">
             <option value="">All</option>
-            <option value="books" <?php selected($_GET['department'] ?? '', 'books'); ?>>Books</option>
-            <option value="stationery" <?php selected($_GET['department'] ?? '', 'stationery'); ?>>Stationery</option>
+            <?php foreach ($departments as $d): ?>
+                <option value="<?php echo $d->id; ?>" <?php selected($_GET['department_id'] ?? '', $d->id); ?>>
+                    <?php echo esc_html($d->name); ?>
+                </option>
+            <?php endforeach; ?>
         </select>
 
         <label>Item Type:</label>
         <select name="type">
             <option value="">All</option>
             <option value="single" <?php selected($_GET['type'] ?? '', 'single'); ?>>Single Items</option>
-            <option value="pack" <?php selected($_GET['type'] ?? '', 'pack'); ?>>Book Packs</option>
+            <option value="pack"   <?php selected($_GET['type'] ?? '', 'pack'); ?>>Book Packs</option>
         </select>
 
         <button class="button">Filter</button>
     </form>
-
 </div>
 
 <hr>
@@ -54,35 +63,27 @@
             <th>Status</th>
         </tr>
     </thead>
-
     <tbody>
         <?php
-        global $wpdb;
-
         $items_table = $wpdb->prefix . 'pca_store_items';
         $packs_table = $wpdb->prefix . 'pca_store_item_packs';
 
-        // Build WHERE conditions
         $where = ["current_stock <= reorder_level"];
 
         if (!empty($_GET['campus'])) {
-            $campus = intval($_GET['campus']);
-            $where[] = "campus_id = $campus";
+            $where[] = $wpdb->prepare("campus_id = %d", intval($_GET['campus']));
         }
 
-        if (!empty($_GET['department'])) {
-            $dept = sanitize_text_field($_GET['department']);
-            $where[] = "department = '$dept'";
+        if (!empty($_GET['department_id'])) {
+            $where[] = $wpdb->prepare("department_id = %d", intval($_GET['department_id']));
         }
 
         if (!empty($_GET['type'])) {
-            $type = sanitize_text_field($_GET['type']);
-            $where[] = "item_type = '$type'";
+            $where[] = $wpdb->prepare("item_type = %s", sanitize_text_field($_GET['type']));
         }
 
         $where_sql = implode(" AND ", $where);
 
-        // Fetch low stock items
         $items = $wpdb->get_results("
             SELECT * FROM $items_table
             WHERE $where_sql
@@ -91,41 +92,36 @@
 
         if ($items) {
             foreach ($items as $item) {
-
-                // For packs, calculate virtual stock
                 if ($item->item_type === 'pack') {
-
                     $children = $wpdb->get_results("
                         SELECT child_item_id, quantity
                         FROM $packs_table
-                        WHERE pack_id = $item->id
+                        WHERE pack_id = {$item->id}
                     ");
 
                     $virtual_stock = 999999;
-
                     foreach ($children as $child) {
                         $child_stock = $wpdb->get_var("
                             SELECT current_stock FROM $items_table
-                            WHERE id = $child->child_item_id
+                            WHERE id = {$child->child_item_id}
                         ");
-
-                        $possible = floor($child_stock / $child->quantity);
-                        $virtual_stock = min($virtual_stock, $possible);
+                        $virtual_stock = min($virtual_stock, floor($child_stock / $child->quantity));
                     }
-
                     $display_stock = $virtual_stock;
                 } else {
                     $display_stock = $item->current_stock;
                 }
 
+                $dept_name = esc_html($dept_map[$item->department_id] ?? '—');
+
                 echo "<tr>
-                        <td>{$item->name}</td>
-                        <td>{$item->department_id}</td>
-                        <td>{$item->item_type}</td>
-                        <td>{$item->class_level}</td>
+                        <td>" . esc_html($item->name)      . "</td>
+                        <td>{$dept_name}</td>
+                        <td>" . esc_html($item->item_type)  . "</td>
+                        <td>" . esc_html($item->class_level). "</td>
                         <td>{$display_stock}</td>
-                        <td>{$item->reorder_level}</td>
-                        <td>{$item->status}</td>
+                        <td>" . intval($item->reorder_level) . "</td>
+                        <td>" . esc_html($item->status)     . "</td>
                       </tr>";
             }
         } else {
