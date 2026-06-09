@@ -37,20 +37,20 @@ function pca_campus_filter(int $campus_id, string $alias): string {
 $kpi_today_sales = $wpdb->get_var("
     SELECT SUM(total_amount)
     FROM {$wpdb->prefix}pca_store_sales
-    WHERE department = 'books'
+    WHERE department_id = $dept_books
     AND DATE(sale_date) = CURDATE()
     " . pca_campus_filter($selected_campus, 'pca_store_sales') . "
 ") ?: 0;
 // Note: no alias on a single-table query — use the table name, or add an alias:
 
 // Cleaner with alias:
-// $kpi_today_sales = $wpdb->get_var("
-//     SELECT SUM(s.total_amount)
-//     FROM {$wpdb->prefix}pca_store_sales s
-//     WHERE s.department_id = $dept_books
-//     AND DATE(s.sale_date) = CURDATE()
-//     " . pca_campus_filter($selected_campus, 's') . "
-// ") ?: 0;
+$kpi_today_sales = $wpdb->get_var("
+    SELECT SUM(s.total_amount)
+    FROM {$wpdb->prefix}pca_store_sales s
+    WHERE s.department_id = $dept_books
+    AND DATE(s.sale_date) = CURDATE()
+    " . pca_campus_filter($selected_campus, 's') . "
+") ?: 0;
 
 // 2. Books Sold Today (qty)
 //    campus_id is on sales (s), not items
@@ -140,7 +140,7 @@ $recent_sales = $wpdb->get_results("
          FROM {$wpdb->prefix}pca_store_sale_items
          WHERE sale_id = s.id) AS items
     FROM {$wpdb->prefix}pca_store_sales s
-    WHERE s.department IN ('books', 'stationery')
+    WHERE s.department_id IN ($dept_books, $dept_stationery)
     " . pca_campus_filter($selected_campus, 's') . "
     ORDER BY s.sale_date DESC
     LIMIT 10
