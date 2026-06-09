@@ -88,7 +88,7 @@
                 echo "<tr>
                         <td>{$s->sale_date}</td>
                         <td>{$s->receipt_no}</td>
-                        <td>{$s->department}</td>
+                        <td>{$s->department_id}</td>
                         <td>₦" . number_format($s->total_amount, 2) . "</td>
                         <td>₦" . number_format($s->amount_paid, 2) . "</td>
                         <td>₦" . number_format($s->discount, 2) . "</td>
