@@ -161,6 +161,7 @@ $low_stock_books = $wpdb->get_results("
     AND st.stock <= i.reorder_level
     " . pca_campus_filter( $selected_campus, 'st' ) . "
     ORDER BY st.stock ASC
+    LIMIT 10
 ");
 
 ?>
@@ -239,6 +240,16 @@ $low_stock_books = $wpdb->get_results("
     <div class="pca-kpi-card">
         <h3>Low Stock (Stationery)</h3>
         <div class="value"><?php echo $kpi_stationery_low; ?></div>
+    </div>
+
+    <div class="pca-kpi-card">
+        <h3>Total Owed (Stationery)</h3>
+        <div class="value"><?php echo $kpi_owed_books; ?></div>
+    </div>
+
+    <div class="pca-kpi-card">
+        <h3>Total Stationery Stock Value</h3>
+        <div class="value">₦<?php echo number_format($kpi_stock_value, 2); ?></div>
     </div>
 
 </div>
