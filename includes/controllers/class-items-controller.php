@@ -218,6 +218,101 @@ class PCA_Store_Items_Controller {
         ]);
     }
 
+    // public static function import_books() {
+    //     global $wpdb;
+
+    //     $items_table = $wpdb->prefix . 'pca_store_items';
+    //     $dept_table  = $wpdb->prefix . 'pca_store_departments';
+    //     $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+
+    //     if (!isset($_FILES['csv_file'])) {
+    //         wp_send_json_error(['message' => 'No file uploaded']);
+    //     }
+
+    //     $file = $_FILES['csv_file']['tmp_name'];
+    //     $rows = array_map('str_getcsv', file($file));
+
+    //     if (count($rows) < 2) {
+    //         wp_send_json_error(['message' => 'CSV is empty']);
+    //     }
+
+    //     // Get Books department ID
+    //     $books_dept_id = $wpdb->get_var("
+    //         SELECT id FROM $dept_table 
+    //         WHERE LOWER(name) = 'books'
+    //         LIMIT 1
+    //     ");
+
+    //     $header = array_map('trim', $rows[0]);
+    //     $added = $skipped = $errors = 0;
+
+    //     for ($i = 1; $i < count($rows); $i++) {
+
+    //         $row = array_combine($header, $rows[$i]);
+    //         if (!$row) { $errors++; continue; }
+
+    //         $name  = trim($row['name'] ?? '');
+    //         $price = floatval($row['selling_price'] ?? 0);
+
+    //         if (!$name || $price <= 0) {
+    //             $errors++;
+    //             continue;
+    //         }
+
+    //         // Campus stock
+    //         $stock_ughelli  = max(0, intval($row['stock_ughelli']  ?? 0));
+    //         $stock_okuokoko = max(0, intval($row['stock_okuokoko'] ?? 0));
+
+    //         // Duplicate check
+    //         $exists = $wpdb->get_var($wpdb->prepare("
+    //             SELECT COUNT(*) FROM $items_table
+    //             WHERE name = %s AND status != 'deleted'
+    //         ", $name));
+
+    //         if ($exists) {
+    //             $skipped++;
+    //             continue;
+    //         }
+
+    //         // Insert item
+    //         $wpdb->insert($items_table, [
+    //             'name'          => $name,
+    //             'department_id' => $books_dept_id,
+    //             'item_type'     => 'single',
+    //             'selling_price' => $price,
+    //             'class_level'   => trim($row['class_level'] ?? ''),
+    //             'subject'       => trim($row['subject'] ?? ''),
+    //             'reorder_level' => intval($row['reorder_level'] ?? 0),
+    //             'status'        => 'active',
+    //             'created_at'    => current_time('mysql'),
+    //         ]);
+
+    //         $item_id = $wpdb->insert_id; // ⭐ FIXED
+
+    //         // Insert Ughelli stock
+    //         $wpdb->insert($stock_table, [
+    //             'item_id'   => $item_id,
+    //             'campus_id' => 1,
+    //             'stock'     => $stock_ughelli,
+    //         ]);
+
+    //         // Insert Okuokoko stock
+    //         $wpdb->insert($stock_table, [
+    //             'item_id'   => $item_id,
+    //             'campus_id' => 2,
+    //             'stock'     => $stock_okuokoko,
+    //         ]);
+
+    //         $added++;
+    //     }
+
+    //     wp_send_json_success([
+    //         'added'   => $added,
+    //         'skipped' => $skipped,
+    //         'errors'  => $errors,
+    //     ]);
+    // }
+
     public static function import_books() {
         global $wpdb;
 
@@ -225,92 +320,97 @@ class PCA_Store_Items_Controller {
         $dept_table  = $wpdb->prefix . 'pca_store_departments';
         $stock_table = $wpdb->prefix . 'pca_store_item_stock';
 
-        if (!isset($_FILES['csv_file'])) {
-            wp_send_json_error(['message' => 'No file uploaded']);
+        if ( ! isset( $_FILES['csv_file'] ) ) {
+            wp_send_json_error( ['message' => 'No file uploaded'] );
         }
 
         $file = $_FILES['csv_file']['tmp_name'];
-        $rows = array_map('str_getcsv', file($file));
+        $rows = array_map( 'str_getcsv', file( $file ) );
 
-        if (count($rows) < 2) {
-            wp_send_json_error(['message' => 'CSV is empty']);
+        if ( count( $rows ) < 2 ) {
+            wp_send_json_error( ['message' => 'CSV is empty'] );
         }
 
-        // Get Books department ID
-        $books_dept_id = $wpdb->get_var("
-            SELECT id FROM $dept_table 
-            WHERE LOWER(name) = 'books'
-            LIMIT 1
-        ");
+        $books_dept_id = $wpdb->get_var(
+            "SELECT id FROM $dept_table WHERE LOWER(name) = 'books' LIMIT 1"
+        );
 
-        $header = array_map('trim', $rows[0]);
-        $added = $skipped = $errors = 0;
+        $header  = array_map( 'trim', $rows[0] );
+        $added   = 0;
+        $skipped = 0;
+        $errors  = 0;
 
-        for ($i = 1; $i < count($rows); $i++) {
+        for ( $i = 1; $i < count( $rows ); $i++ ) {
 
-            $row = array_combine($header, $rows[$i]);
-            if (!$row) { $errors++; continue; }
+            $row = array_combine( $header, $rows[$i] );
+            if ( ! $row ) { $errors++; continue; }
 
-            $name  = trim($row['name'] ?? '');
-            $price = floatval($row['selling_price'] ?? 0);
+            $name  = trim( $row['name'] ?? '' );
+            $price = floatval( $row['selling_price'] ?? 0 );
 
-            if (!$name || $price <= 0) {
-                $errors++;
-                continue;
-            }
+            if ( ! $name || $price <= 0 ) { $errors++; continue; }
 
-            // Campus stock
-            $stock_ughelli  = max(0, intval($row['stock_ughelli']  ?? 0));
-            $stock_okuokoko = max(0, intval($row['stock_okuokoko'] ?? 0));
+            $stock_ughelli  = max( 0, intval( $row['stock_ughelli']  ?? 0 ) );
+            $stock_okuokoko = max( 0, intval( $row['stock_okuokoko'] ?? 0 ) );
 
-            // Duplicate check
-            $exists = $wpdb->get_var($wpdb->prepare("
-                SELECT COUNT(*) FROM $items_table
-                WHERE name = %s AND status != 'deleted'
-            ", $name));
+            $exists = $wpdb->get_var( $wpdb->prepare(
+                "SELECT COUNT(*) FROM $items_table WHERE name = %s AND status != 'deleted'",
+                $name
+            ) );
 
-            if ($exists) {
-                $skipped++;
-                continue;
-            }
+            if ( $exists ) { $skipped++; continue; }
 
             // Insert item
-            $wpdb->insert($items_table, [
+            $wpdb->insert( $items_table, [
                 'name'          => $name,
                 'department_id' => $books_dept_id,
                 'item_type'     => 'single',
                 'selling_price' => $price,
-                'class_level'   => trim($row['class_level'] ?? ''),
-                'subject'       => trim($row['subject'] ?? ''),
-                'reorder_level' => intval($row['reorder_level'] ?? 0),
+                'class_level'   => trim( $row['class_level'] ?? '' ),
+                'subject'       => trim( $row['subject']     ?? '' ),
+                'reorder_level' => intval( $row['reorder_level'] ?? 0 ),
                 'status'        => 'active',
-                'created_at'    => current_time('mysql'),
-            ]);
+                'created_at'    => current_time( 'mysql' ),
+            ] );
 
-            $item_id = $wpdb->insert_id; // ⭐ FIXED
+            $item_id = $wpdb->insert_id;
 
-            // Insert Ughelli stock
-            $wpdb->insert($stock_table, [
-                'item_id'   => $item_id,
-                'campus_id' => 1,
-                'stock'     => $stock_ughelli,
-            ]);
+            // Campus config: [ campus_id => qty ]
+            $campuses = [
+                1 => $stock_ughelli,
+                2 => $stock_okuokoko,
+            ];
 
-            // Insert Okuokoko stock
-            $wpdb->insert($stock_table, [
-                'item_id'   => $item_id,
-                'campus_id' => 2,
-                'stock'     => $stock_okuokoko,
-            ]);
+            foreach ( $campuses as $campus_id => $qty ) {
+                // Always seed the stock row at 0 so apply_stock_movement
+                // can read stock_before = 0 and produce an accurate log entry.
+                $wpdb->insert( $stock_table, [
+                    'item_id'   => $item_id,
+                    'campus_id' => $campus_id,
+                    'stock'     => 0,
+                ] );
+
+                if ( $qty > 0 ) {
+                    PCA_Store_Stock_Controller::apply_stock_movement(
+                        $item_id,
+                        $qty,
+                        $campus_id,
+                        'add',
+                        'csv_import',
+                        0,
+                        'Initial stock via CSV import'
+                    );
+                }
+            }
 
             $added++;
         }
 
-        wp_send_json_success([
+        wp_send_json_success( [
             'added'   => $added,
             'skipped' => $skipped,
             'errors'  => $errors,
-        ]);
+        ] );
     }
 
     public static function delete_pack() {

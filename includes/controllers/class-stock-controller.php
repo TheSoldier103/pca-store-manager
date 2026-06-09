@@ -4,6 +4,7 @@ class PCA_Store_Stock_Controller {
 
     public static function init() {
         add_action('wp_ajax_pca_store_add_stock', [__CLASS__, 'add_stock']);
+        add_action('wp_ajax_pca_store_apply_stock_movement', [__CLASS__, 'apply_stock_movement']);
         add_action('wp_ajax_pca_store_damage_stock', [__CLASS__, 'damage_stock']);
         add_action('wp_ajax_pca_store_correct_stock', [__CLASS__, 'correct_stock']);
         add_action('wp_ajax_pca_store_return_stock', [__CLASS__, 'return_stock']);
