@@ -13,10 +13,109 @@ class PCA_Store_Items_Controller {
         add_action('wp_ajax_pca_store_get_book_packs', [__CLASS__, 'get_book_packs']);
         add_action('wp_ajax_pca_store_delete_pack', [__CLASS__, 'delete_pack']);
         add_action('wp_ajax_pca_store_import_books', [__CLASS__, 'import_books']);
+        add_action('wp_ajax_pca_store_import_stationery', [__CLASS__, 'import_stationery']);
         add_action('wp_ajax_pca_store_get_filtered_items', [__CLASS__, 'get_filtered_items']);
         add_action('wp_ajax_pca_store_add_stationery_to_pack', [__CLASS__, 'add_stationery_to_pack']);
         add_action('wp_ajax_pca_store_get_stationery_items', [__CLASS__, 'get_stationery_items']);
 
+    }
+
+    public static function import_stationery() {
+        global $wpdb;
+
+        $items_table = $wpdb->prefix . 'pca_store_items';
+        $dept_table  = $wpdb->prefix . 'pca_store_departments';
+        $stock_table = $wpdb->prefix . 'pca_store_item_stock';
+
+        if ( ! isset( $_FILES['csv_file'] ) ) {
+            wp_send_json_error( ['message' => 'No file uploaded'] );
+        }
+
+        $file = $_FILES['csv_file']['tmp_name'];
+        $rows = array_map( 'str_getcsv', file( $file ) );
+
+        if ( count( $rows ) < 2 ) {
+            wp_send_json_error( ['message' => 'CSV is empty'] );
+        }
+
+        $stationery_dept_id = $wpdb->get_var(
+            "SELECT id FROM $dept_table WHERE LOWER(name) = 'stationery' LIMIT 1"
+        );
+
+        if ( ! $stationery_dept_id ) {
+            wp_send_json_error( ['message' => 'Stationery department not found'] );
+        }
+
+        $header  = array_map( 'trim', $rows[0] );
+        $added   = 0;
+        $skipped = 0;
+        $errors  = 0;
+
+        for ( $i = 1; $i < count( $rows ); $i++ ) {
+
+            $row = array_combine( $header, $rows[$i] );
+            if ( ! $row ) { $errors++; continue; }
+
+            $name  = trim( $row['name'] ?? '' );
+            $price = floatval( $row['selling_price'] ?? 0 );
+
+            if ( ! $name || $price <= 0 ) { $errors++; continue; }
+
+            $stock_ughelli  = max( 0, intval( $row['stock_ughelli']  ?? 0 ) );
+            $stock_okuokoko = max( 0, intval( $row['stock_okuokoko'] ?? 0 ) );
+
+            $exists = $wpdb->get_var( $wpdb->prepare(
+                "SELECT COUNT(*) FROM $items_table WHERE name = %s AND status != 'deleted'",
+                $name
+            ) );
+
+            if ( $exists ) { $skipped++; continue; }
+
+            $wpdb->insert( $items_table, [
+                'name'          => $name,
+                'department_id' => $stationery_dept_id,
+                'item_type'     => 'single',
+                'selling_price' => $price,
+                'reorder_level' => intval( $row['reorder_level'] ?? 0 ),
+                'status'        => 'active',
+                'created_at'    => current_time( 'mysql' ),
+            ] );
+
+            $item_id = $wpdb->insert_id;
+
+            $campuses = [
+                1 => $stock_ughelli,
+                2 => $stock_okuokoko,
+            ];
+
+            foreach ( $campuses as $campus_id => $qty ) {
+                $wpdb->insert( $stock_table, [
+                    'item_id'   => $item_id,
+                    'campus_id' => $campus_id,
+                    'stock'     => 0,
+                ] );
+
+                if ( $qty > 0 ) {
+                    PCA_Store_Stock_Controller::apply_stock_movement(
+                        $item_id,
+                        $qty,
+                        $campus_id,
+                        'add',
+                        'csv_import',
+                        0,
+                        'Initial stock via CSV import'
+                    );
+                }
+            }
+
+            $added++;
+        }
+
+        wp_send_json_success( [
+            'added'   => $added,
+            'skipped' => $skipped,
+            'errors'  => $errors,
+        ] );
     }
 
     public static function get_book_packs() {

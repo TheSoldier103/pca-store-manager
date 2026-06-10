@@ -912,9 +912,58 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    /* =============================================================
+        CSV IMPORT — STATIONERY
+    ============================================================= */
+
+    $(document).on('click', '#pca-import-stationery-btn', function (e) {
+        e.preventDefault();
+        $('#pca-import-stationery-result').html('');
+        $('#pca-import-stationery-modal').show();
+    });
+
+    $(document).on('click', '#pca-close-import-stationery', () => $('#pca-import-stationery-modal').hide());
+
+    $(document).on('click', '#pca-upload-stationery-csv', function (e) {
+        e.preventDefault();
+
+        const file = $('#pca-stationery-csv-file')[0].files[0];
+        if (!file) { alert('Please select a CSV file.'); return; }
+
+        const formData = new FormData();
+        formData.append('action', 'pca_store_import_stationery');
+        formData.append('csv_file', file);
+
+        $('#pca-import-stationery-result').html('<p><em>Importing… please wait.</em></p>');
+
+        $.ajax({
+            url:         ajaxurl,
+            type:        'POST',
+            data:        formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (!response.success) {
+                    $('#pca-import-stationery-result').html(`<p style="color:red;">${response.data.message}</p>`);
+                    return;
+                }
+
+                const r = response.data;
+                $('#pca-import-stationery-result').html(`
+                    <p><strong>Import Complete</strong></p>
+                    <p>Added: ${r.added}</p>
+                    <p>Skipped (duplicates): ${r.skipped}</p>
+                    <p>Errors: ${r.errors}</p>
+                `);
+
+                if (r.added > 0) setTimeout(() => location.reload(), 1500);
+            }
+        });
+    });
+
 
     /* =============================================================
-       CSV IMPORT
+       CSV IMPORT BOOKS
     ============================================================= */
 
     $(document).on('click', '#pca-import-books-btn', function (e) {

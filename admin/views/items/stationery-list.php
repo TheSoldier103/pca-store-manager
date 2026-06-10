@@ -1,6 +1,7 @@
 <h2 class="title">Stationery Items</h2>
 
 <button class="button button-primary" id="pca-add-stationery-btn">Add Stationery Item</button>
+<button class="button" id="pca-import-stationery-btn">Import CSV</button>
 
 <table class="wp-list-table widefat fixed striped">
     <thead>
