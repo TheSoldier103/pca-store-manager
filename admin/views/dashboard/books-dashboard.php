@@ -274,15 +274,15 @@ $low_stock_books = $wpdb->get_results("
 
     <p>
         <strong>Books:</strong>
-        <a href="?page=pca-store-sales&tab=books" class="button button-primary">Record Book Sale</a>
-        <a href="?page=pca-store-stock&tab=add" class="button">Add Book Stock</a>
+        <a href="?page=pca-store-book-sales&tab=books" class="button button-primary">Record Book Sale</a>
+        <a href="?page=pca-store-stock&tab=add-books" class="button">Add Book Stock</a>
         <a href="?page=pca-store-items&tab=books" class="button">Manage Books</a>
     </p>
 
     <p>
         <strong>Stationery:</strong>
-        <a href="?page=pca-store-sales&tab=stationery" class="button button-primary">Record Stationery Sale</a>
-        <a href="?page=pca-store-stock&tab=add" class="button">Add Stationery Stock</a>
+        <a href="?page=pca-store-book-sales&tab=stationery" class="button button-primary">Record Stationery Sale</a>
+        <a href="?page=pca-store-stock&tab=add-stationery" class="button">Add Stationery Stock</a>
         <a href="?page=pca-store-items&tab=stationery" class="button">Manage Stationery</a>
     </p>
 </div>
