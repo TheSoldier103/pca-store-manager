@@ -183,15 +183,3 @@ $action_nonce = wp_create_nonce( 'pca_item_action' );
     </div>
 <?php endif; ?>
 
-
-<div id="pca-import-stationery-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:24px; z-index:9999; border:1px solid #ccd0d4; box-shadow:0 4px 20px rgba(0,0,0,.15); min-width:340px;">
-    <h3>Import Stationery CSV</h3>
-    <p style="color:#666; font-size:13px;">
-        Required columns: <code>name</code>, <code>selling_price</code>, <code>reorder_level</code>,
-        <code>stock_ughelli</code>, <code>stock_okuokoko</code>
-    </p>
-    <input type="file" id="pca-stationery-csv-file" accept=".csv"><br><br>
-    <button class="button button-primary" id="pca-upload-stationery-csv">Import</button>
-    <button class="button" id="pca-close-import-stationery">Cancel</button>
-    <div id="pca-import-stationery-result" style="margin-top:12px;"></div>
-</div>
