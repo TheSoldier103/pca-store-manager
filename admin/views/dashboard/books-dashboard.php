@@ -100,6 +100,15 @@ $kpi_owed_books = $wpdb->get_var("
     " . pca_campus_filter( $selected_campus, 'oi' ) . "
 ") ?: 0;
 
+// 7. Total Stationery Stock Value
+$kpi_stationery_stock_value = $wpdb->get_var("
+    SELECT SUM(st.stock * i.selling_price)
+    FROM {$wpdb->prefix}pca_store_item_stock st
+    INNER JOIN {$wpdb->prefix}pca_store_items i ON i.id = st.item_id
+    WHERE i.department_id = $dept_stationery
+    " . pca_campus_filter( $selected_campus, 'st' ) . "
+") ?: 0;
+
 /* ============================================================
    KPI QUERIES — STATIONERY
 ============================================================ */
@@ -254,7 +263,7 @@ $low_stock_books = $wpdb->get_results("
 
     <div class="pca-kpi-card">
         <h3>Total Stationery Stock Value</h3>
-        <div class="value">₦<?php echo number_format($kpi_stock_value, 2); ?></div>
+        <div class="value">₦<?php echo number_format($kpi_stationery_stock_value, 2); ?></div>
     </div>
 
 </div>
