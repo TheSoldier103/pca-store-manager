@@ -99,8 +99,8 @@ $type_labels = [
 
 <div class="pca-filters" style="margin-bottom:12px;">
     <form method="get" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
-        <input type="hidden" name="page" value="<?php echo esc_attr( $_GET['page'] ?? 'pca-store-items' ); ?>">
-        <input type="hidden" name="tab"  value="movements">
+        <input type="hidden" name="page" value="<?php echo esc_attr( $_GET['page'] ?? 'pca-store-stock' ); ?>">
+        <input type="hidden" name="tab"  value="history">
         <input type="hidden" name="paged" value="1">
 
         <div>
