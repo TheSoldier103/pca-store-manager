@@ -1,7 +1,7 @@
 <?php $fixed_campus = PCA_Store_Helpers::get_user_campus(); ?>
 
 <form method="get">
-    <input type="hidden" name="page" value="pca-store-sales">
+    <input type="hidden" name="page" value="pca-store-book-sales">
     <input type="hidden" name="tab" value="recent">
 
     <?php if (!$fixed_campus): ?>
