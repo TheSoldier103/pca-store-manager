@@ -107,6 +107,7 @@ class PCA_Store_Sales_Controller {
         $sale_items_table = $wpdb->prefix . 'pca_store_sale_items';
         $stock_table      = $wpdb->prefix . 'pca_store_item_stock';
         $owed_table       = $wpdb->prefix . 'pca_store_owed_items';
+        $dept_table       = $wpdb->prefix . 'pca_store_departments';
 
         $item_id        = intval($_POST['item_id']);
         $qty_requested  = intval($_POST['qty']);
@@ -115,7 +116,7 @@ class PCA_Store_Sales_Controller {
         $receipt_no     = sanitize_text_field($_POST['receipt_no']);
         $payment_method = sanitize_text_field($_POST['payment_method']);
         $notes          = sanitize_text_field($_POST['notes']);
-        $department     = sanitize_text_field($_POST['department']);
+        $department     = sanitize_text_field($_POST['department']); // still the code/name from the form
         $campus_id      = intval($_POST['campus_id']);
 
         if (!$item_id || $qty_requested <= 0) {
@@ -127,6 +128,26 @@ class PCA_Store_Sales_Controller {
         }
 
         // ---------------------------------------------------------
+        // RESOLVE DEPARTMENT ID
+        // ---------------------------------------------------------
+        // Try matching by code first, fall back to name
+        $department_id = intval($wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $dept_table WHERE code = %s AND is_active = 1 LIMIT 1",
+            $department
+        )));
+
+        if (!$department_id) {
+            $department_id = intval($wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM $dept_table WHERE name = %s AND is_active = 1 LIMIT 1",
+                $department
+            )));
+        }
+
+        if (!$department_id) {
+            wp_send_json_error(['message' => "Unknown department: $department"]);
+        }
+
+        // ---------------------------------------------------------
         // 1. GET CURRENT STOCK
         // ---------------------------------------------------------
         $available_stock = intval($wpdb->get_var($wpdb->prepare(
@@ -135,7 +156,7 @@ class PCA_Store_Sales_Controller {
         )));
 
         // ---------------------------------------------------------
-        // 2. CALCULATE Owed + Deductable
+        // 2. CALCULATE Owed + Deductible
         // ---------------------------------------------------------
         $qty_to_deduct = min($qty_requested, $available_stock);
         $qty_owed      = max(0, $qty_requested - $available_stock);
@@ -143,12 +164,15 @@ class PCA_Store_Sales_Controller {
         // ---------------------------------------------------------
         // 3. INSERT SALE
         // ---------------------------------------------------------
-        $total_amount = ($price * $qty_requested) - $discount;
+        $subtotal     = $price * $qty_requested;
+        $total_amount = $subtotal - $discount;
 
         $wpdb->insert($sales_table, [
             'receipt_no'     => $receipt_no,
             'sale_date'      => current_time('mysql'),
-            'department'     => $department,
+            'department_id'  => $department_id,   // ← fixed
+            'subtotal'       => $subtotal,         // ← new column in schema
+            'discount'       => $discount,         // ← new column in schema
             'total_amount'   => $total_amount,
             'amount_paid'    => $total_amount,
             'balance'        => 0,
